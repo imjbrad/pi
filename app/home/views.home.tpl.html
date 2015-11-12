@@ -1,0 +1,26 @@
+<div id="Space" ng-controller="HomeController">
+    <div id="CircleSpace" ng-class="{'single-day-view': (view == 'single-day-view'), 'multi-day-view': (view == 'multi-day-view')}">
+        <div id="big-day">
+            <div class="little-day"><task-donut tag="M" index="1"></task-donut></div>
+            <div class="little-day"><task-donut tag="T" index="2"></task-donut></div>
+            <div class="little-day"><task-donut tag="W" index="3"></task-donut></div>
+            <div class="little-day"><task-donut tag="TH" index="4"></task-donut></div>
+            <div class="little-day"><task-donut tag="F" index="5"></task-donut></div>
+            <div class="little-day"><task-donut tag="S" index="6"></task-donut></div>
+            <task-donut index="7"></task-donut>
+        </div>
+    </div>
+    <div id="TaskSpace">
+        <form name="newTaskForm" ng-submit="createNewTask()">
+            <input id="header" ng-model="newTaskName" autocomplete="off" name="newTaskNameInput" type="text" placeholder="TODAY:" />
+        </form>
+        <ul id="taskList" ui-sortable="sortableOptions" ng-model="taskData.tasks">
+            <li ng-repeat="task in taskData.tasks">
+                <div class="task-item {{ task.taskType }}">{{ task.name + "-" + task.angleSize}}</div>
+            </li>
+        </ul>
+    </div>
+</div>
+<footer>
+
+</footer>

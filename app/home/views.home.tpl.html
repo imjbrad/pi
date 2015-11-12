@@ -1,13 +1,7 @@
-<div id="Space" ng-controller="HomeController">
-    <div id="CircleSpace" ng-class="{'single-day-view': (view == 'single-day-view'), 'multi-day-view': (view == 'multi-day-view')}">
+<div id="Space" class="just-circle" ng-controller="HomeController">
+    <div id="CircleSpace" class="single-day-view" ng-class="{'single-day-view': (view == 'single-day-view'), 'multi-day-view': (view == 'multi-day-view')}">
         <div id="big-day">
-            <div class="little-day"><task-donut tag="M" index="1"></task-donut></div>
-            <div class="little-day"><task-donut tag="T" index="2"></task-donut></div>
-            <div class="little-day"><task-donut tag="W" index="3"></task-donut></div>
-            <div class="little-day"><task-donut tag="TH" index="4"></task-donut></div>
-            <div class="little-day"><task-donut tag="F" index="5"></task-donut></div>
-            <div class="little-day"><task-donut tag="S" index="6"></task-donut></div>
-            <task-donut index="7"></task-donut>
+            <task-donut index="1"></task-donut>
         </div>
     </div>
     <div id="TaskSpace">
@@ -21,6 +15,6 @@
         </ul>
     </div>
 </div>
-<footer>
+<!--<footer>-->
 
-</footer>
+<!--</footer>-->

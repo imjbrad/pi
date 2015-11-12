@@ -30,14 +30,15 @@ angular.module('app.controllers.home', ["ui.sortable"])
             tasks: [
 
                 {
-                    name: "Build church project home page",
-                    angleSize: Math.floor(Math.random() * (60 - 20 + 1)) + 20,
-                    color: "#f9b978"
-                },
-                {
                     name: "Polish cirque app screens",
                     angleSize: Math.floor(Math.random() * (60 - 20 + 1)) + 20,
                     color: "#f97340"
+                },
+                {
+                    name: "Build church project home page",
+                    angleSize: Math.floor(Math.random() * (60 - 20 + 1)) + 20,
+                    taskType: "standardBreak"
+
                 },
                 {
                     name: "Read african american history book",
@@ -81,7 +82,9 @@ angular.module('app.controllers.home', ["ui.sortable"])
             console.log("setting multi-day-view")
         }
 
-        function _setSingleDayView(){}
+        function _setSingleDayView(){
+            console.log("setting multi-day-view")
+        }
 
         $scope.setView = function(view) {
             $scope.view = view;
@@ -93,10 +96,6 @@ angular.module('app.controllers.home', ["ui.sortable"])
             }
         };
 
-        $timeout(function(){
-            $scope.setView("multi-day-view");
-        });
-
         $scope.sortableOptions = {
             update: function(event) {
                 $timeout(function () {
@@ -107,7 +106,7 @@ angular.module('app.controllers.home', ["ui.sortable"])
             out: function(){
                 $timeout(function () {
                     //$scope.view = "multi-day-view";
-                    $scope.setView("multi-day-view");
+                    //$scope.setView("multi-day-view");
 
                 })
             },

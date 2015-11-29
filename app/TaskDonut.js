@@ -12,11 +12,12 @@ var TaskDonut = function(svgArea, _tasks){
     var drawCircle;
     var drawTasks;
     var drawingArea = svgArea;
-
-    var patternImg = drawingArea.image("/assets/dark-stripes.png", 0, 0, 25, 25).attr({"opacity": .25});
-    var pattern = patternImg.toPattern(0, 0, 25, 25);
+    var pattern, patternImg;
 
     init = function(){
+
+        patternImg = drawingArea.image("/assets/dark-stripes.png", 0, 0, 25, 25).attr({"opacity": .35});
+        pattern = patternImg.toPattern(0, 0, 25, 25);
 
         self.tasks = self.tasks || _tasks;
         self.drawingArea = drawingArea;
@@ -149,7 +150,7 @@ var TaskDonut = function(svgArea, _tasks){
          * what you need at a particular instant or moment
          * in your life, then with your voice, shaping the
          * medium and fashioining it into the thing you need,
-         * the thing you want to see. Therefore you spent time
+         * the thing you want to see. Therefore you spend time
          * with it. As you make it the thing you need, you
          * think more and more about what that thing really is
          * and what that thing is at its core- you're foreced to

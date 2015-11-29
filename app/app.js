@@ -2,8 +2,9 @@
 
 // Declare app level module which depends on views, and components
 angular.module('app', [
-  'ui.router',
-  'app.controllers.home'
+    'ui.router',
+    'app.controllers.home',
+    'app.emojipicker'
 ])
 
 .config(function($stateProvider, $urlRouterProvider) {

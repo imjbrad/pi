@@ -226,7 +226,7 @@ var TaskSlice = function(TaskDonut, segmentIndex) {
             self.innerStartingVectorLine.attr({"stroke-width": 0});
             self.innerTerminalVectorLine.attr({"stroke-width": 0});
             self.slice.attr({"fill": sleepGradient, opacity: 1, 'stroke-width': 0});
-            self.innerSlice.attr({"fill": sleepGradient, opacity: .05, 'stroke-width': 0});
+            self.innerSlice.attr({"fill": sleepGradient, opacity: .067, 'stroke-width': 0});
         }
 
     };
@@ -312,15 +312,17 @@ var TaskSlice = function(TaskDonut, segmentIndex) {
             if(ghost_group){
                 ghost_group.remove();
                 ghost_group = null;
+
+                //reshow the slice
+                var animationAttributes = {opacity: 1};
+                self.innerSlice.attr(animationAttributes);
+                self.slice.attr(animationAttributes);
+                self.emoji.attr(animationAttributes);
+
+                dropCanceled = true;
+
             }
 
-            //reshow the slice
-            var animationAttributes = {opacity: 1};
-            self.innerSlice.attr(animationAttributes);
-            self.slice.attr(animationAttributes);
-            self.emoji.attr(animationAttributes);
-
-            dropCanceled = true;
         }
     };
 

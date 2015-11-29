@@ -1,13 +1,38 @@
 /**
  * Created by jordanbradley on 10/22/15.
  */
+function findRelativeMousePoints(mx, my, TaskDonut){
+    //translate the mouse coordinates to the svg viewbox coordinates
+    var root = TaskDonut.svgNode[0];
+
+    var mousePoint = root.createSVGPoint();
+    mousePoint.x = mx;
+    mousePoint.y = my;
+
+    return mousePoint.matrixTransform(root.getScreenCTM().inverse());
+}
+
 var TaskSlice = function(TaskDonut, segmentIndex) {
 
     //private
     var self = this;
-    var resizeSlice;
+    var resizeTaskSliceByDraggingHandle;
+    var dragTaskSliceByEmoji;
+    var stopDraggingTaskSliceByEmoji;
+    var cancelledTaskSliceDropInBucket;
+    var successfulTaskDropInBucket;
     var init;
     var HANDLE_SLICE_SIZE = 10;
+    var ghost_circle;
+    var ghost_emoji;
+    var ghost_emoji_width = 7;
+    var ghost_group;
+    var dropCanceled;
+
+    var patternImg = TaskDonut.drawingArea.image("/assets/dark-stripes.png", 0, 0, 25, 25).attr({opacity:.15});
+    var pattern = patternImg.toPattern(0, 0, 25, 25);
+
+    var sleepGradient = TaskDonut.drawingArea.gradient("l(0, 0, 1, 0)#F8B978-#5C6879");
 
     //exposed
     self.sliceIndex = segmentIndex;
@@ -29,7 +54,7 @@ var TaskSlice = function(TaskDonut, segmentIndex) {
         self.startingAngle = self.drawingAngles["startingAngle"];
         self.terminalAngle = self.drawingAngles["terminalAngle"];
 
-        self.innerSliceRadius = TaskDonut.radius/1.03;
+        self.innerSliceRadius = TaskDonut.radius/1.017;
         self.emojiRadius =  self.innerSliceRadius/1.1;
 
         var startingVector = [
@@ -161,35 +186,47 @@ var TaskSlice = function(TaskDonut, segmentIndex) {
         var innerMoveTo = "M"+TaskDonut.centerX+","+TaskDonut.centerY;
         var innerLineTo = "L"+self.innerStartingVector[2]+","+self.innerStartingVector[3];
         var innerArc = "A"+self.innerSliceRadius+","+self.innerSliceRadius+" 0 "+sweep+" 1 "+self.innerTerminalVector[2]+","+self.innerTerminalVector[3]+" z";
-        var innerFill = "white";
         var emojiSlice = [innerMoveTo, innerLineTo, innerArc].join(" ");
 
         //emoji image
+        self.emoji_uri = self.task.emoji;
+
         if(self.emoji){
             self.emoji.remove();
         }
-        var emojiWidth = 7,
-            emojiHeight = emojiWidth;
-        var emojiX = self.emojiVector[2] - (emojiWidth/2);
-        var emojiY = self.emojiVector[3] - (emojiWidth/2);
-        var emojiCenterX = emojiX + (emojiWidth/2);
-        var emojiCenterY = emojiY + (emojiHeight/2);
 
-        self.emoji = TaskDonut.drawingArea.image("/assets/emojis/72x72/1f1e9.png", emojiX, emojiY, emojiWidth, emojiHeight);
-        self.emoji.attr({transform: "rotate("+(-TaskDonut.angle_offset) + " " + emojiCenterX +" "+ emojiCenterY +")"});
-        TaskDonut.donut_group.add(self.emoji);
-        self.emoji.drag(resizeSlice);
+        if(self.emoji_uri){
+            var emojiWidth = 7,
+                emojiHeight = emojiWidth;
+            var emojiX = self.emojiVector[2] - (emojiWidth/2);
+            var emojiY = self.emojiVector[3] - (emojiWidth/2);
+            var emojiCenterX = emojiX + (emojiWidth/2);
+            var emojiCenterY = emojiY + (emojiHeight/2);
+
+            self.emoji = TaskDonut.drawingArea.image("/assets/emojis/72x72/"+self.emoji_uri+".png", emojiX, emojiY, emojiWidth, emojiHeight);
+            self.emoji.attr({transform: "rotate("+(-TaskDonut.angle_offset) + " " + emojiCenterX +" "+ emojiCenterY +")"});
+            TaskDonut.donut_group.add(self.emoji);
+
+            self.emoji.drag(dragTaskSliceByEmoji, null, stopDraggingTaskSliceByEmoji);
+        }
 
         //apply attributes
-        self.innerStartingVectorLine.attr({x1: TaskDonut.centerX, y1: TaskDonut.centerY, x2: self.innerStartingVector[2], y2: self.innerStartingVector[3], stroke:"#cccccc", "stroke-width":.25});
-        self.innerTerminalVectorLine.attr({x1: TaskDonut.centerX, y1: TaskDonut.centerY, x2: self.innerTerminalVector[2], y2: self.innerTerminalVector[3], stroke:"#cccccc", "stroke-width":.25});
+        self.innerStartingVectorLine.attr({x1: TaskDonut.centerX, y1: TaskDonut.centerY, x2: self.innerStartingVector[2], y2: self.innerStartingVector[3], stroke:"#ededed", "stroke-width":.25});
+        self.innerTerminalVectorLine.attr({x1: TaskDonut.centerX, y1: TaskDonut.centerY, x2: self.innerTerminalVector[2], y2: self.innerTerminalVector[3], stroke:"#ededed", "stroke-width":.25});
         self.slice.attr({"d": categorySlice, stroke:"transparent", "stroke-width":.25, "fill":fill});
-        self.innerSlice.attr({"d": emojiSlice, stroke:"white", "stroke-width":.25, "fill":innerFill});
+        self.innerSlice.attr({"d": emojiSlice, stroke:"white", "stroke-width":.25, "fill": "white"});
 
         //apply special types
         if(self.task.taskType && self.task.taskType == "standardBreak"){
-            self.slice.attr({"fill": "#5b6778"});
-            self.innerSlice.attr({"fill": "transparent"});
+            self.slice.attr({"fill": pattern, 'stroke-width': 0});
+            self.innerSlice.attr({"fill": "transparent", 'stroke-width': 0});
+        }
+
+        if(self.task.taskType && self.task.taskType == "standardSleep"){
+            self.innerStartingVectorLine.attr({"stroke-width": 0});
+            self.innerTerminalVectorLine.attr({"stroke-width": 0});
+            self.slice.attr({"fill": sleepGradient, opacity: 1, 'stroke-width': 0});
+            self.innerSlice.attr({"fill": sleepGradient, opacity: .05, 'stroke-width': 0});
         }
 
     };
@@ -200,6 +237,7 @@ var TaskSlice = function(TaskDonut, segmentIndex) {
         if(self.handle){
             self.handle.remove();
         }
+
         self.handle = TaskDonut.drawingArea.path();
 
         //handle slice
@@ -210,13 +248,83 @@ var TaskSlice = function(TaskDonut, segmentIndex) {
 
         self.handle.attr({"d": handleSlice, "fill":"transparent", "opacity": 0.4});
 
+        self.handle.drag(resizeTaskSliceByDraggingHandle);
         TaskDonut.donut_group.add(self.handle);
-
-        self.handle.drag(resizeSlice);
 
     };
 
-    resizeSlice = function(dx, dy, mx, my){
+
+
+    dragTaskSliceByEmoji = function(dx, dy, mx, my){
+        TaskDonut.bucket_ring.show();
+
+        dropCanceled = false;
+        var relativeMouse = findRelativeMousePoints(mx, my, TaskDonut, self.slice);
+
+        //hide the slice
+        var animationAttributes = {opacity: 0};
+        self.innerSlice.attr(animationAttributes);
+        self.slice.attr(animationAttributes);
+        self.emoji.attr(animationAttributes);
+
+        //turn the task into a circle
+        var cx = relativeMouse.x + 3,
+            cy = relativeMouse.y - 3,
+            r = 8;
+
+        var path = "M "+cx+" "+cy+" m "+(-r)+", 0 a "+r+","+r+" 0 1,0 "+(r * 2)+",0 a "+r+","+r+" 0 1,0"+(-r * 2)+",0";
+
+        if(!ghost_group){
+            ghost_circle = TaskDonut.drawingArea.path();
+            var ghost_emoji_box = self.emoji.getBBox();
+            ghost_emoji = TaskDonut.drawingArea.image("/assets/emojis/72x72/"+self.emoji_uri+".png", ghost_emoji_box.x, ghost_emoji_box.y, ghost_emoji_box.w, ghost_emoji_box.h);
+
+            ghost_group = TaskDonut.drawingArea.group();
+            ghost_group.add(ghost_circle, ghost_emoji);
+        }
+
+        ghost_emoji.attr({"x": cx-(ghost_emoji_width/2), "y": cy-(ghost_emoji_width/2), "width": ghost_emoji_width, "height": ghost_emoji_width}) ;
+        ghost_circle.attr({"d": path, stroke: self.task.color, "stroke-width": 1, "fill":"white"});
+
+        //broadcast that the task is dragging
+        eve("taskSliceIsDragging", {}, self, relativeMouse.x, relativeMouse.y);
+
+    };
+
+    stopDraggingTaskSliceByEmoji = function(e){
+        TaskDonut.bucket_ring.hide();
+
+        var relativeMouse = findRelativeMousePoints(e.x, e.y, TaskDonut, self.slice);
+        eve("taskSliceStoppedDragging", {}, self, relativeMouse.x, relativeMouse.y);
+    };
+
+    successfulTaskDropInBucket = function(){
+        if(ghost_group){
+            dropCanceled = false;
+            ghost_group.remove();
+            ghost_group = null;
+        }
+    };
+
+    cancelledTaskSliceDropInBucket = function(){
+        if(!dropCanceled){
+
+            if(ghost_group){
+                ghost_group.remove();
+                ghost_group = null;
+            }
+
+            //reshow the slice
+            var animationAttributes = {opacity: 1};
+            self.innerSlice.attr(animationAttributes);
+            self.slice.attr(animationAttributes);
+            self.emoji.attr(animationAttributes);
+
+            dropCanceled = true;
+        }
+    };
+
+    resizeTaskSliceByDraggingHandle = function(dx, dy, mx, my){
 
        //translate the mouse coordinates to the svg viewbox coordinates
         var root = TaskDonut.svgNode[0];
@@ -229,7 +337,6 @@ var TaskSlice = function(TaskDonut, segmentIndex) {
 
         if (ctm = ctm.inverse()){
             var relativeMousePoint = mousePoint.matrixTransform(ctm);
-            console.log(mx, relativeMousePoint.x);
         }
 
         var relative_mx = relativeMousePoint.x;
@@ -240,7 +347,6 @@ var TaskSlice = function(TaskDonut, segmentIndex) {
 
         var mouseAngle = Math.atan2(relative_my - relative_center_y, relative_mx - relative_center_x).mod(2*Math.PI);
 
-        console.log(mouseAngle);
 
         var newLocalTheta = (Snap.deg((mouseAngle - self.terminalAngle)) + self.localAngle);
 
@@ -251,7 +357,11 @@ var TaskSlice = function(TaskDonut, segmentIndex) {
 
     };
 
-
+    /*
+    * Eve
+    * */
+    eve.on("cancelledTaskSliceDropInBucket"+self.sliceIndex, cancelledTaskSliceDropInBucket);
+    eve.on("successfulTaskDropInBucket"+self.sliceIndex, successfulTaskDropInBucket);
 
     init();
 

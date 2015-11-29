@@ -30,15 +30,21 @@ html, body {
 #TaskSpace, #CircleSpace{
   float: left;
   height: 100%;
+  position: relative;
 }
 
 .TaskDonut{
   overflow: visible;
-  border: 0px solid transparent;
-  border-radius: 50%;
-  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.25);
-  background-color: rgba(255, 255, 255, .5);
-  background-image: url("/assets/dark-stripes.png");
+
+  &:before{
+    content: "";
+    display: block;
+    border: 0px solid transparent;
+    border-radius: 50%;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.25);
+    width: 45%;
+    height: 45%;
+  }
 }
 
 #TaskSpace{
@@ -101,41 +107,18 @@ html, body {
     -webkit-transition: all .4s;
   }
 
-  .little-day{
+  #toggleListButton{
+    width: 40px;
+    height: 40px;
+    display: block;
     position: absolute;
-    -webkit-transition: height, width, -webkit-transform .4s;
-  }
-
-  #big-day, .little-day{
-    -webkit-transform-origin: 50% 50%;
-    //border: 1px solid red;
-  }
-
-  &.multi-day-view{
-
-    #big-day{
-      -webkit-transform: translateY(14vw);
-      height: 24vw;
-      width: 24vw;
-
-      //arrange in a circle
-      .little-day {
-
-        opacity: 1;
-        border: none;
-        height: 8.7vw;
-        width: 8.7vw;
-
-        &:nth-of-type(1) {  top: 0;  -webkit-transform: translateX(-79%) translateY(184%)  }
-        &:nth-of-type(2) {  top: 0;  -webkit-transform: translateX(-107%) translateY(83%)  }
-        &:nth-of-type(3) {  top: 0;  -webkit-transform: translateX(-74%) translateY(-19%)  }
-        &:nth-of-type(4) {  top: 0;  -webkit-transform: translateY(-92%) translateX(8%)  }
-        &:nth-of-type(5) {  top: 0;  -webkit-transform: translateX(117%) translateY(-109%)  }
-        &:nth-of-type(6) {  top: 0;  -webkit-transform: translateX(214%) translateY(-67%)  }
-      }
-
-    }
-
+    right: 0;
+    top: 15%;
+    cursor: pointer;
+    background-image: url('../../assets/list.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: right center;
   }
 
   &.single-day-view{
@@ -144,15 +127,6 @@ html, body {
       -webkit-transform: translateY(6vw);
       height: 38vw;
       width: 38vw;
-
-      .little-day{
-        -webkit-transform: translateX(0) translateY(0);
-        top: 0;
-        opacity: 0;
-        height: 0;
-        width: 0;
-      }
-
     }
 
 
@@ -181,4 +155,16 @@ footer{
   height: $footer-size;
   width: 100vw;
   background-color: $sleep-blue;
+}
+
+
+g.dragOver {
+
+  path {
+    stroke: red;
+  }
+
+  text {
+    stroke: black;
+  }
 }

@@ -4,9 +4,6 @@ angular.module('app.controllers.home', ["ui.sortable"])
 
     .controller('HomeController', function ($scope, $timeout, $filter) {
 
-        var week,
-            privateTasks = [];
-
         Number.prototype.mod = function(n) {
             return ((this%n)+n)%n;
         };
@@ -32,23 +29,25 @@ angular.module('app.controllers.home', ["ui.sortable"])
                 {
                     name: "Polish cirque app screens",
                     angleSize: Math.floor(Math.random() * (60 - 20 + 1)) + 20,
-                    color: "#f97340"
+                    color: "#f97340",
+                    emoji: "1f62d"
                 },
                 {
                     name: "Build church project home page",
                     angleSize: Math.floor(Math.random() * (60 - 20 + 1)) + 20,
                     taskType: "standardBreak"
-
                 },
                 {
                     name: "Read african american history book",
                     angleSize: Math.floor(Math.random() * (60 - 20 + 1)) + 20,
-                    color: "#f9b978"
+                    color: "#f9b978",
+                    emoji: "1f4f1"
                 },
                 {
                     name: "Eat Breakfast",
                     angleSize: Math.floor(Math.random() * (60 - 20 + 1)) + 20,
-                    color: "#f97340"
+                    color: "#f97340",
+                    emoji: "1f34b"
                 }
             ]
         };

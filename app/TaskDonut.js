@@ -13,6 +13,9 @@ var TaskDonut = function(svgArea, _tasks){
     var drawTasks;
     var drawingArea = svgArea;
 
+    var patternImg = drawingArea.image("/assets/dark-stripes.png", 0, 0, 25, 25).attr({"opacity": .25});
+    var pattern = patternImg.toPattern(0, 0, 25, 25);
+
     init = function(){
 
         self.tasks = self.tasks || _tasks;
@@ -23,6 +26,8 @@ var TaskDonut = function(svgArea, _tasks){
 
         validateTasks();
         determineSize();
+
+        self.bucket_ring = new BucketRing(self);
         self.draw();
     };
 
@@ -57,14 +62,18 @@ var TaskDonut = function(svgArea, _tasks){
     determineSize = function(){
         self.svgNode = $(self.drawingArea.node);
 
-        self.outerRadius = 100;
+        self.categoryOuterRadius = 100;
+        self.categoryInnerRadius = self.categoryOuterRadius/1.17;
+
+        self.outerRadius = self.categoryInnerRadius/1.06;
         self.radius = self.outerRadius/1.01;
         self.innerSliceRadius = self.radius/1.26;
 
-        self.pictureRadius = self.innerSliceRadius/1.03;
+        self.pictureRadius = self.innerSliceRadius/1.02;
 
-        self.centerX = self.outerRadius;
-        self.centerY = self.outerRadius;
+        self.centerX = self.categoryOuterRadius;
+        self.centerY = self.categoryOuterRadius;
+
     };
 
     self.draw = function(){
@@ -86,16 +95,16 @@ var TaskDonut = function(svgArea, _tasks){
 
         //outermost ring, white border
         var outerCircle = drawingArea.circle();
-        var shadow = drawingArea.filter(Snap.filter.shadow(0, 0, 2, "black", .35));
+        var shadow = drawingArea.filter(Snap.filter.shadow(0, 0, 2, "black", .17));
         outerCircle.attr({"cx":self.centerX, "cy":self.centerY, "r":self.outerRadius, "fill": "white"});
 
+        outerCircle.attr({filter: shadow});
+
         //task ring, categories
-        var patternImg = drawingArea.image("/assets/dark-stripes.png", 0, 0, 25, 25).attr({"opacity": .25});
-        var pattern = patternImg.toPattern(0, 0, 25, 25);
         var circle = drawingArea.circle();
         circle.attr({"cx":self.centerX, "cy":self.centerY, "r":self.radius, "fill": pattern});
 
-        //mask
+        //create mask
         var donutMaskCircle = drawingArea.circle(self.centerX, self.centerY, self.outerRadius+5).attr({"fill":"white"});
         var donutMaskInnerCircle = drawingArea.circle(self.centerX, self.centerY, self.innerSliceRadius);
         var donutMask = drawingArea.g().add(donutMaskCircle, donutMaskInnerCircle);
@@ -115,11 +124,47 @@ var TaskDonut = function(svgArea, _tasks){
             self.slices[index].draw();
         });
 
-        //draw handles
-        self.slices.forEach(function(element, index, array){
+        //draw task slice handles
+        /*
+        * It never occured to me that I could
+        * love code. --not love code like loving
+        * the activity of programming. It's occuring
+        * to me right now that I love the code itself
+        * -- the list of commands to the computer.
+        * The amount of time i've spent with this code,
+        * imagining all the things it could do,
+        * embracing it as a material that is allowing
+        * me to learn more about myself and the way
+        * I go about each day. While the code itself
+        * make up a list of commands, it's actually
+        * a medium-- when the subject matter has
+         * made itself such a personal product,
+         * the code is really just my extended voice.
+         * In a lot of ways it is a bookmark of what
+         * I am telling myself I need at a point in life
+         * When you program something you're telling the
+         * computer what you need- whether you need a basic
+         * calculator, or in this case a personal
+         * daily planner, you are first recgonizing
+         * what you need at a particular instant or moment
+         * in your life, then with your voice, shaping the
+         * medium and fashioining it into the thing you need,
+         * the thing you want to see. Therefore you spent time
+         * with it. As you make it the thing you need, you
+         * think more and more about what that thing really is
+         * and what that thing is at its core- you're foreced to
+         * understnad the solution to the problem you are experiencing
+         * in your life at that time. You are litterally working
+         * through a problem. In that, just code can be
+         * a deeply personal medium... it can be a documentation
+         * of a moment in ones life.
+        * */
+
+         self.slices.forEach(function(element, index, array){
             self.slices[index].drawHandle();
         });
 
+        //apply masks
         self.donut_group.attr({mask: donutMask});
         self.donut_group.attr({transform: "rotate("+self.angle_offset + " " + self.centerX +" "+self.centerY+")"});
 
@@ -133,6 +178,14 @@ var TaskDonut = function(svgArea, _tasks){
         //
         //self.coverGroup.add(self.coverCircle, self.svgCoverText);
         //self.coverGroup.node.style.display = "none";
+
+    };
+
+    self.showWeeklyBuckets = function(){
+
+    };
+
+    self.hideWeeklyBuckets = function(){
 
     };
 

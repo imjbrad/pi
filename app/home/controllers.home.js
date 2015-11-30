@@ -12,13 +12,11 @@ angular.module('app.controllers.home', ["ui.sortable"])
             return deg * Math.PI / 180;
         };
 
-        $scope.taskDonuts = [];
+        $scope.selectedEmoji = null;
+        $scope.selectedTask = null;
+        $scope.showListView = false;
 
-        $scope.redrawDonuts = function(){
-            $scope.taskDonuts.forEach(function(donut, index, array){
-                donut.updateTasks($scope.taskData.tasks);
-            });
-        };
+        $scope.taskDonuts = [];
 
         $scope.taskData = {
             info: {
@@ -26,30 +24,12 @@ angular.module('app.controllers.home', ["ui.sortable"])
             },
             tasks: [
 
-                {
-                    name: "Polish cirque app screens",
-                    angleSize: Math.floor(Math.random() * (60 - 20 + 1)) + 20,
-                    color: "#f97340",
-                    emoji: "1f62d"
-                },
-                {
-                    name: "Build church project home page",
-                    angleSize: Math.floor(Math.random() * (60 - 20 + 1)) + 20,
-                    taskType: "standardBreak"
-                },
-                {
-                    name: "Read african american history book",
-                    angleSize: Math.floor(Math.random() * (60 - 20 + 1)) + 20,
-                    color: "#f9b978",
-                    emoji: "1f4f1"
-                },
-                {
-                    name: "Eat Breakfast",
-                    angleSize: Math.floor(Math.random() * (60 - 20 + 1)) + 20,
-                    color: "#f97340",
-                    emoji: "1f34b"
-                }
             ]
+        };
+
+        $scope.selectTask = function(i){
+            $scope.selectedTask = $scope.taskData.tasks[i];
+            $scope.selectedTaskIndex = i;
         };
 
         $scope.taskFilter = function(task, index, array){
@@ -64,25 +44,23 @@ angular.module('app.controllers.home', ["ui.sortable"])
                 color: "#f97340"
             };
 
-            $scope.tasks.push(newTask);
+            $scope.taskData.tasks.push(newTask);
             $scope.newTaskName = "";
+            $scope.selectTask($scope.taskData.tasks.length-1);
+            $scope.taskDonuts[0].redraw();
+        };
+
+        $scope.toggleListView = function(){
+            $scope.showListView = !$scope.showListView;
+            console.log("List View: "+$scope.showListView);
         };
 
         function _setMultiDayView() {
 
-            $scope.littleDays = $filter('filter')($scope.taskDonuts, function(donut, index, array){
-                return donut.index >= 1 && donut.index <= 6
-            });
-
-            $scope.littleDays.forEach(function(donut, index, array){
-                donut.setCoverText(donut.tag);
-            });
-
-            console.log("setting multi-day-view")
         }
 
         function _setSingleDayView(){
-            console.log("setting multi-day-view")
+            console.log("setting single-day-view")
         }
 
         $scope.setView = function(view) {
@@ -95,30 +73,39 @@ angular.module('app.controllers.home', ["ui.sortable"])
             }
         };
 
+        $scope.$watch('selectedEmoji', function() {
+            console.log($scope.selectedEmoji);
+            if($scope.selectedTask){
+                $scope.taskData.tasks[$scope.selectedTaskIndex].emoji =  $scope.selectedEmoji;
+                $scope.taskDonuts[0].redraw();
+            }
+        });
+
         $scope.sortableOptions = {
+
+            start: function(){
+            },
+
             update: function(event) {
                 $timeout(function () {
-                    $scope.redrawDonuts();
+                    $scope.taskDonuts[0].redraw();
                 })
             },
 
             out: function(){
                 $timeout(function () {
-                    //$scope.view = "multi-day-view";
-                    //$scope.setView("multi-day-view");
-
+                    $scope.taskDonuts[0].bucket_ring.show();
                 })
             },
 
             over: function(){
                 $timeout(function () {
-                    $scope.view = "single-day-view"
                 })
             },
 
             stop: function(){
                 $timeout(function () {
-                    $scope.view = "single-day-view"
+                    $scope.taskDonuts[0].bucket_ring.hide();
                 })
             }
 

@@ -1,5 +1,6 @@
 $sleep-blue: #5B6778;
 $footer-size: 45px;
+$task-space-wrapper-size: 545px;
 
 *{
   box-sizing: border-box;
@@ -9,13 +10,7 @@ $footer-size: 45px;
 
 html, body {
   margin: 0;
-  font-family: sans-serif;
-}
-
-#test_resize{
-  width: 30vw;
-  height: 30vw;
-  border: 1px solid red;
+  font-family: 'source_sans_prosemibold', sans-serif !important;
 }
 
 #Space{
@@ -25,12 +20,15 @@ html, body {
   max-width: 100%;
   max-height: 100%;
   overflow: auto;
+  overflow-x: hidden;
 }
 
 #TaskSpace, #CircleSpace{
   float: left;
   height: 100%;
   position: relative;
+  -webkit-transform: translate3d(0, 0, 0);
+  -webkit-transition: width .3s $easeInQuad;
 }
 
 .TaskDonut{
@@ -47,22 +45,51 @@ html, body {
   }
 }
 
-#TaskSpace{
-  width: 40%;
+#TaskSpace {
 
-  #header{
-    text-align: left;
-    padding: 20px 0px;
-    font-weight: bold;
-    font-size: 20px;
-    border: none;
-    background: transparent;
-    outline: none;
-    color: grey;
-    display: block;
-    width: calc(100% - 40px);
-    height: 90px;
-    margin-left: 8px;
+  #task-space-wrapper {
+    top: 15%;
+    width: $task-space-wrapper-size - 10px;
+    position: relative;
+
+    #task-detail-wrapper {
+      padding: 0 10px;
+    }
+
+    #task-list-wrapper, #task-detail-wrapper{
+      width: 50%;
+      float: left;
+      overflow: auto;
+    }
+
+  }
+
+  #task-detail {
+    width: 100%;
+    border-radius: 2px;
+    position: relative;
+    border: 1px solid rgba(229, 229, 229, 1);
+
+    #task-name {
+      background-color: white;
+      font-weight: bold;
+      border-bottom: 1px solid #cccccc;
+      padding: 15px 20px;
+      font-size: 15px;
+      color: #818285;
+      overflow-wrap: break-word;
+    }
+
+    #task-details {
+      min-height: 250px;
+      background-color: rgba(255, 255, 255, 1);
+      padding: 5px;
+    }
+
+  }
+
+  form {
+    overflow: auto;
   }
 
   #taskList::-webkit-scrollbar { width: 0 !important }
@@ -82,19 +109,7 @@ html, body {
 
 }
 
-#Space.just-circle {
-
-  #TaskSpace {
-    width: 0;
-  }
-
-  #CircleSpace {
-    width: 100%;
-  }
-}
-
 #CircleSpace{
-  width: 60%;
 
   .TaskDonut{
     height: calc(100% - 1px);
@@ -102,33 +117,111 @@ html, body {
   }
 
   #big-day {
-    margin: auto;
     position: relative;
     -webkit-transition: all .4s;
   }
 
   #toggleListButton{
-    width: 40px;
-    height: 40px;
+    width: 57px;
+    height: 35px;
     display: block;
     position: absolute;
     right: 0;
     top: 15%;
     cursor: pointer;
+    -webkit-transition: all .5s $easeInQuad;
     background-image: url('../../assets/list.png');
     background-repeat: no-repeat;
-    background-size: contain;
+    background-size: 35px 35px;
     background-position: right center;
-  }
-
-  &.single-day-view{
-
-    #big-day{
-      -webkit-transform: translateY(6vw);
-      height: 38vw;
-      width: 38vw;
+    
+    &:hover .list-label{
+      opacity: 1;
+      -webkit-transition: opacity .2s;
     }
 
+    .list-label {
+      opacity: 0;
+      font-weight: bold;
+      position: absolute;
+      top: 0;
+      left: 0;
+      font-size: 10px;
+      color: #B2B2B2;
+      -webkit-transition: opacity .2s;
+    }
+
+    .fa {
+      color: white;
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+  }
+
+}
+
+#Space {
+
+  &.single-day-view {
+    #CircleSpace {
+
+      width: 100%;
+
+      #big-day{
+        -webkit-transform: translateY(5vw) translateX(-50%);
+        height: 38vw;
+        width: 38vw;
+        left: 50%;
+      }
+
+    }
+
+    #TaskSpace {
+      width: 0;
+      overflow: hidden;
+    }
+
+  }
+
+  &.show-list {
+
+    #CircleSpace {
+      width: calc(100% - #{($task-space-wrapper-size/1.85)});
+
+      #toggleListButton{
+        right: 10px;
+        text-align: right;
+        background-image: none;
+      }
+
+    }
+
+    #TaskSpace {
+      width: $task-space-wrapper-size/1.85;
+      overflow: visible;
+
+      #task-space-wrapper {
+
+        top: 15%;
+        position: relative;
+        border-left: 1px dotted rgba(255, 255, 255, 0.95);
+        padding-left: 10px;
+
+      }
+    }
+
+    &.show-list-expanded {
+
+      #CircleSpace {
+        width: calc(100% - #{$task-space-wrapper-size});
+      }
+
+      #TaskSpace {
+        width: $task-space-wrapper-size;
+      }
+
+    }
 
   }
 
@@ -136,14 +229,19 @@ html, body {
 
 /**for ui sortable**/
 .task-item {
-  padding: 20px 30px;
-  font-size: 14px;
+  font: 12px 'source_sans_prosemibold', sans-serif !important;
+  outline: none;
   color: grey;
+  padding: 15px 20px;
+  border-radius: 3px;
+  border: 1px solid rgba(229, 229, 229, 0.9);
   background: rgba(255, 255, 255, 1);
-  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
-  float: left;
-  margin: 8px;
+  -webkit-transform: translateZ(0);
+  //float: left;
+  margin-bottom: 5px;
   cursor: pointer;
+  width: 100%;
+  overflow-wrap: break-word;
 
   &.standardSleep {
     display: none;

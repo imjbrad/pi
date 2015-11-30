@@ -84,7 +84,7 @@ var TaskDonut = function(svgArea, _tasks){
         var pictureHeight = pictureWidth;
         var pictureX = self.centerX - pictureWidth/2;
         var pictureY = self.centerY - pictureHeight/2;
-        var picture = drawingArea.image("/assets/andrew.jpg", pictureX, pictureY, pictureWidth, pictureHeight);
+        var picture = drawingArea.image("/assets/me.png", pictureX, pictureY, pictureWidth, pictureHeight);
 
         //mask self portrait
         var pictureMask = drawingArea.circle();

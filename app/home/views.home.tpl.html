@@ -1,19 +1,34 @@
-<div id="Space" class="just-circle" ng-controller="HomeController">
-    <div id="CircleSpace" class="single-day-view" ng-class="{'single-day-view': (view == 'single-day-view'), 'multi-day-view': (view == 'multi-day-view')}">
+<div id="Space" class="single-day-view" ng-controller="HomeController" ng-class="{'show-list': showListView, 'show-list-expanded': selectedTask}">
+    <div id="CircleSpace" class="">
         <div id="big-day">
             <task-donut index="1"></task-donut>
         </div>
-        <button id="toggleListButton" ng-click="toggleList()"></button>
+        <button id="toggleListButton" ng-click="toggleListView()">
+            <!--<span class="list-label">LIST</span>-->
+            <span class="fa fa-2x fa-times" ng-show="showListView"></span>
+        </button>
     </div>
     <div id="TaskSpace">
-        <form name="newTaskForm" ng-submit="createNewTask()">
-            <input id="header" ng-model="newTaskName" autocomplete="off" name="newTaskNameInput" type="text" placeholder="TODAY:" />
-        </form>
-        <ul id="taskList" ui-sortable="sortableOptions" ng-model="taskData.tasks">
-            <li ng-repeat="task in taskData.tasks">
-                <div class="task-item {{ task.taskType }}">{{ task.name + "-" + task.angleSize}}</div>
-            </li>
-        </ul>
+        <div id="task-space-wrapper">
+            <div id="task-list-wrapper">
+                <form name="newTaskForm" ng-submit="createNewTask()">
+                    <input id="header" class="task-item" ng-model="newTaskName" autocomplete="off" name="newTaskNameInput" type="text" placeholder="Add an item:" autofocus=""/>
+                </form>
+                <ul id="taskList" ui-sortable="sortableOptions" ng-model="taskData.tasks">
+                    <li ng-repeat="task in taskData.tasks" ng-click="selectTask($index)">
+                        <div class="task-item {{ task.taskType }}">{{ task.name }}</div>
+                    </li>
+                </ul>
+            </div>
+            <div id="task-detail-wrapper">
+                <div id="task-detail">
+                    <div id="task-name">{{ selectedTask.name }}</div>
+                    <div id="task-details">
+                        <emoji-picker selected-emoji-model="selectedEmoji"></emoji-picker>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <!--<footer>-->

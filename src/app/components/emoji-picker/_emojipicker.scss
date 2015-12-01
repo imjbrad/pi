@@ -1,0 +1,37 @@
+.EmojiPicker {
+  border: 1px solid white;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, .4);
+  border-radius: 1.3px;
+  overflow: auto;
+  width: auto;
+  height: 200px;
+}
+
+.EmojiPicker::-webkit-scrollbar { width: 0 !important }
+.emoji-list::-webkit-scrollbar { display: none; }
+
+.emoji-list {
+  list-style: none;
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  width: calc(98% - 5px);
+  height: calc(98% - 5px);
+
+  .emoji-item {
+    float: left;
+    width: 19px;
+    height: auto;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    cursor: pointer;
+
+    img {
+      width: 100%;
+      height: auto;
+      pointer-events: none;
+    }
+  }
+
+}

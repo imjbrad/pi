@@ -200,7 +200,7 @@ export function TaskSlice(TaskDonut, segmentIndex) {
       var emojiCenterX = emojiX + (emojiWidth/2);
       var emojiCenterY = emojiY + (emojiHeight/2);
 
-      self.emoji = TaskDonut.drawingArea.image("/assets/emojis/72x72/"+self.emoji_uri+".png", emojiX, emojiY, emojiWidth, emojiHeight);
+      self.emoji = TaskDonut.drawingArea.image("app/assets/emojis/72x72/"+self.emoji_uri+".png", emojiX, emojiY, emojiWidth, emojiHeight);
       self.emoji.attr({transform: "rotate("+(-TaskDonut.angle_offset) + " " + emojiCenterX +" "+ emojiCenterY +")"});
       TaskDonut.donut_group.add(self.emoji);
 
@@ -274,7 +274,7 @@ export function TaskSlice(TaskDonut, segmentIndex) {
     if(!ghost_group){
       ghost_circle = TaskDonut.drawingArea.path();
       var ghost_emoji_box = self.emoji.getBBox();
-      ghost_emoji = TaskDonut.drawingArea.image("/assets/emojis/72x72/"+self.emoji_uri+".png", ghost_emoji_box.x, ghost_emoji_box.y, ghost_emoji_box.w, ghost_emoji_box.h);
+      ghost_emoji = TaskDonut.drawingArea.image("app/assets/emojis/72x72/"+self.emoji_uri+".png", ghost_emoji_box.x, ghost_emoji_box.y, ghost_emoji_box.w, ghost_emoji_box.h);
 
       ghost_group = TaskDonut.drawingArea.group();
       ghost_group.add(ghost_circle, ghost_emoji);

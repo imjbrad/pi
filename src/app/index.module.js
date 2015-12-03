@@ -12,16 +12,18 @@ import { Bucket } from './components/Bucket.js';
 import { BucketRing } from './components/BucketRing.js';
 
 import { EmojiPicker } from './components/emoji-picker/emojipicker.directives.js';
+import { SliderDirective } from './components/slider/directives.slider.js';
 
-angular.module('app', ['ngResource', 'ui.router', 'ui.bootstrap'])
+angular.module('app', ['ngResource', 'ui.router', 'ui.bootstrap', 'ui.sortable'])
   .constant('moment', moment)
   .config(config)
   .config(routerConfig)
   .run(runBlock)
 
-
   .controller('MainController', MainController)
+
   .directive('emojiPicker', EmojiPicker)
   .directive('taskDonut', TaskDonutDirective)
+  .directive('slider', SliderDirective)
 
   ;

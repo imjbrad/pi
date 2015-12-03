@@ -12,6 +12,7 @@ export function MainController ($scope, $timeout, $filter) {
 
       $scope.selectedEmoji = null;
       $scope.selectedTask = null;
+      $scope.selectedValue = 0;
       $scope.showListView = false;
 
       $scope.taskDonuts = [];
@@ -75,6 +76,14 @@ export function MainController ($scope, $timeout, $filter) {
         console.log($scope.selectedEmoji);
         if($scope.selectedTask){
           $scope.taskData.tasks[$scope.selectedTaskIndex].emoji =  $scope.selectedEmoji;
+          $scope.taskDonuts[0].redraw();
+        }
+      });
+
+      $scope.$watch('selectedValue', function() {
+        //console.log($scope.selectedValue);
+        if($scope.selectedValue){
+          $scope.taskData.tasks[$scope.selectedTaskIndex].angleSize =  $scope.selectedValue;
           $scope.taskDonuts[0].redraw();
         }
       });

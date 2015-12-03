@@ -4,7 +4,6 @@ $task-space-wrapper-size: 545px;
 
 *{
   box-sizing: border-box;
-  //border: 1px solid red;
 }
 
 html, body {
@@ -59,30 +58,6 @@ html, body {
       width: 50%;
       float: left;
       overflow: auto;
-    }
-
-  }
-
-  #task-detail {
-    width: 100%;
-    border-radius: 2px;
-    position: relative;
-    border: 1px solid rgba(229, 229, 229, 1);
-
-    #task-name {
-      background-color: white;
-      font-weight: bold;
-      border-bottom: 1px solid #cccccc;
-      padding: 15px 20px;
-      font-size: 15px;
-      color: #818285;
-      overflow-wrap: break-word;
-    }
-
-    #task-details {
-      min-height: 250px;
-      background-color: rgba(255, 255, 255, 1);
-      padding: 5px;
     }
 
   }
@@ -227,26 +202,6 @@ html, body {
 }
 
 /**for ui sortable**/
-.task-item {
-  font: 12px 'source_sans_prosemibold', sans-serif !important;
-  outline: none;
-  color: grey;
-  padding: 15px 20px;
-  border-radius: 3px;
-  border: 1px solid rgba(229, 229, 229, 0.9);
-  background: rgba(255, 255, 255, 1);
-  -webkit-transform: translateZ(0);
-  //float: left;
-  margin-bottom: 5px;
-  cursor: pointer;
-  width: 100%;
-  overflow-wrap: break-word;
-
-  &.standardSleep {
-    display: none;
-  }
-}
-
 
 footer{
   height: $footer-size;

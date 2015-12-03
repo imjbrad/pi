@@ -4,33 +4,50 @@
       <task-donut index="1"></task-donut>
     </div>
     <button id="toggleListButton" ng-click="toggleListView()">
-      <!--<span class="list-label">LIST</span>-->
       <span class="fa fa-2x fa-times" ng-show="showListView"></span>
     </button>
   </div>
   <div id="TaskSpace">
     <div id="task-space-wrapper">
       <div id="task-list-wrapper">
-        <form name="newTaskForm" ng-submit="createNewTask()">
-          <input id="header" class="task-item" ng-model="newTaskName" autocomplete="off" name="newTaskNameInput" type="text" placeholder="Add an item:" autofocus=""/>
+        <form name="newTaskForm" class="task-item" ng-submit="createNewTask()">
+          <input id="header" class="task-label" ng-model="newTaskName" autocomplete="off" name="newTaskNameInput" type="text" placeholder="Add an item:" autofocus=""/>
         </form>
         <ul id="taskList" ui-sortable="sortableOptions" ng-model="taskData.tasks">
           <li ng-repeat="task in taskData.tasks" ng-click="selectTask($index)">
-            <div class="task-item {{ task.taskType }}">{{ task.name }}</div>
+            <div class="task-item {{ task.taskType }}">
+              <div class="task-label">{{ task.name }}</div>
+            </div>
           </li>
         </ul>
       </div>
       <div id="task-detail-wrapper">
         <div id="task-detail">
-          <div id="task-name">{{ selectedTask.name }}</div>
+          <div id="task-name">
+            {{ selectedTask.name }}
+          </div>
           <div id="task-details">
-            <emoji-picker selected-emoji-model="selectedEmoji"></emoji-picker>
+
+            <div class="task-detail-item">
+              <div class="header">How much should I put into this?</div>
+              <slider class="task-slider" slider-value="selectedValue"></slider>
+            </div>
+
+            <div class="task-detail-item">
+              <div class="header">Pick an Emoji</div>
+              <div class="emoji-picker-container">
+                <emoji-picker selected-emoji-model="selectedEmoji"></emoji-picker>
+                <div class="white-gradient"></div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
 <!--<footer>-->
 
 <!--</footer>-->

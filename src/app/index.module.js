@@ -14,7 +14,7 @@ import { BucketRing } from './components/BucketRing.js';
 import { EmojiPicker } from './components/emoji-picker/emojipicker.directives.js';
 import { SliderDirective } from './components/slider/directives.slider.js';
 
-angular.module('app', ['ngResource', 'ui.router', 'ui.bootstrap', 'ui.sortable'])
+angular.module('app', ['ngResource', 'ui.router', 'ui.bootstrap','ui.sortable'])
   .constant('moment', moment)
   .config(config)
   .config(routerConfig)

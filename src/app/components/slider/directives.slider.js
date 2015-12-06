@@ -12,9 +12,12 @@ export function SliderDirective(){
                 var slider_bar = angular.element('.slider-bar', element),
                     value_bar = angular.element('.value-bar', slider_bar),
                     handle = angular.element('.handle', slider_bar),
-                    draggable_overlay = angular.element('.draggable-overlay', slider_bar),
                     min = attr["min"] || 0,
                     max = attr["max"] || 100;
+
+                //1x1 pixel transparent image for the dragging ghost
+                var img = document.createElement("img");
+                img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
                 function _xBound(element, point){
                     var bounds = element.getBoundingClientRect();
@@ -26,7 +29,7 @@ export function SliderDirective(){
 
                 //simple map number to range of numbers
                 //http://stackoverflow.com/questions/10756313/javascript-jquery-map-a-range-of-numbers-to-another-range-of-numbers
-                function mapNum(i, in_min , in_max , out_min , out_max ) {
+                function _mapNum(i, in_min , in_max , out_min , out_max ) {
                     return ( i - in_min ) * ( out_max - out_min ) / ( in_max - in_min ) + out_min;
                 }
 
@@ -40,26 +43,26 @@ export function SliderDirective(){
                         };
                 }
 
+                function _setWidth(percentage){
+                    value_bar[0].style.width = percentage+"%";
+                }
 
-                draggable_overlay[0].ondrag = function(e){
+                slider_bar[0].addEventListener("dragstart", function(e) {
+                    e.dataTransfer.setDragImage(img, 0, 0);
+                }, false);
 
-                    var ic = new Image();
-
-                    ic.width = 0;
-                    ic.height = 0;
-                    ic.style.visibility = 'hidden';
-                    ic.style.opacity = "0";
-
-                    e.dataTransfer.setDragImage(ic, 1,1);
+                slider_bar[0].ondrag = function(e){
                     var dragging_point = {x: e.pageX, y: e.pageY};
                     if (_xBound(slider_bar[0], dragging_point)){
                         var value = _findValue(slider_bar[0], dragging_point);
-                        value_bar[0].style.width = value.percentage+"%";
                         $scope.sliderValue = value.percentage;
                         $scope.$apply();
-                        //console.log(value);
                     }
-                }
+                };
+
+                $scope.$watch('sliderValue', function(){
+                    var mappedvalue = _setWidth($scope.sliderValue);
+                });
             }
         };
     }

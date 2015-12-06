@@ -4,15 +4,27 @@
   position: relative;
   border: 1px solid rgba(229, 229, 229, 1);
 
-  .slider-bar{
-    height: 2px;
+  .time-allotment-btn-group {
+    margin-bottom: 9px;
+  }
 
+  .task-slider {
+    height: 12px;
+  }
+
+  .slider-bar{
+    height: 12px;
+    
+    .bar, .value-bar{
+      height: 2px;
+    }
+    
     .value-bar {
       background-color: #cccccc;
 
       .handle {
-        width: 6px;
-        height: 6px;
+        width: 8px;
+        height: 8px;
         right: 0;
         top: 50%;
         -webkit-transform: translateY(-50%);
@@ -31,12 +43,15 @@
 
 
   .emoji-picker-container{
+    padding: 6px;
+    border: 1px solid $pie-light-grey;
     position: relative;
-    //-webkit-mask-image: -webkit-linear-gradient(-270deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.14) 14.49%, rgba(0, 0, 0, 1) 100%);
+    overflow: hidden;
+    height: 65px;
 
     .EmojiPicker{
-      height: 65px;
       padding: 0;
+      -webkit-mask-image: -webkit-linear-gradient(-270deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.14) 14.49%, rgba(0, 0, 0, 1) 100%);
     }
   }
 

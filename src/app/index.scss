@@ -14,8 +14,26 @@ button {
   border: none;
 }
 
+.pie-btn-group-justified{
+  .btn {
+    border-color: $pie-light-grey;
+    border-radius: 2px;
+    background-color: #FBFBFB;
+    color: $pie-grey;
+
+    &.active {
+      box-shadow: inset 0 1px 7px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
 //manually import vendor styles and app styles here
 @import "../../bower_components/font-awesome/scss/font-awesome";
+
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/mixins";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/variables";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/buttons";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/button-groups";
 
 @import "main/main.style";
 

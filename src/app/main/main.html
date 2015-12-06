@@ -1,5 +1,14 @@
-<div id="Space" class="single-day-view" ng-controller="MainController" ng-class="{'show-list': showListView, 'show-list-expanded': selectedTask}">
+<div id="Space" class="single-day-view" ng-class="{'show-list': showListView, 'show-list-expanded': selectedTask}">
   <div id="CircleSpace" class="">
+
+    <pre style="
+    position:absolute;
+    opacity: .1;
+    top: 0;
+    left: 0">
+      {{ taskDataString }}
+    </pre>
+
     <div id="big-day">
       <task-donut index="1"></task-donut>
     </div>
@@ -30,7 +39,32 @@
 
             <div class="task-detail-item">
               <div class="header">How much should I put into this?</div>
-              <slider class="task-slider" slider-value="selectedValue"></slider>
+
+              <!--
+              i'm probably most excited about this little slider. a friend
+              has been saying he's confused because the slider doesn't reference
+              time specically... that's cause time is abstracted away... the number
+              of minutes i spend on something doesn't really matter to me... it
+              more about how much energy i put into it in proportion to other tasks...
+              time itself is arbitary anyway... the question "how much should i put
+              into this" led me to some other questions i want to use as labels for
+              the other task detail inputs: what does this represent?, anything else
+              to keep in mind?
+              -->
+
+              <div class="btn-group btn-group-justified pie-btn-group-justified time-allotment-btn-group">
+                <label class="btn" ng-model="selectedTaskDetail.timeAllotment" uib-btn-radio="2">2</label>
+                <label class="btn" ng-model="selectedTaskDetail.timeAllotment" uib-btn-radio="5">5</label>
+                <label class="btn" ng-model="selectedTaskDetail.timeAllotment" uib-btn-radio="10">10</label>
+                <label class="btn"
+                       ng-class="{active: selectedTaskDetail.timeAllotment > 20}"
+                       ng-click="selectedTaskDetail.timeAllotment = 20">
+                  +
+                </label>
+              </div>
+              <div class="task-slider" ng-show="selectedTaskDetail.timeAllotment >= 20">
+                <slider  slider-value="selectedTaskDetail.timeAllotment"></slider>
+              </div>
             </div>
 
             <div class="task-detail-item">

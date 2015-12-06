@@ -9,14 +9,19 @@ export function TaskDonutDirective(){
     link: function($scope, el, attr){
       var newDonut = new TaskDonut(Snap(el[0]), $scope.taskData.tasks);
 
-      newDonut.onupdated(function(){
+      /*
+      * when the donut is used, it affects data
+      * outside of the angular digest loop so
+      * we have to call apply for angular to
+      * refresh the scope
+      * */
+
+      newDonut.onUserUpdatedDonutManually(function(updatedTaskSet){
         $scope.$apply();
       });
 
-      newDonut.setIndex(parseInt(attr.index));
-      newDonut.setTag(attr.tag);
-
       $scope.taskDonuts.push(newDonut);
+
     }
   }
 

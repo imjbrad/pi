@@ -149,7 +149,6 @@ export function Bucket(_taskDonut, _startingAngle, _angularSize) {
     }else{
       console.log("bucket "+self.textLabel+" rejected drop from "+taskSlice.sliceIndex);
       eve("cancelledTaskSliceDropInBucket"+taskSlice.sliceIndex, {}, taskSlice);
-      canceled = true;
     }
   };
 

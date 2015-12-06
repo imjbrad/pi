@@ -40,6 +40,8 @@ export function TaskSlice(TaskDonut, segmentIndex) {
   self.innerStartingVectorLine = TaskDonut.drawingArea.line();
   self.innerTerminalVectorLine = TaskDonut.drawingArea.line();
 
+  self.tempData = {};
+
   TaskDonut.donut_group.add(self.slice, self.innerSlice, self.innerStartingVectorLine, self.innerTerminalVectorLine);
 
   init = function(){
@@ -131,15 +133,15 @@ export function TaskSlice(TaskDonut, segmentIndex) {
 
   self.willCauseOverlap = function() {
 
-    var BUMPER = 10;
+    var BUMPER = 2;
     self._willCauseOverlap = false;
 
     var total = 0;
 
     TaskDonut.slices.forEach(function(slice, index, array){
-      total += slice.tempLocalAngle || slice.localAngle;
+      total += slice.tempData.localAngle || slice.localAngle;
       if(index <= self.sliceIndex){
-        var tempTerminalAngle = slice.tempTerminalAngle || slice.terminalAngle;
+        var tempTerminalAngle = slice.tempData.terminalAngle || slice.terminalAngle;
         if(tempTerminalAngle < slice.startingAngle + Snap.rad(BUMPER)){
           self._willCauseOverlap = true;
           return false;
@@ -250,7 +252,28 @@ export function TaskSlice(TaskDonut, segmentIndex) {
 
   };
 
+  /*
+  * sets temporary data.
+  * when the donut tries to
+  * redistribute, it redistributes
+  * with with any available temp
+  * data. if the donut is still
+  * valid w/ the temp data, the temp
+  * data becomes permanent
+  * */
 
+  self.update = function(tempData){
+
+    for(var key in self.tempData){
+      if(key in tempData){
+        var value = tempData[key];
+        self.tempData[key] = value;
+      }
+    }
+
+    TaskDonut.redistributeTasks();
+
+  };
 
   dragTaskSliceByEmoji = function(dx, dy, mx, my){
     TaskDonut.bucket_ring.show();
@@ -346,13 +369,14 @@ export function TaskSlice(TaskDonut, segmentIndex) {
 
     var mouseAngle = Math.atan2(relative_my - relative_center_y, relative_mx - relative_center_x).mod(2*Math.PI);
 
-
     var newLocalTheta = (Snap.deg((mouseAngle - self.terminalAngle)) + self.localAngle);
 
-    self.tempLocalAngle = newLocalTheta;
-    self.tempTerminalAngle = self.calculateDrawingAngles(newLocalTheta).terminalAngle;
+    self.update({
+      localAngle: newLocalTheta,
+      terminalAngle: self.calculateDrawingAngles(newLocalTheta).terminalAngle
+    });
 
-    TaskDonut.redistributeTasks();
+    TaskDonut.dispatch("userUpdatedDonutManually", [self.tasks]);
 
   };
 

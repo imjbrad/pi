@@ -12,10 +12,13 @@ export function MainController ($scope, $timeout, $filter) {
 
       $scope.selectedEmoji = null;
       $scope.selectedTask = null;
-      $scope.selectedValue = 0;
-      $scope.showListView = false;
+
+      $scope.selectedTaskDetail = {
+        timeAllotment: 0
+      };
 
       $scope.taskDonuts = [];
+      $scope.taskDonut = $scope.taskDonuts[0];
 
       $scope.taskData = {
         info: {
@@ -72,6 +75,10 @@ export function MainController ($scope, $timeout, $filter) {
         }
       };
 
+      $timeout(function(){
+
+      }, 100);
+
       $scope.$watch('selectedEmoji', function() {
         console.log($scope.selectedEmoji);
         if($scope.selectedTask){
@@ -80,13 +87,20 @@ export function MainController ($scope, $timeout, $filter) {
         }
       });
 
-      $scope.$watch('selectedValue', function() {
-        //console.log($scope.selectedValue);
-        if($scope.selectedValue){
-          $scope.taskData.tasks[$scope.selectedTaskIndex].angleSize =  $scope.selectedValue;
-          $scope.taskDonuts[0].redraw();
+      $scope.$watch('selectedTaskDetail.timeAllotment', function() {
+        var newTimeAllotment = $scope.selectedTaskDetail.timeAllotment;
+        if(newTimeAllotment){
+          var slice = $scope.taskDonuts[0].slices[$scope.selectedTaskIndex];
+          slice.update({
+            localAngle: newTimeAllotment,
+            terminalAngle: slice.calculateDrawingAngles(newTimeAllotment).terminalAngle
+          });
         }
       });
+
+      $scope.$watch('taskData', function(){
+        $scope.taskDataString = JSON.stringify($scope.taskData, null, 4);
+      }, true);
 
       $scope.sortableOptions = {
 

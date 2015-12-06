@@ -16,6 +16,8 @@ export function TaskDonut(svgArea, _tasks) {
   var drawingArea = svgArea;
   var pattern, patternImg;
 
+  self.dispatchedEvents = {};
+
   init = function(){
 
     patternImg = drawingArea.image("app/assets/dark-stripes.png", 0, 0, 25, 25).attr({"opacity": .35});
@@ -184,23 +186,15 @@ export function TaskDonut(svgArea, _tasks) {
 
   };
 
-  self.showWeeklyBuckets = function(){
-
-  };
-
-  self.hideWeeklyBuckets = function(){
-
-  };
-
   self.redistributeTaskAtIndex = function(index){
     var slice = self.getSliceAtIndex(index);
 
     if(slice.willCauseOverlap() == false){
-      self.tasks[index].angleSize = slice.tempLocalAngle || self.tasks[index].angleSize;
+      self.tasks[index].angleSize = slice.tempData.localAngle || self.tasks[index].angleSize;
     }
 
-    slice.tempLocalAngle = undefined;
-    slice.tempTerminalAngle = undefined;
+    slice.tempData.localAngle = undefined;
+    slice.tempData.terminalAngle = undefined;
 
   };
 
@@ -211,7 +205,6 @@ export function TaskDonut(svgArea, _tasks) {
     });
 
     self.redrawSlices();
-    self.dispatch("updated", [self.tasks]);
   };
 
   self.redraw = function(){
@@ -264,17 +257,13 @@ export function TaskDonut(svgArea, _tasks) {
     self.redraw();
   };
 
-  self.onupdated = function(eventHandlerFunction){
-    self.updated = eventHandlerFunction;
-  };
-
-  self.dispatchUpdate = function(){
-    self.dispatch("updated", [self.tasks]);
+  self.onUserUpdatedDonutManually = function(eventHandlerFunction){
+    self.dispatchedEvents["userUpdatedDonutManually"] = eventHandlerFunction;
   };
 
   self.dispatch = function(eventName, argList){
-    if(self[eventName] && self[eventName].call){
-      self[eventName](self, argList);
+    if(self.dispatchedEvents[eventName] && self.dispatchedEvents[eventName].call){
+      self.dispatchedEvents[eventName].apply(self, argList);
     }
   };
 

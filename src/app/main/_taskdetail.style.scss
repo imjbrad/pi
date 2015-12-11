@@ -2,10 +2,24 @@
   width: 100%;
   border-radius: 2px;
   position: relative;
-  border: 1px solid rgba(229, 229, 229, 1);
+  border: 1px solid $pie-light-grey;
+
+  &.selected {
+    //background: rgba(255, 255, 255, .5);
+    //padding: 4px;
+  }
 
   .time-allotment-btn-group {
     margin-bottom: 9px;
+
+    .btn {
+      line-height: 11px;
+    }
+
+    .btn span{
+      font-size: 9px;
+      font-family: source_sans_proregular, sans-serif;
+    }
   }
 
   .task-slider {
@@ -20,7 +34,7 @@
     }
     
     .value-bar {
-      background-color: #cccccc;
+      background-color: $pie-grey;
 
       .handle {
         width: 8px;
@@ -28,12 +42,12 @@
         right: 0;
         top: 50%;
         -webkit-transform: translateY(-50%);
-        background-color: #cccccc;
+        background-color: $pie-grey;
         z-index: initial;
         cursor: pointer;
 
         &:hover{
-          background-color: #cccccc;
+          background-color: $pie-grey;
         }
 
       }
@@ -47,11 +61,11 @@
     border: 1px solid $pie-light-grey;
     position: relative;
     overflow: hidden;
-    height: 65px;
+    height: 165px;
 
     .EmojiPicker{
       padding: 0;
-      -webkit-mask-image: -webkit-linear-gradient(-270deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.14) 14.49%, rgba(0, 0, 0, 1) 100%);
+      //-webkit-mask-image: -webkit-linear-gradient(-270deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.14) 14.49%, rgba(0, 0, 0, 1) 100%);
     }
   }
 
@@ -61,7 +75,7 @@
     font-weight: bold;
     padding: 15px 20px;
     font-size: 15px;
-    color: #818285;
+    color: $pie-dark-grey;
     overflow-wrap: break-word;
     border-bottom: 1px solid $pie-light-grey;
   }
@@ -76,7 +90,7 @@
       margin-bottom: 20px;
 
       .header {
-        color: $pie-grey;
+        color: $pie-dark-grey;
         font-size: 11px;
         font-family: source_sans_prosemibold, sans-serif;
         margin-bottom: 9px;

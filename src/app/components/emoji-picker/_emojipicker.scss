@@ -13,19 +13,20 @@
 
 .emoji-list {
   list-style: none;
-  margin: auto;
+  height: 100%;
+  width: 100%;
   padding: 0;
-  overflow: auto;
-  width: calc(98% - 5px);
-  height: calc(98% - 5px);
+  display: flex;
+  align-content: space-between;
+  justify-content: space-between;
+  flex-flow: row wrap;
 
   .emoji-item {
-    float: left;
-    width: 16px;
-    height: auto;
-    margin-right: 4px;
-    margin-bottom: 4px;
+    width: 28px;
+    //height: 20px;
+    margin: auto;
     cursor: pointer;
+    //border: 1px solid red;
 
     img {
       width: 100%;

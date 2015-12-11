@@ -15,6 +15,8 @@ export function SliderDirective(){
                     min = attr["min"] || 0,
                     max = attr["max"] || 100;
 
+                console.log(min, max);
+
                 //1x1 pixel transparent image for the dragging ghost
                 var img = document.createElement("img");
                 img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
@@ -36,7 +38,7 @@ export function SliderDirective(){
                 function _findValue(bar, point){
                     var bounds = bar.getBoundingClientRect(),
                         i = point.x-bounds.left,
-                        total = bounds.width
+                        total = bounds.width;
                         return {
                             "percentage": (i/total)*100,
                             "raw": Math.round((i/total)*max)
@@ -55,13 +57,16 @@ export function SliderDirective(){
                     var dragging_point = {x: e.pageX, y: e.pageY};
                     if (_xBound(slider_bar[0], dragging_point)){
                         var value = _findValue(slider_bar[0], dragging_point);
-                        $scope.sliderValue = value.percentage;
+                        $scope.sliderValue = value.raw;
                         $scope.$apply();
                     }
                 };
 
                 $scope.$watch('sliderValue', function(){
-                    var mappedvalue = _setWidth($scope.sliderValue);
+                    var sliderValue = $scope.sliderValue;
+                    if(sliderValue){
+                        _setWidth(_mapNum(sliderValue, min, max, 0, 100));
+                    }
                 });
             }
         };

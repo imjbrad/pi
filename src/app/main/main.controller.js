@@ -10,27 +10,22 @@ export function MainController ($scope, $timeout, $filter) {
         return deg * Math.PI / 180;
       };
 
-      $scope.selectedEmoji = null;
+
       $scope.selectedTask = null;
 
-      $scope.selectedTaskDetail = {
-        timeAllotment: 0
-      };
+      $scope.selectedTaskDetail = {};
 
       $scope.taskDonuts = [];
       $scope.taskDonut = $scope.taskDonuts[0];
 
       $scope.taskData = {
-        info: {
-          type: "day"
-        },
         tasks: [
 
         ]
       };
 
       $scope.selectTask = function(i){
-        $scope.selectedTask = $scope.taskData.tasks[i];
+        $scope.selectedTaskDetail = $scope.taskData.tasks[i];
         $scope.selectedTaskIndex = i;
       };
 
@@ -57,38 +52,15 @@ export function MainController ($scope, $timeout, $filter) {
         console.log("List View: "+$scope.showListView);
       };
 
-      function _setMultiDayView() {
-
-      }
-
-      function _setSingleDayView(){
-        console.log("setting single-day-view")
-      }
-
-      $scope.setView = function(view) {
-        $scope.view = view;
-        if($scope.view == "multi-day-view"){
-          _setMultiDayView();
-        }
-        if($scope.view == "single-day-view"){
-          _setSingleDayView();
-        }
-      };
-
-      $timeout(function(){
-
-      }, 100);
-
-      $scope.$watch('selectedEmoji', function() {
-        console.log($scope.selectedEmoji);
-        if($scope.selectedTask){
-          $scope.taskData.tasks[$scope.selectedTaskIndex].emoji =  $scope.selectedEmoji;
+      $scope.$watch('selectedTaskDetail.emoji', function() {
+        var newEmoji = $scope.selectedTaskDetail.emoji;
+        if(newEmoji){
           $scope.taskDonuts[0].redraw();
         }
       });
 
-      $scope.$watch('selectedTaskDetail.timeAllotment', function() {
-        var newTimeAllotment = $scope.selectedTaskDetail.timeAllotment;
+      $scope.$watch('selectedTaskDetail.angleSize', function() {
+        var newTimeAllotment = $scope.selectedTaskDetail.angleSize;
         if(newTimeAllotment){
           var slice = $scope.taskDonuts[0].slices[$scope.selectedTaskIndex];
           slice.update({

@@ -1,9 +1,9 @@
-<div id="Space" class="single-day-view" ng-class="{'show-list': showListView, 'show-list-expanded': selectedTask}">
+<div id="Space" class="single-day-view" ng-class="{'show-list': showListView, 'show-list-expanded': selectedTaskDetail.name}">
   <div id="CircleSpace" class="">
 
     <pre style="
     position:absolute;
-    opacity: .1;
+    opacity: 0;
     top: 0;
     left: 0">
       {{ taskDataString }}
@@ -24,21 +24,21 @@
         </form>
         <ul id="taskList" ui-sortable="sortableOptions" ng-model="taskData.tasks">
           <li ng-repeat="task in taskData.tasks" ng-click="selectTask($index)">
-            <div class="task-item {{ task.taskType }}">
+            <div class="task-item {{ task.taskType }}" ng-class="{'selected': $index == selectedTaskIndex}">
               <div class="task-label">{{ task.name }}</div>
             </div>
           </li>
         </ul>
       </div>
       <div id="task-detail-wrapper">
-        <div id="task-detail">
+        <div id="task-detail" ng-class="{'selected': selectedTaskIndex}">
           <div id="task-name">
-            {{ selectedTask.name }}
+            {{ selectedTaskDetail.name }}
           </div>
           <div id="task-details">
 
             <div class="task-detail-item">
-              <div class="header">How much should I put into this?</div>
+              <div class="header">How much time should I put into this?</div>
 
               <!--
               i'm probably most excited about this little slider. a friend
@@ -53,24 +53,24 @@
               -->
 
               <div class="btn-group btn-group-justified pie-btn-group-justified time-allotment-btn-group">
-                <label class="btn" ng-model="selectedTaskDetail.timeAllotment" uib-btn-radio="2">2</label>
-                <label class="btn" ng-model="selectedTaskDetail.timeAllotment" uib-btn-radio="5">5</label>
-                <label class="btn" ng-model="selectedTaskDetail.timeAllotment" uib-btn-radio="10">10</label>
+                <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="5">5<br><span>min</span></label>
+                <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="10">10<br><span>min</span></label>
+                <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="15">15<br><span>min</span></label>
                 <label class="btn"
-                       ng-class="{active: selectedTaskDetail.timeAllotment > 20}"
-                       ng-click="selectedTaskDetail.timeAllotment = 20">
+                       ng-class="{active: selectedTaskDetail.angleSize > 20}"
+                       ng-click="selectedTaskDetail.angleSize = 20">
                   +
                 </label>
               </div>
-              <div class="task-slider" ng-show="selectedTaskDetail.timeAllotment >= 20">
-                <slider  slider-value="selectedTaskDetail.timeAllotment"></slider>
+              <div class="task-slider" ng-show="selectedTaskDetail.angleSize >= 20">
+                <slider  slider-value="selectedTaskDetail.angleSize" min="2" max="360"></slider>
               </div>
             </div>
 
             <div class="task-detail-item">
               <div class="header">Pick an Emoji</div>
               <div class="emoji-picker-container">
-                <emoji-picker selected-emoji-model="selectedEmoji"></emoji-picker>
+                <emoji-picker selected-emoji-model="selectedTaskDetail.emoji"></emoji-picker>
                 <div class="white-gradient"></div>
               </div>
             </div>

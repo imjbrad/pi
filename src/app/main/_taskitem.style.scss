@@ -1,10 +1,14 @@
 .task-item {
-
   border-radius: 3px;
   border: 1px solid rgba(229, 229, 229, 0.9);
-  background: rgba(255, 255, 255, 1);
   margin-bottom: 5px;
   cursor: pointer;
+
+  &.selected {
+    background: rgba(255, 255, 255, .5);
+    padding: 4px;
+    border: none;
+  }
 
   &.standardSleep {
     display: none;
@@ -12,6 +16,7 @@
 
   .task-label {
     width: 100%;
+    background: rgba(255, 255, 255, 1);
     font: 12px 'source_sans_prosemibold', sans-serif !important;
     outline: none;
     color: grey;

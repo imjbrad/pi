@@ -53,7 +53,7 @@ export function TaskSlice(TaskDonut, segmentIndex) {
     self.startingAngle = self.drawingAngles["startingAngle"];
     self.terminalAngle = self.drawingAngles["terminalAngle"];
 
-    self.innerSliceRadius = TaskDonut.radius/1.017;
+    self.innerSliceRadius = TaskDonut.radius/1.015;
     self.emojiRadius =  self.innerSliceRadius/1.1;
 
     var startingVector = [
@@ -207,13 +207,24 @@ export function TaskSlice(TaskDonut, segmentIndex) {
       TaskDonut.donut_group.add(self.emoji);
 
       self.emoji.drag(dragTaskSliceByEmoji, null, stopDraggingTaskSliceByEmoji);
+
+      var colorThief = new ColorThief();
+
+      var img = new Image(72, 72);
+      img.src = "app/assets/emojis/72x72/"+self.emoji_uri+".png";
+
+      var suggestedBackgroundColor = colorThief.getColor(img);
+      suggestedBackgroundColor.push(1);
+      suggestedBackgroundColor = "rgba("+suggestedBackgroundColor.join(",")+")";
+      console.log(suggestedBackgroundColor)
+
     }
 
     //apply attributes
     self.innerStartingVectorLine.attr({x1: TaskDonut.centerX, y1: TaskDonut.centerY, x2: self.innerStartingVector[2], y2: self.innerStartingVector[3], stroke:"#ededed", "stroke-width":.25});
     self.innerTerminalVectorLine.attr({x1: TaskDonut.centerX, y1: TaskDonut.centerY, x2: self.innerTerminalVector[2], y2: self.innerTerminalVector[3], stroke:"#ededed", "stroke-width":.25});
-    self.slice.attr({"d": categorySlice, stroke:"transparent", "stroke-width":.25, "fill":fill});
-    self.innerSlice.attr({"d": emojiSlice, stroke:"white", "stroke-width":.25, "fill": "white"});
+    self.slice.attr({"d": categorySlice, stroke:"transparent", "stroke-width":.25, "fill": suggestedBackgroundColor || fill});
+    self.innerSlice.attr({"d": emojiSlice, stroke:"white", "stroke-width":.25, "fill": "#FFFFFF"});
 
     //apply special types
     if(self.task.taskType && self.task.taskType == "standardBreak"){
@@ -225,7 +236,7 @@ export function TaskSlice(TaskDonut, segmentIndex) {
       self.innerStartingVectorLine.attr({"stroke-width": 0});
       self.innerTerminalVectorLine.attr({"stroke-width": 0});
       self.slice.attr({"fill": sleepGradient, opacity: 1, 'stroke-width': 0});
-      self.innerSlice.attr({"fill": sleepGradient, opacity: .067, 'stroke-width': 0});
+      self.innerSlice.attr({"fill": sleepGradient, opacity: .37, 'stroke-width': 0});
     }
 
   };

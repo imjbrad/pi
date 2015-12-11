@@ -1,6 +1,6 @@
 $sleep-blue: #5B6778;
 $footer-size: 45px;
-$task-space-wrapper-size: 545px;
+$task-space-wrapper-size: 590px;
 
 *{
   box-sizing: border-box;
@@ -144,8 +144,8 @@ html, body {
 
       #big-day{
         -webkit-transform: translateY(5vw) translateX(-50%);
-        height: 38vw;
-        width: 38vw;
+        height: 40vw;
+        width: 40vw;
         left: 50%;
       }
 
@@ -162,6 +162,12 @@ html, body {
 
     #CircleSpace {
       width: calc(100% - #{($task-space-wrapper-size/1.85)});
+
+      #big-day{
+        height: 38vw;
+        width: 38vw;
+        left: 50%;
+      }
 
       #toggleListButton{
         right: 10px;

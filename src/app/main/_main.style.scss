@@ -11,14 +11,18 @@ html, body {
   font-family: 'source_sans_prosemibold', sans-serif !important;
 }
 
+body {
+}
+
 #Space{
   background : -webkit-linear-gradient(-50deg, rgba(248, 185, 120, 1) 0%, rgba(250, 204, 156, 1) 24.54%, rgba(254, 240, 227, 1) 76.02%, rgba(255, 255, 255, 1) 100%);
   width: 100vw;
-  height: 100vh;
   max-width: 100%;
+  height: 100vh;
   max-height: 100%;
   overflow: auto;
   overflow-x: hidden;
+  margin: auto;
 }
 
 #TaskSpace, #CircleSpace{
@@ -143,10 +147,11 @@ html, body {
       width: 100%;
 
       #big-day{
-        -webkit-transform: translateY(5vw) translateX(-50%);
+        -webkit-transform: translateY(-50%) translateX(-50%);
         height: 40vw;
         width: 40vw;
         left: 50%;
+        top: 50%;
       }
 
     }
@@ -164,8 +169,8 @@ html, body {
       width: calc(100% - #{($task-space-wrapper-size/1.85)});
 
       #big-day{
-        height: 38vw;
-        width: 38vw;
+        height: 75%;
+        width: 75%;
         left: 50%;
       }
 

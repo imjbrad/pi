@@ -1,3 +1,5 @@
+import { PieUtilities } from '../components/TaskDonutUtilities.js';
+
 export function MainController ($scope, $timeout, $filter) {
 
     'ngInject';
@@ -24,6 +26,8 @@ export function MainController ($scope, $timeout, $filter) {
         ]
       };
 
+      $scope.Utilities = PieUtilities;
+
       $scope.selectTask = function(i){
         $scope.selectedTaskDetail = $scope.taskData.tasks[i];
         $scope.selectedTaskIndex = i;
@@ -37,12 +41,57 @@ export function MainController ($scope, $timeout, $filter) {
 
         var newTask = {
           name: $scope.newTaskName,
-          angleSize: 20,
+          angleSize: PieUtilities.toAngleSize(15),
           color: "#f97340"
         };
 
         $scope.taskData.tasks.push(newTask);
         $scope.newTaskName = "";
+        $scope.selectTask($scope.taskData.tasks.length-1);
+        $scope.taskDonuts[0].redraw();
+      };
+
+      function insertAfter(task){
+        var nextTask = $scope.taskData.tasks[$scope.selectedTaskIndex+1];
+        console.log(nextTask);
+        if(nextTask && nextTask.insertedAfterward){
+          $scope.taskData.tasks.splice($scope.selectedTaskIndex+1, 1, task);
+        }else{
+          $scope.taskData.tasks.push(task);
+        }
+
+        $scope.taskDonuts[0].redraw();
+      }
+
+      $scope.addBreakTaskAfterward = function(){
+
+        var newBreakTask = {
+          name: '30 Minute Break',
+          angleSize: PieUtilities.toAngleSize(30),
+          color: PieUtilities.colors.night,
+          taskType: 'standardBreak',
+          insertedAfterward: true
+        };
+
+        insertAfter(newBreakTask);
+
+      };
+
+      $scope.addEatTaskAfterward = function(){
+
+        var newEatTask = {
+          name: 'Eat',
+          angleSize: PieUtilities.toAngleSize(45),
+          color: PieUtilities.colors.day,
+          taskType: 'standardBreak',
+          insertedAfterward: true
+        };
+
+        insertAfter(newEatTask);
+      };
+
+      $scope.removeTaskAfterward = function(){
+        $scope.taskData.tasks.splice($scope.selectedTaskIndex+1, 1);
         $scope.selectTask($scope.taskData.tasks.length-1);
         $scope.taskDonuts[0].redraw();
       };
@@ -59,6 +108,23 @@ export function MainController ($scope, $timeout, $filter) {
         }
       });
 
+      $scope.$watch('selectedTaskDetail.afterward', function(){
+        var key = $scope.selectedTaskDetail.afterward;
+
+        if(key){
+          if(key == "break"){
+            $scope.addBreakTaskAfterward();
+          }
+
+          if(key == "eat"){
+            $scope.addEatTaskAfterward();
+          }
+        }else{
+          $scope.removeTaskAfterward();
+        }
+
+      });
+
       $scope.$watch('selectedTaskDetail.angleSize', function() {
         var newTimeAllotment = $scope.selectedTaskDetail.angleSize;
         if(newTimeAllotment){
@@ -68,11 +134,15 @@ export function MainController ($scope, $timeout, $filter) {
             terminalAngle: slice.calculateDrawingAngles(newTimeAllotment).terminalAngle
           });
         }
+        console.log("Angle "+newTimeAllotment+" Minutes: "+PieUtilities.toMinutes(newTimeAllotment));
       });
 
       $scope.$watch('taskData', function(){
         $scope.taskDataString = JSON.stringify($scope.taskData, null, 4);
       }, true);
+
+
+
 
       $scope.sortableOptions = {
 

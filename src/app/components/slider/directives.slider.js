@@ -1,10 +1,14 @@
+import { PieUtilities } from '../TaskDonutUtilities.js';
+
 export function SliderDirective(){
 
         return {
             restrict: 'E',
             replace: false,
             scope: {
-                sliderValue: '='
+                sliderValue: '=',
+                min: '=',
+                max: '='
             },
             templateUrl: 'app/components/slider/slider.html',
             link: function($scope, element, attr, $interval) {
@@ -12,10 +16,8 @@ export function SliderDirective(){
                 var slider_bar = angular.element('.slider-bar', element),
                     value_bar = angular.element('.value-bar', slider_bar),
                     handle = angular.element('.handle', slider_bar),
-                    min = attr["min"] || 0,
-                    max = attr["max"] || 100;
-
-                console.log(min, max);
+                    min = $scope.min || 0,
+                    max = $scope.max || 100;
 
                 //1x1 pixel transparent image for the dragging ghost
                 var img = document.createElement("img");
@@ -23,49 +25,69 @@ export function SliderDirective(){
 
                 function _xBound(element, point){
                     var bounds = element.getBoundingClientRect();
-                    if((point.x < bounds.right) && (point.x > bounds.left))
-                    {
-                        return true;
-                    }
+                    return (point.x <= bounds.right + handle.width()) && (point.x >= bounds.left - handle.width());
                 }
 
-                //simple map number to range of numbers
-                //http://stackoverflow.com/questions/10756313/javascript-jquery-map-a-range-of-numbers-to-another-range-of-numbers
-                function _mapNum(i, in_min , in_max , out_min , out_max ) {
-                    return ( i - in_min ) * ( out_max - out_min ) / ( in_max - in_min ) + out_min;
+                function _mapNum(i) {
+                    var mapped = ((i - min) / (max - min)) * 100;
+                    return snap(mapped);
                 }
 
                 function _findValue(bar, point){
                     var bounds = bar.getBoundingClientRect(),
                         i = point.x-bounds.left,
-                        total = bounds.width;
+                        total = bounds.width,
+                        fraction = (i/total),
+                        percentage = fraction*100,
+                        raw = Math.round(fraction*max);
+
+                        if(raw <= min ){
+                            raw = min;
+                        }
+
+                        if(raw >= max){
+                            raw = max
+                        }
+
                         return {
-                            "percentage": (i/total)*100,
-                            "raw": Math.round((i/total)*max)
+                            "percentage": percentage,
+                            "raw": raw
                         };
                 }
 
-                function _setWidth(percentage){
-                    value_bar[0].style.width = percentage+"%";
+                function _setWidth(value){
+                    value_bar[0].style.width = value+"%";
                 }
 
-                slider_bar[0].addEventListener("dragstart", function(e) {
-                    e.dataTransfer.setDragImage(img, 0, 0);
-                }, false);
+                function snap(x, i){
+                    var i = i || 1;
+                    return Math.ceil(x/i)*i;
+                }
 
-                slider_bar[0].ondrag = function(e){
-                    var dragging_point = {x: e.pageX, y: e.pageY};
-                    if (_xBound(slider_bar[0], dragging_point)){
-                        var value = _findValue(slider_bar[0], dragging_point);
-                        $scope.sliderValue = value.raw;
+                function moveSliderFromClickOrDrag(e){
+                    var point = {x: e.pageX, y: e.pageY};
+                    if (_xBound(slider_bar[0], point)){
+                        var value = _findValue(slider_bar[0], point);
+                        //snap every 15 minutes
+                        var raw = value.raw;
+                        raw = snap(raw, PieUtilities.toAngleSize(15));
+                        $scope.sliderValue = raw;
                         $scope.$apply();
                     }
-                };
+                }
+
+                function setDragImage(e){
+                    e.dataTransfer.setDragImage(img, 0, 0);
+                }
+
+                slider_bar[0].addEventListener("click", moveSliderFromClickOrDrag);
+                slider_bar[0].addEventListener("dragstart", setDragImage);
+                slider_bar[0].addEventListener("drag", moveSliderFromClickOrDrag);
 
                 $scope.$watch('sliderValue', function(){
                     var sliderValue = $scope.sliderValue;
                     if(sliderValue){
-                        _setWidth(_mapNum(sliderValue, min, max, 0, 100));
+                        _setWidth(_mapNum(sliderValue));
                     }
                 });
             }

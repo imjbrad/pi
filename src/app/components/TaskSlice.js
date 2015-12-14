@@ -1,3 +1,5 @@
+import { PieUtilities } from './TaskDonutUtilities.js';
+
 export function findRelativeMousePoints(mx, my, TaskDonut){
   //translate the mouse coordinates to the svg viewbox coordinates
   var root = TaskDonut.svgNode[0];
@@ -18,6 +20,8 @@ export function TaskSlice(TaskDonut, segmentIndex) {
   var stopDraggingTaskSliceByEmoji;
   var cancelledTaskSliceDropInBucket;
   var successfulTaskDropInBucket;
+  var showTimeWhileResizing;
+  var hideTimeWhenNotResizing;
   var init;
   var HANDLE_SLICE_SIZE = 10;
   var ghost_circle;
@@ -25,8 +29,9 @@ export function TaskSlice(TaskDonut, segmentIndex) {
   var ghost_emoji_width = 7;
   var ghost_group;
   var dropCanceled;
+  var timeGroup = TaskDonut.drawingArea.g();
 
-  var patternImg = TaskDonut.drawingArea.image("app/assets/dark-stripes.png", 0, 0, 25, 25).attr({opacity:.15});
+  var patternImg = TaskDonut.drawingArea.image("app/assets/dark-stripes.png", 0, 0, 25, 25).attr({opacity: 1});
   var pattern = patternImg.toPattern(0, 0, 25, 25);
 
   var sleepGradient = TaskDonut.drawingArea.gradient("l(0, 0, 1, 0)#F8B978-#5C6879");
@@ -40,7 +45,13 @@ export function TaskSlice(TaskDonut, segmentIndex) {
   self.innerStartingVectorLine = TaskDonut.drawingArea.line();
   self.innerTerminalVectorLine = TaskDonut.drawingArea.line();
 
+  self.time = TaskDonut.drawingArea.text();
+  self.sun = TaskDonut.drawingArea.circle();
+
   self.tempData = {};
+
+  timeGroup.add(self.time, self.sun);
+  timeGroup.attr({opacity: 0});
 
   TaskDonut.donut_group.add(self.slice, self.innerSlice, self.innerStartingVectorLine, self.innerTerminalVectorLine);
 
@@ -53,8 +64,11 @@ export function TaskSlice(TaskDonut, segmentIndex) {
     self.startingAngle = self.drawingAngles["startingAngle"];
     self.terminalAngle = self.drawingAngles["terminalAngle"];
 
-    self.innerSliceRadius = TaskDonut.radius/1.015;
+
+    self.innerSliceRadius = TaskDonut.sliceBorderRadius;
     self.emojiRadius =  self.innerSliceRadius/1.1;
+
+    self.timeRadius = TaskDonut.outerRadius + 8;
 
     var startingVector = [
       TaskDonut.centerX,
@@ -105,14 +119,26 @@ export function TaskSlice(TaskDonut, segmentIndex) {
       (TaskDonut.centerY+self.emojiRadius*Math.sin(self.startingAngle + Snap.rad(self.localAngle/2)))
     ];
 
+    var timeVector = [
+      TaskDonut.centerX,
+      TaskDonut.centerY,
+      TaskDonut.centerX+self.timeRadius*Math.cos(self.terminalAngle),
+      TaskDonut.centerY+self.timeRadius*Math.sin(self.terminalAngle)
+    ];
+
     self.innerStartingVector = innerStartingVector;
     self.innerTerminalVector = innerTerminalVector;
     self.startingVector = startingVector;
     self.terminalVector = terminalVector;
     self.emojiVector = emojiVector;
+    self.timeVector = timeVector;
 
     self.handleStartingVector = handleStartingVector;
     self.handleTerminalVector = handleTerminalVector;
+
+    timeGroup.attr({
+      transform: "rotate("+(TaskDonut.angle_offset) + " " + TaskDonut.centerX +" "+ TaskDonut.centerY +")"
+    });
 
   };
 
@@ -220,23 +246,43 @@ export function TaskSlice(TaskDonut, segmentIndex) {
 
     }
 
+    //time
+    var timeBox = self.time.getBBox();
+
+    self.time.attr({
+      x: self.timeVector[2],
+      y: self.timeVector[3],
+      //text: PieUtilities.toTimeOfDay(Snap.deg(self.terminalAngle), "h:mm A"),
+      "alignment-baseline": "central",
+      "font-size": 3.5,
+      "fill": "black",
+      transform: "rotate("+(-TaskDonut.angle_offset) + " " + self.timeVector[2] +" "+ self.timeVector[3] +")"
+    });
+
+    self.sun.attr({
+      cx: self.timeVector[2],
+      cy: self.timeVector[3],
+      //r: 1.5,
+      fill: PieUtilities.colorForAngle(Snap.deg(self.terminalAngle))
+    });
+
     //apply attributes
-    self.innerStartingVectorLine.attr({x1: TaskDonut.centerX, y1: TaskDonut.centerY, x2: self.innerStartingVector[2], y2: self.innerStartingVector[3], stroke:"#ededed", "stroke-width":.25});
-    self.innerTerminalVectorLine.attr({x1: TaskDonut.centerX, y1: TaskDonut.centerY, x2: self.innerTerminalVector[2], y2: self.innerTerminalVector[3], stroke:"#ededed", "stroke-width":.25});
-    self.slice.attr({"d": categorySlice, stroke:"transparent", "stroke-width":.25, "fill": suggestedBackgroundColor || fill});
-    self.innerSlice.attr({"d": emojiSlice, stroke:"white", "stroke-width":.25, "fill": "#FFFFFF"});
+    self.innerStartingVectorLine.attr({x1: TaskDonut.centerX, y1: TaskDonut.centerY, x2: self.innerStartingVector[2], y2: self.innerStartingVector[3], stroke:"#cccccc", "stroke-width": .1});
+    self.innerTerminalVectorLine.attr({x1: TaskDonut.centerX, y1: TaskDonut.centerY, x2: self.innerTerminalVector[2], y2: self.innerTerminalVector[3], stroke:"#cccccc", "stroke-width": .1});
+    self.slice.attr({"d": categorySlice, stroke:"transparent", "stroke-width": 0, "fill": '#f37342'});
+    self.innerSlice.attr({"d": emojiSlice, stroke:"white", "stroke-width": 0, "fill": "#FFFFFF"});
 
     //apply special types
     if(self.task.taskType && self.task.taskType == "standardBreak"){
-      self.slice.attr({"fill": pattern, 'stroke-width': 0});
-      self.innerSlice.attr({"fill": "transparent", 'stroke-width': 0});
+      self.slice.attr({"fill": 'transparent', 'stroke-width': 0, 'fill-opacity': 1});
+      self.innerSlice.attr({"fill": pattern, 'stroke-width': 0, 'fill-opacity': .6});
     }
 
     if(self.task.taskType && self.task.taskType == "standardSleep"){
       self.innerStartingVectorLine.attr({"stroke-width": 0});
       self.innerTerminalVectorLine.attr({"stroke-width": 0});
-      self.slice.attr({"fill": sleepGradient, opacity: 1, 'stroke-width': 0});
-      self.innerSlice.attr({"fill": sleepGradient, opacity: .37, 'stroke-width': 0});
+      self.slice.attr({"fill": 'transparent', opacity: 1, 'stroke-width': 0});
+      self.innerSlice.attr({"fill": sleepGradient, opacity: .5, 'stroke-width': 0});
     }
 
   };
@@ -258,7 +304,7 @@ export function TaskSlice(TaskDonut, segmentIndex) {
 
     self.handle.attr({"d": handleSlice, "fill":"transparent", "opacity": 0.4});
 
-    self.handle.drag(resizeTaskSliceByDraggingHandle);
+    self.handle.drag(resizeTaskSliceByDraggingHandle, null, hideTimeWhenNotResizing);
     TaskDonut.donut_group.add(self.handle);
 
   };
@@ -357,6 +403,16 @@ export function TaskSlice(TaskDonut, segmentIndex) {
     }
   };
 
+  showTimeWhileResizing = function(){
+    timeGroup.attr({
+      opacity: 1
+    });
+  };
+
+  hideTimeWhenNotResizing = function(){
+    timeGroup.attr({opacity: 0});
+  };
+
   resizeTaskSliceByDraggingHandle = function(dx, dy, mx, my){
 
     //translate the mouse coordinates to the svg viewbox coordinates
@@ -380,12 +436,18 @@ export function TaskSlice(TaskDonut, segmentIndex) {
 
     var mouseAngle = Math.atan2(relative_my - relative_center_y, relative_mx - relative_center_x).mod(2*Math.PI);
 
+
+    var fiveMinutes = PieUtilities.toAngleSize(5);
+
     var newLocalTheta = (Snap.deg((mouseAngle - self.terminalAngle)) + self.localAngle);
+    var newLocalTheta = Math.ceil(newLocalTheta/fiveMinutes)*fiveMinutes;
 
     self.update({
       localAngle: newLocalTheta,
       terminalAngle: self.calculateDrawingAngles(newLocalTheta).terminalAngle
     });
+
+    showTimeWhileResizing();
 
     TaskDonut.dispatch("userUpdatedDonutManually", [self.tasks]);
 

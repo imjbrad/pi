@@ -20,7 +20,7 @@ export function TaskDonut(svgArea, _tasks) {
 
   init = function(){
 
-    patternImg = drawingArea.image("app/assets/dark-stripes.png", 0, 0, 25, 25).attr({"opacity": 1});
+    patternImg = drawingArea.image("app/assets/dark-stripes.png", 0, 0, 25, 25).attr({"opacity": .27});
     pattern = patternImg.toPattern(0, 0, 25, 25);
 
     self.tasks = self.tasks || _tasks;
@@ -65,19 +65,18 @@ export function TaskDonut(svgArea, _tasks) {
   };
 
   determineSize = function(){
+
     self.svgNode = $(self.drawingArea.node);
 
-    self.categoryOuterRadius = 100;
-    self.categoryInnerRadius = self.categoryOuterRadius/1.17;
-
-    self.outerRadius = self.categoryInnerRadius/1.06;
+    self.outerRadius = 100;
     self.radius = self.outerRadius/1.01;
+    self.sliceBorderRadius = self.radius/1.03;
     self.innerSliceRadius = self.radius/1.26;
 
     self.pictureRadius = self.innerSliceRadius/1.1;
 
-    self.centerX = self.categoryOuterRadius;
-    self.centerY = self.categoryOuterRadius;
+    self.centerX = self.outerRadius;
+    self.centerY = self.outerRadius;
 
   };
 
@@ -89,7 +88,7 @@ export function TaskDonut(svgArea, _tasks) {
     var outerPictureX = self.centerX - outerPictureWidth/2;
     var outerPictureY = self.centerY - outerPictureHeight/2;
     var blur = drawingArea.filter(Snap.filter.blur(4, 4));
-    var outerPicture = drawingArea.image("app/assets/me4.jpg", outerPictureX, outerPictureY, outerPictureWidth, outerPictureHeight)
+    var outerPicture = drawingArea.image("app/assets/me6.jpg", outerPictureX, outerPictureY, outerPictureWidth, outerPictureHeight)
         .attr({filter: blur});
 
     //self portrait
@@ -97,7 +96,7 @@ export function TaskDonut(svgArea, _tasks) {
     var pictureHeight = pictureWidth;
     var pictureX = self.centerX - pictureWidth/2;
     var pictureY = self.centerY - pictureHeight/2;
-    var picture = drawingArea.image("app/assets/me4.jpg", pictureX, pictureY, pictureWidth, pictureHeight)
+    var picture = drawingArea.image("app/assets/me6.jpg", pictureX, pictureY, pictureWidth, pictureHeight)
         //.attr({filter: drawingArea.filter(Snap.filter.grayscale(.5))})
         ;
 
@@ -108,26 +107,27 @@ export function TaskDonut(svgArea, _tasks) {
 
     //mask outer self portrait
     var outerPictureMask = drawingArea.circle();
-    outerPictureMask.attr({"cx":self.centerX, "cy":self.centerY, "r":self.radius, "fill":"white"});
+    outerPictureMask.attr({"cx":self.centerX, "cy":self.centerY, "r":self.innerSliceRadius, "fill":"white"});
     outerPicture.attr({mask: outerPictureMask, opacity: .6});
 
     //ring group
     self.donut_group = self.drawingArea.g();
 
     //outermost ring, white border
-    var outerCircle = drawingArea.circle();
-    var shadow = drawingArea.filter(Snap.filter.shadow(0, 0, 2, "black", .17));
-    outerCircle.attr({"cx":self.centerX, "cy":self.centerY, "r":self.outerRadius, "fill": "white", filter: shadow});
+    //var outerCircle = drawingArea.circle();
+    //var shadow = drawingArea.filter(Snap.filter.shadow(0, 0, 2, "black", .17));
+    //outerCircle.attr({"cx":self.centerX, "cy":self.centerY, "r":self.outerRadius, stroke: "white", fill:"transparent", filter: shadow});
 
     //task ring, categories
+    var sleepGradient = drawingArea.gradient("l(0, 0, 1, 0)#F8B978-#5C6879");
     var circle = drawingArea.circle();
-    circle.attr({"cx":self.centerX, "cy":self.centerY, "r":self.radius, "fill": pattern, 'fill-opacity': ".35"});
+    circle.attr({"cx":self.centerX, "cy":self.centerY, "r":self.sliceBorderRadius, "fill": pattern, 'fill-opacity': "1"});
 
     //create mask
     var donutMaskCircle = drawingArea.circle(self.centerX, self.centerY, self.outerRadius+5).attr({"fill":"white"});
     var donutMaskInnerCircle = drawingArea.circle(self.centerX, self.centerY, self.innerSliceRadius);
     var donutMask = drawingArea.g().add(donutMaskCircle, donutMaskInnerCircle);
-    self.donut_group.add(outerCircle, circle);
+    self.donut_group.add(circle);
 
     //add task slices
     self.tasks.forEach(function(element, index, array){

@@ -4,71 +4,6 @@
   position: relative;
   border: 1px solid $pie-light-grey;
 
-  &.selected {
-    //background: rgba(255, 255, 255, .5);
-    //padding: 4px;
-  }
-
-  .time-allotment-btn-group {
-    margin-bottom: 9px;
-
-    .btn {
-      line-height: 11px;
-    }
-
-    .btn span{
-      font-size: 9px;
-      font-family: source_sans_proregular, sans-serif;
-    }
-  }
-
-  .task-slider {
-    height: 12px;
-  }
-
-  .slider-bar{
-    height: 12px;
-    
-    .bar, .value-bar{
-      height: 2px;
-    }
-    
-    .value-bar {
-      background-color: $pie-grey;
-
-      .handle {
-        width: 8px;
-        height: 8px;
-        right: 0;
-        top: 50%;
-        -webkit-transform: translateY(-50%);
-        background-color: $pie-grey;
-        z-index: initial;
-        cursor: pointer;
-
-        &:hover{
-          background-color: $pie-grey;
-        }
-
-      }
-    }
-
-  }
-
-
-  .emoji-picker-container{
-    padding: 6px;
-    border: 1px solid $pie-light-grey;
-    position: relative;
-    overflow: hidden;
-    height: 165px;
-
-    .EmojiPicker{
-      padding: 0;
-      //-webkit-mask-image: -webkit-linear-gradient(-270deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.14) 14.49%, rgba(0, 0, 0, 1) 100%);
-    }
-  }
-
   #task-name {
     background-color: white;
     font-family: source_sans_probold, sans-serif;
@@ -96,12 +31,150 @@
         margin-bottom: 9px;
       }
 
-      .item {
+    }
 
+  }
+
+  .time-allotment{
+
+    .time-allotment-btn-group {
+      margin-bottom: 9px;
+      table-layout: auto;
+
+      .btn {
+        line-height: 11px;
+        padding: 6px 3px;
+
+        &.active {
+          color: white;
+        }
+      }
+
+      .btn span{
+        font-size: 11px;
+        font-family: source_sans_prosemibold, sans-serif;
+        vertical-align: middle;
+
+        .unit {
+          font-size: 9px;
+          margin-top: 0px;
+          font-family: source_sans_proregular, sans-serif;
+        }
+
+      }
+
+      #plus{
+
+        min-width: 45px;
+
+        .minutes {
+          display: none;
+        }
+
+        .unit {
+          font-size: 13px;
+          font-family: source_sans_prosemibold, sans-serif;
+        }
+
+        &.revealMinutes {
+
+          padding: 0;
+
+          .minutes{
+            display: block;
+            font-size: 9px;
+          }
+
+          .unit {
+            font-size: inherit;
+            font-family: source_sans_proregular, sans-serif;
+          }
+        }
+
+      }
+    }
+
+    .task-slider {
+      height: 12px;
+      opacity: 1;
+      -webkit-transition: opacity .2s;
+
+      &.fadeOut {
+        opacity: 0;
+        visibility: hidden;
       }
 
     }
 
+    .slider-bar {
+      height: 12px;
+
+      .bar, .value-bar {
+        height: 2px;
+      }
+
+      .value-bar {
+        background-color: $pie-grey;
+        min-width: 0px;
+
+        .handle {
+          width: 8px;
+          height: 8px;
+          right: -8px;
+          top: 50%;
+          -webkit-transform: translateY(-50%);
+          background-color: $pie-grey;
+          z-index: initial;
+          cursor: pointer;
+
+          &:hover {
+            background-color: $pie-grey;
+          }
+
+        }
+      }
+
+    }
+  }
+
+  .pick-emoji {
+    .emoji-picker-container{
+      padding: 6px;
+      border: 1px solid $pie-light-grey;
+      position: relative;
+      overflow: hidden;
+      height: 165px;
+
+      .EmojiPicker{
+        padding: 0;
+        //-webkit-mask-image: -webkit-linear-gradient(-270deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.14) 14.49%, rgba(0, 0, 0, 1) 100%);
+      }
+    }
+  }
+
+  .afterwards {
+
+    .pie-task-detail-btn.btn{
+      border: 1px solid $pie-light-grey;
+      background-color: $pie-off-white;
+      border-radius: 0;
+      display: block;
+      margin-bottom: 6px;
+      font-family: source_sans_probold, sans-serif;
+      font-size: 9px;
+      text-align: center;
+      color: $pie-dark-grey;
+      padding: 12px;
+      width: 100%;
+      -webkit-appearance: none;
+
+      &.active {
+        background-color: $pie-dark-grey;
+        color: white;
+        box-shadow: inset 0 1px 9px rgba(0, 0, 0, 0.01);
+      }
+
+    }
   }
 
 }

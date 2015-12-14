@@ -15,14 +15,20 @@ button {
 }
 
 .pie-btn-group-justified{
+
   .btn {
     border-color: $pie-light-grey;
     border-radius: 2px;
     background-color: #FBFBFB;
     color: $pie-dark-grey;
 
+    &:not(:first-of-type){
+      border-left: none;
+    }
+
     &.active {
-      box-shadow: inset 0 1px 7px rgba(0, 0, 0, 0.1);
+      background-color: $pie-dark-grey;
+      box-shadow: inset 0 1px 9px rgba(0, 0, 0, 0.1);
     }
   }
 }

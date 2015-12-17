@@ -64,7 +64,18 @@ export function PieUtilities(){
 
 PieUtilities.colors = {
     day: "#f37342",
-    night: "#37445c"
+    night: "#37445c",
+    pieOffWhite: "#FBFBFB",
+    pieLightGrey: "#E5E5E5",
+    pieGrey: "#CCCCCC",
+    pieDarkGrey: "818285",
+    pieOrange: "#f37342",
+    pieOrangeCream: "#f8b978",
+    piePink: "#f1656f",
+    pieLightBlue: "#9ec2e1",
+    pieDimBlue: "#5c6879",
+    pieDarkBlue: "#37445c",
+    pieYellow: "#f7ce6e"
 };
 
 PieUtilities.colors.gradients = {

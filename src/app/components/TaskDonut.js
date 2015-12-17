@@ -20,8 +20,8 @@ export function TaskDonut(svgArea, _tasks) {
 
   init = function(){
 
-    patternImg = drawingArea.image("app/assets/dark-stripes.png", 0, 0, 25, 25).attr({"opacity": .27});
-    pattern = patternImg.toPattern(0, 0, 25, 25);
+    patternImg = drawingArea.image("http://www.transparenttextures.com/patterns/debut-light.png", 0, 0, 100, 100).attr({"opacity": 1});
+    pattern = patternImg.toPattern(0, 0, 100, 100);
 
     self.tasks = self.tasks || _tasks;
     self.drawingArea = drawingArea;
@@ -70,7 +70,7 @@ export function TaskDonut(svgArea, _tasks) {
 
     self.outerRadius = 100;
     self.radius = self.outerRadius/1.01;
-    self.sliceBorderRadius = self.radius/1.03;
+    self.sliceBorderRadius = self.radius/1.02;
     self.innerSliceRadius = self.radius/1.26;
 
     self.pictureRadius = self.innerSliceRadius/1.1;
@@ -88,7 +88,7 @@ export function TaskDonut(svgArea, _tasks) {
     var outerPictureX = self.centerX - outerPictureWidth/2;
     var outerPictureY = self.centerY - outerPictureHeight/2;
     var blur = drawingArea.filter(Snap.filter.blur(4, 4));
-    var outerPicture = drawingArea.image("app/assets/me6.jpg", outerPictureX, outerPictureY, outerPictureWidth, outerPictureHeight)
+    var outerPicture = drawingArea.image("app/assets/me4.jpg", outerPictureX, outerPictureY, outerPictureWidth, outerPictureHeight)
         .attr({filter: blur});
 
     //self portrait
@@ -96,7 +96,7 @@ export function TaskDonut(svgArea, _tasks) {
     var pictureHeight = pictureWidth;
     var pictureX = self.centerX - pictureWidth/2;
     var pictureY = self.centerY - pictureHeight/2;
-    var picture = drawingArea.image("app/assets/me6.jpg", pictureX, pictureY, pictureWidth, pictureHeight)
+    var picture = drawingArea.image("app/assets/me4.jpg", pictureX, pictureY, pictureWidth, pictureHeight)
         //.attr({filter: drawingArea.filter(Snap.filter.grayscale(.5))})
         ;
 
@@ -119,9 +119,8 @@ export function TaskDonut(svgArea, _tasks) {
     //outerCircle.attr({"cx":self.centerX, "cy":self.centerY, "r":self.outerRadius, stroke: "white", fill:"transparent", filter: shadow});
 
     //task ring, categories
-    var sleepGradient = drawingArea.gradient("l(0, 0, 1, 0)#F8B978-#5C6879");
     var circle = drawingArea.circle();
-    circle.attr({"cx":self.centerX, "cy":self.centerY, "r":self.sliceBorderRadius, "fill": pattern, 'fill-opacity': "1"});
+    circle.attr({"cx":self.centerX, "cy":self.centerY, "r":self.radius, "fill": "#fbfcfc", 'fill-opacity': ".23"});
 
     //create mask
     var donutMaskCircle = drawingArea.circle(self.centerX, self.centerY, self.outerRadius+5).attr({"fill":"white"});
@@ -179,7 +178,28 @@ export function TaskDonut(svgArea, _tasks) {
      * of a moment in ones life.
      * */
 
-    self.slices.forEach(function(element, index, array){
+
+      /*
+      * I wrote this a few days ago as a rewrite of ^
+      * I think this gets the idea more:
+      *
+      * A programmer is tasked with dictating to a machine in great
+      * detail, his needs and concerns. The machine listens and works
+      * to serve the programmer. However, as is the case with any situation
+      * in life, one must have an understanding of an issue before exploring
+      * a solution. So, in the case of creating tools and expressions with
+      * code, those aesthetic or contextual issues exist at a personal
+      * level, and therefore require a personal meditation to conquer.
+      *
+      * Thus, code becomes a medium. It becomes a deeply personal thing in
+      * which a programmer becomes more an artist or craftsperson. He is
+      * tasked with molding and shaping with his voice, a satisfying,
+      * functioning image.. an attempt at representing answers to a persons
+      * most challenging and persistent questions
+      *
+      * */
+
+     self.slices.forEach(function(element, index, array){
       self.slices[index].drawHandle();
     });
 

@@ -31,8 +31,8 @@ export function TaskSlice(TaskDonut, segmentIndex) {
   var dropCanceled;
   var timeGroup = TaskDonut.drawingArea.g();
 
-  var patternImg = TaskDonut.drawingArea.image("app/assets/dark-stripes.png", 0, 0, 25, 25).attr({opacity: 1});
-  var pattern = patternImg.toPattern(0, 0, 25, 25);
+  var patternImg = TaskDonut.drawingArea.image("http://www.transparenttextures.com/patterns/debut-light.png", 0, 0, 100, 100).attr({"opacity": 1});
+  var pattern = patternImg.toPattern(0, 0, 100, 100);
 
   var sleepGradient = TaskDonut.drawingArea.gradient("l(0, 0, 1, 0)#F8B978-#5C6879");
 
@@ -269,20 +269,22 @@ export function TaskSlice(TaskDonut, segmentIndex) {
     //apply attributes
     self.innerStartingVectorLine.attr({x1: TaskDonut.centerX, y1: TaskDonut.centerY, x2: self.innerStartingVector[2], y2: self.innerStartingVector[3], stroke:"#cccccc", "stroke-width": .1});
     self.innerTerminalVectorLine.attr({x1: TaskDonut.centerX, y1: TaskDonut.centerY, x2: self.innerTerminalVector[2], y2: self.innerTerminalVector[3], stroke:"#cccccc", "stroke-width": .1});
-    self.slice.attr({"d": categorySlice, stroke:"transparent", "stroke-width": 0, "fill": '#f37342'});
+    self.slice.attr({"d": categorySlice, stroke:"transparent", "stroke-width": 0, "fill": PieUtilities.colors.pieOrangeCream});
     self.innerSlice.attr({"d": emojiSlice, stroke:"white", "stroke-width": 0, "fill": "#FFFFFF"});
 
     //apply special types
     if(self.task.taskType && self.task.taskType == "standardBreak"){
-      self.slice.attr({"fill": 'transparent', 'stroke-width': 0, 'fill-opacity': 1});
-      self.innerSlice.attr({"fill": pattern, 'stroke-width': 0, 'fill-opacity': .6});
+      self.innerStartingVectorLine.attr({"stroke-width": 0});
+      self.innerTerminalVectorLine.attr({"stroke-width": 0});
+      self.slice.attr({"fill": "#ffffff", 'stroke-width': 0, 'fill-opacity': .54});
+      self.innerSlice.attr({"fill": "#ffffff", 'stroke-width': 0, 'fill-opacity': .54});
     }
 
     if(self.task.taskType && self.task.taskType == "standardSleep"){
       self.innerStartingVectorLine.attr({"stroke-width": 0});
       self.innerTerminalVectorLine.attr({"stroke-width": 0});
-      self.slice.attr({"fill": 'transparent', opacity: 1, 'stroke-width': 0});
-      self.innerSlice.attr({"fill": sleepGradient, opacity: .5, 'stroke-width': 0});
+      self.slice.attr({"fill": sleepGradient, opacity: .85, 'stroke-width': 0});
+      self.innerSlice.attr({"fill": sleepGradient, opacity: .75, 'stroke-width': 0});
     }
 
   };

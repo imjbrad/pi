@@ -1,0 +1,23 @@
+#Space {
+
+  &.single-day-view {
+
+    #CircleSpace {
+      width: 100%;
+
+      #big-day{
+        height: 60%;
+        width: 60%;
+        top: 85px;
+        margin: auto;
+      }
+
+    }
+
+    #TaskSpace {
+      width: 0;
+      overflow: hidden;
+    }
+
+  }
+}

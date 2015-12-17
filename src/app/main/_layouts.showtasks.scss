@@ -1,0 +1,61 @@
+#Space.single-day-view {
+
+  $partially-expanded-width: #{$_task-space-wrapper-size/1.85};
+
+  &.show-list {
+
+    #CircleSpace {
+      width: calc(100% - #{$partially-expanded-width});
+
+      header{
+        position: relative;
+        width: 90%;
+        left: 10%;
+        margin: 0;
+        margin-top: 70px;
+        overflow: auto;
+      }
+
+      #show-tasks-button{
+        height: 35px;
+
+        .icon{
+          background-color: transparent;
+        }
+
+      }
+
+      #big-day {
+        height: 60%;
+        width: 60%;
+        top: 85px;
+        margin: auto;
+      }
+
+    }
+
+    #TaskSpace {
+      width: $partially-expanded-width;
+      overflow: visible;
+
+      #task-space-wrapper {
+        position: relative;
+        border-left: 1px dotted rgba(255, 255, 255, 0.95);
+        padding-left: 5px;
+
+      }
+    }
+
+    &.show-list-expanded {
+
+      #CircleSpace {
+        width: calc(100% - (#{$_task-space-wrapper-size} + 4vw));
+      }
+
+      #TaskSpace {
+        width: calc(#{$task-space-wrapper-size} + 4vw);
+      }
+
+    }
+  }
+}

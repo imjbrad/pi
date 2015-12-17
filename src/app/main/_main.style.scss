@@ -1,6 +1,10 @@
 $sleep-blue: #5B6778;
 $footer-size: 45px;
-$task-space-wrapper-size: 590px;
+//$task-space-wrapper-size: calc(100vw * .4);
+$task-space-wrapper-size: 600px;
+$_task-space-wrapper-size: 600px;
+$task-space-size: 33%;
+$transition: all .2s linear;
 
 *{
   box-sizing: border-box;
@@ -12,6 +16,62 @@ html, body {
 }
 
 body {
+}
+
+header {
+
+  position: relative;
+  width: 80%;
+  left: 10%;
+  margin-top: 70px;
+  overflow: auto;
+  -webkit-transition: $transition;
+
+  .header-button{
+
+    display: block;
+    overflow: auto;
+    height: 40px;
+    padding: 0;
+    -webkit-transition: $transition;
+
+    .label{
+      background-color: rgba(255, 255, 255, .5);
+      color: $pie-dark-grey;
+      float: left;
+      height: inherit;
+      padding: 0px 27px;
+      line-height: 40px;
+      font-family: apercu_medium, sans-serif;
+      font-size: 12px;
+    }
+
+    .icon{
+      float: left;
+      background-color: white;
+      height: inherit;
+      width: 50px;
+      padding: 10px;
+      cursor: pointer;
+      -webkit-transition: $transition;
+
+      img{
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+      }
+    }
+  }
+
+  #day-picker-button{
+    float: left;
+  }
+
+  #show-tasks-button{
+    float: right;
+  }
+
 }
 
 #Space{
@@ -31,6 +91,7 @@ body {
   position: relative;
   -webkit-transform: translate3d(0, 0, 0);
   -webkit-transition: width .3s $easeInQuad;
+  //border:1px solid red;
 }
 
 .TaskDonut{
@@ -50,8 +111,8 @@ body {
 #TaskSpace {
 
   #task-space-wrapper {
-    top: 15%;
-    width: $task-space-wrapper-size - 10px;
+    margin-top: 70px;
+    width: $task-space-wrapper-size;
     position: relative;
 
     #task-detail-wrapper {
@@ -99,118 +160,8 @@ body {
     -webkit-transition: all .4s;
   }
 
-  #toggleListButton{
-    width: 57px;
-    height: 35px;
-    display: block;
-    position: absolute;
-    right: 0;
-    top: 15%;
-    cursor: pointer;
-    -webkit-transition: all .5s $easeInQuad;
-    background-image: url('../app/assets/list.png');
-    background-repeat: no-repeat;
-    background-size: 35px 35px;
-    background-position: right center;
-
-    &:hover .list-label{
-      opacity: 1;
-      -webkit-transition: opacity .2s;
-    }
-
-    .list-label {
-      opacity: 0;
-      font-weight: bold;
-      position: absolute;
-      top: 0;
-      left: 0;
-      font-size: 10px;
-      color: #B2B2B2;
-      -webkit-transition: opacity .2s;
-    }
-
-    .fa {
-      color: white;
-      position: absolute;
-      top: 0;
-      right: 0;
-    }
-  }
-
 }
 
-#Space {
-
-  &.single-day-view {
-    #CircleSpace {
-
-      width: 100%;
-
-      #big-day{
-        -webkit-transform: translateY(-50%) translateX(-50%);
-        height: 40vw;
-        width: 40vw;
-        left: 50%;
-        top: 50%;
-      }
-
-    }
-
-    #TaskSpace {
-      width: 0;
-      overflow: hidden;
-    }
-
-  }
-
-  &.show-list {
-
-    #CircleSpace {
-      width: calc(100% - #{($task-space-wrapper-size/1.85)});
-
-      #big-day{
-        height: 75%;
-        width: 75%;
-        left: 50%;
-      }
-
-      #toggleListButton{
-        right: 10px;
-        text-align: right;
-        background-image: none;
-      }
-
-    }
-
-    #TaskSpace {
-      width: $task-space-wrapper-size/1.85;
-      overflow: visible;
-
-      #task-space-wrapper {
-
-        top: 15%;
-        position: relative;
-        border-left: 1px dotted rgba(255, 255, 255, 0.95);
-        padding-left: 10px;
-
-      }
-    }
-
-    &.show-list-expanded {
-
-      #CircleSpace {
-        width: calc(100% - #{$task-space-wrapper-size});
-      }
-
-      #TaskSpace {
-        width: $task-space-wrapper-size;
-      }
-
-    }
-
-  }
-
-}
 
 /**for ui sortable**/
 footer{

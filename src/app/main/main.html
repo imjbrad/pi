@@ -1,5 +1,5 @@
-<div id="Space" class="single-day-view" ng-class="{'show-list': showListView, 'show-list-expanded': selectedTaskDetail.name}">
-  <div id="CircleSpace" class="">
+<div id="Space" class="single-day-view" ng-class="{'show-list': showListView, 'show-list-expanded': selectedTaskDetail.name != null}">
+  <div id="CircleSpace">
 
     <pre style="
     position:absolute;
@@ -9,12 +9,31 @@
       {{ taskDataString }}
     </pre>
 
+    <header>
+      <button id="day-picker-button" class="header-button">
+        <div class="label">
+          Monday, December 16
+        </div>
+        <div class="icon">
+          <img src="app/assets/group.svg">
+        </div>
+      </button>
+      <button id="show-tasks-button" class="header-button" ng-click="toggleListView()">
+        <div class="label" ng-hide="showListView">
+          {{ taskData.tasks.length || "No"  }} Task{{ taskData.tasks.length > 1 ? "s" : ""  }} Today
+        </div>
+        <div class="icon">
+          <img ng-src="{{ showListView ? 'app/assets/x.svg' : 'app/assets/list.svg'}}">
+        </div>
+      </button>
+    </header>
+
     <div id="big-day">
       <task-donut index="1"></task-donut>
     </div>
-    <button id="toggleListButton" ng-click="toggleListView()">
-      <span class="fa fa-2x fa-times" ng-show="showListView"></span>
-    </button>
+    <!--<button id="toggleListButton" ng-click="toggleListView()">-->
+      <!--<span class="fa fa-2x fa-times" ng-show="showListView"></span>-->
+    <!--</button>-->
   </div>
   <div id="TaskSpace">
     <div id="task-space-wrapper">
@@ -25,17 +44,23 @@
         <ul id="taskList" ui-sortable="sortableOptions" ng-model="taskData.tasks">
           <li ng-repeat="task in taskData.tasks" ng-click="selectTask($index)">
             <div class="task-item {{ task.taskType }}" ng-class="{'selected': $index == selectedTaskIndex}">
-              <div class="task-label">{{ task.name }}</div>
+              <input type="text" class="task-label" ng-model="task.name">
             </div>
           </li>
         </ul>
       </div>
       <div id="task-detail-wrapper">
+
         <div id="task-detail" ng-class="{'selected': selectedTaskIndex}">
-          <div id="task-name">
-            {{ selectedTaskDetail.name }}
-          </div>
+          <input type="text" id="task-name" ng-model="selectedTaskDetail.name" />
           <div id="task-details">
+            <div class="task-detail-item pick-emoji">
+              <div class="header">Pick an Emoji</div>
+              <div class="emoji-picker-container">
+                <emoji-picker selected-emoji-model="selectedTaskDetail.emoji"></emoji-picker>
+                <div class="white-gradient"></div>
+              </div>
+            </div>
 
             <div class="task-detail-item time-allotment">
               <div class="header">How much time should I put into this?</div>
@@ -56,32 +81,29 @@
                 <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(5)"><span>5<div class="unit">min</div></span></label>
                 <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(15)"><span>15<div class="unit">min</div></span></label>
                 <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(30)"><span>30<div class="unit">min</div></span></label>
-                <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(60)"><span>1<div class="unit">hr</div></span></label>
+                <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(45)"><span>45<div class="unit">min</div></span></label>
                 <label id="plus" class="btn"
                        ng-class="{
-                       active: selectedTaskDetail.angleSize > Utilities.toAngleSize(60),
-                       revealMinutes: selectedTaskDetail.angleSize > Utilities.toAngleSize(60)}"
-                       ng-click="selectedTaskDetail.angleSize = Utilities.toAngleSize(75)">
+                       active: selectedTaskDetail.angleSize > Utilities.toAngleSize(45),
+                       revealMinutes: selectedTaskDetail.angleSize > Utilities.toAngleSize(45)}"
+                       ng-click="selectedTaskDetail.angleSize = Utilities.toAngleSize(60)">
                   <span><span class="minutes">{{ Utilities.humanizeMinutes(Utilities.toMinutes(selectedTaskDetail.angleSize)) }}</span><div class="unit">+</div></span>
                 </label>
               </div>
-              <div class="task-slider" ng-class="{ fadeOut: selectedTaskDetail.angleSize <= Utilities.toAngleSize(60) }">
-                <slider  slider-value="selectedTaskDetail.angleSize" min="Utilities.toAngleSize(60)" max="360"></slider>
-              </div>
-            </div>
-
-            <div class="task-detail-item pick-emoji">
-              <div class="header">Pick an Emoji</div>
-              <div class="emoji-picker-container">
-                <emoji-picker selected-emoji-model="selectedTaskDetail.emoji"></emoji-picker>
-                <div class="white-gradient"></div>
+              <div class="task-slider" ng-class="{ fadeOut: selectedTaskDetail.angleSize <= Utilities.toAngleSize(45) }">
+                <slider  slider-value="selectedTaskDetail.angleSize" min="Utilities.toAngleSize(30)" max="360"></slider>
               </div>
             </div>
 
             <div class="task-detail-item afterwards">
               <div class="header">Afterwards?</div>
-              <label class="pie-task-detail-btn btn" ng-model="selectedTaskDetail.afterward" uib-btn-radio="'break'" uncheckable>TAKE A 30 MINUTE BREAK</label>
-              <label class="pie-task-detail-btn btn" ng-model="selectedTaskDetail.afterward" uib-btn-radio="'eat'" uncheckable>HAVE SOMETHING TO EAT</label>
+              <label class="pie-task-detail-btn btn" ng-click="selectTaskAfter()" ng-model="selectedTaskDetail.afterward" uib-btn-radio="'Break'" uncheckable>TAKE A 30 MINUTE BREAK</label>
+              <label class="pie-task-detail-btn btn" ng-click="selectTaskAfter()" ng-model="selectedTaskDetail.afterward" uib-btn-radio="'Eat'" uncheckable>HAVE SOMETHING TO EAT</label>
+              <label class="pie-task-detail-btn btn" ng-click="selectTaskAfter()" ng-model="selectedTaskDetail.afterward" uib-btn-radio="'Exercise'" uncheckable>EXERCISE</label>
+            </div>
+
+            <div class="task-detail-item danger-zone">
+              <button id="delete-button" ng-dblclick="deleteCurrentlySelectedTask()"><i class="fa fa-trash-o"></i></button>
             </div>
 
           </div>
@@ -90,7 +112,3 @@
     </div>
   </div>
 </div>
-
-<!--<footer>-->
-
-<!--</footer>-->

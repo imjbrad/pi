@@ -7,12 +7,16 @@
   #task-name {
     background-color: white;
     font-family: source_sans_probold, sans-serif;
-    font-weight: bold;
     padding: 15px 20px;
     font-size: 15px;
     color: $pie-dark-grey;
     overflow-wrap: break-word;
+    border: none;
+    display: block;
+    width: 100%;
+    word-wrap: break-word;
     border-bottom: 1px solid $pie-light-grey;
+    outline: none;
   }
 
   #task-details {
@@ -22,7 +26,9 @@
 
     .task-detail-item {
 
-      margin-bottom: 20px;
+      &:not(:last-of-type){
+        margin-bottom: 20px;
+      }
 
       .header {
         color: $pie-dark-grey;
@@ -100,8 +106,8 @@
       -webkit-transition: opacity .2s;
 
       &.fadeOut {
-        opacity: 0;
         visibility: hidden;
+        height: 0;
       }
 
     }
@@ -143,11 +149,10 @@
       border: 1px solid $pie-light-grey;
       position: relative;
       overflow: hidden;
-      height: 165px;
+      height: 93px;
 
       .EmojiPicker{
         padding: 0;
-        //-webkit-mask-image: -webkit-linear-gradient(-270deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.14) 14.49%, rgba(0, 0, 0, 1) 100%);
       }
     }
   }
@@ -175,6 +180,20 @@
       }
 
     }
+  }
+
+  .danger-zone {
+    overflow: auto;
+
+    #delete-button {
+      background-color: rgba(243, 115, 66, 0.85);
+      padding: 6px;
+      color: white;
+      border-radius: 2px;
+      float: right;
+      cursor: pointer;
+    }
+
   }
 
 }

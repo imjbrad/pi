@@ -46,8 +46,10 @@ export function SliderDirective(){
                         }
 
                         if(raw >= max){
-                            raw = max
+                            raw = max;
                         }
+
+
 
                         return {
                             "percentage": percentage,

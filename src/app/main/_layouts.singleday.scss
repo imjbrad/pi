@@ -6,10 +6,11 @@
       width: 100%;
 
       #big-day{
-        height: 60%;
-        width: 60%;
-        top: 85px;
+        height: 540px;
+        width: 540px;
         margin: auto;
+        -webkit-transform: translateX(0);
+        -webkit-transition: $transition;
       }
 
     }

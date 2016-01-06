@@ -8,27 +8,24 @@
       width: calc(100% - #{$partially-expanded-width});
 
       header{
-        position: relative;
         width: 90%;
         left: 10%;
-        margin: 0;
-        margin-top: 70px;
-        overflow: auto;
       }
 
       #show-tasks-button{
-        height: 35px;
+        height: auto;
+        opacity: .4;
 
         .icon{
-          background-color: transparent;
+          height: 30px;
+          width: 30px;
         }
 
       }
 
       #big-day {
-        height: 60%;
-        width: 60%;
-        top: 85px;
+        height: 540px;
+        width: 540px;
         margin: auto;
       }
 
@@ -44,6 +41,12 @@
         padding-left: 5px;
 
       }
+    }
+
+    #wrapper {
+      width: 90%;
+      left: 10%;
+      margin: 0;
     }
 
     &.show-list-expanded {

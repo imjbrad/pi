@@ -8,6 +8,13 @@ export function MainController ($scope, $timeout, $filter) {
         return ((this%n)+n)%n;
       };
 
+      Number.prototype.roundToTheNearest = function(i) {
+        var i = i || 1;
+        return Math.ceil(this/i)*i;
+      };
+
+      Math.TWOPI = 2*Math.PI;
+
       var _toRad = function(deg){
         return deg * Math.PI / 180;
       };
@@ -22,15 +29,27 @@ export function MainController ($scope, $timeout, $filter) {
 
       $scope.taskData = {
         tasks: [
-
+          {
+            name: "Sleep_a",
+            startingAngle: PieUtilities.toAngle("12:00 AM"),
+            terminalAngle: PieUtilities.toAngle("9:30 AM"),
+            type: "sleep"
+          },
+          {
+            name: "test_activity",
+            startingAngle: PieUtilities.toAngle("4:00 PM"),
+            terminalAngle: PieUtilities.toAngle("10:00 PM")
+          },
+          {
+            name: "Sleep_b",
+            startingAngle: PieUtilities.toAngle("11:30 PM"),
+            terminalAngle: PieUtilities.toAngle("12:00 AM"),
+            type: "sleep"
+          }
         ]
       };
 
       $scope.Utilities = PieUtilities;
-
-      $scope.taskFilter = function(task, index, array){
-        return (task.taskType && task.taskType == "standardSleep") ? false : true;
-      };
 
       $scope.selectTask = function(i){
         $scope.selectedTaskDetail = $scope.taskData.tasks[i];
@@ -54,10 +73,10 @@ export function MainController ($scope, $timeout, $filter) {
           angleSize: PieUtilities.toAngleSize(15),
           color: "#9ec2e1"
         };
-        $scope.taskData.tasks.push(newTask);
+
+        $scope.taskDonuts[0].addTask(newTask);
         $scope.newTaskName = "";
-        $scope.selectLastTask();
-        $scope.taskDonuts[0].redraw();
+        //$scope.selectLastTask();
       };
 
       $scope.deleteCurrentlySelectedTask = function(){
@@ -101,7 +120,7 @@ export function MainController ($scope, $timeout, $filter) {
           name: '30 Minute Break',
           angleSize: PieUtilities.toAngleSize(30),
           color: PieUtilities.colors.night,
-          taskType: 'standardBreak',
+          type: 'break',
           insertedAfterward: true
         };
         insertTaskAfterCurrentlySelectedTask(newBreakTask);
@@ -112,7 +131,7 @@ export function MainController ($scope, $timeout, $filter) {
           name: 'Eat',
           angleSize: PieUtilities.toAngleSize(45),
           color: PieUtilities.colors.day,
-          taskType: 'standardBreak',
+          type: 'break',
           insertedAfterward: true
         };
         insertTaskAfterCurrentlySelectedTask(newEatTask);
@@ -157,8 +176,7 @@ export function MainController ($scope, $timeout, $filter) {
         if(newTimeAllotment){
           var slice = $scope.taskDonuts[0].slices[$scope.selectedTaskIndex];
           slice.update({
-            localAngle: newTimeAllotment,
-            terminalAngle: slice.calculateDrawingAngles(newTimeAllotment).terminalAngle
+            angleSize: newTimeAllotment
           });
           console.log("Angle "+newTimeAllotment+" Minutes: "+PieUtilities.toMinutes(newTimeAllotment));
         }

@@ -3,24 +3,28 @@
 
     <pre style="
     position:absolute;
-    opacity: 0;
+    opacity: .4;
     top: 0;
     left: 0">
       {{ taskDataString }}
     </pre>
 
     <header>
-      <button id="day-picker-button" class="header-button">
-        <div class="label">
-          Monday, December 16
+        <button id="day-picker-button" ng-click="showCalendar = !showCalendar" class="header-button">
+          <div class="label">
+            {{ showListView && selectedTaskDetail.name ? 'MON 12/16' : 'Monday, December 16' }}
+          </div>
+          <div class="icon">
+            <img src="app/assets/group.svg">
+          </div>
+        </button>
+
+        <div class="pie-calendar" ng-show="showCalendar">
+          <md-calendar ng-model="myDate"></md-calendar>
         </div>
-        <div class="icon">
-          <img src="app/assets/group.svg">
-        </div>
-      </button>
       <button id="show-tasks-button" class="header-button" ng-click="toggleListView()">
         <div class="label" ng-hide="showListView">
-          {{ taskData.tasks.length || "No"  }} Task{{ taskData.tasks.length > 1 ? "s" : ""  }} Today
+          {{ taskData.tasks.length || "No"  }} Item{{ taskData.tasks.length > 1 ? "s" : ""  }} Today
         </div>
         <div class="icon">
           <img ng-src="{{ showListView ? 'app/assets/x.svg' : 'app/assets/list.svg'}}">
@@ -28,12 +32,12 @@
       </button>
     </header>
 
-    <div id="big-day">
-      <task-donut index="1"></task-donut>
+    <div id="wrapper">
+      <div id="big-day">
+        <task-donut index="1"></task-donut>
+      </div>
     </div>
-    <!--<button id="toggleListButton" ng-click="toggleListView()">-->
-      <!--<span class="fa fa-2x fa-times" ng-show="showListView"></span>-->
-    <!--</button>-->
+
   </div>
   <div id="TaskSpace">
     <div id="task-space-wrapper">

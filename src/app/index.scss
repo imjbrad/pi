@@ -1,10 +1,13 @@
 @import "fonts";
 @import "variables";
 
-/**
- BaseStyle {
- }
-**/
+//manually import vendor styles
+@import "../../bower_components/font-awesome/scss/font-awesome";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/mixins";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/variables";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/buttons";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/button-groups";
+@import "../../bower_components/angular-material/angular-material.scss";
 
 * {}
 
@@ -33,14 +36,7 @@ button {
   }
 }
 
-//manually import vendor styles and app styles here
-@import "../../bower_components/font-awesome/scss/font-awesome";
-
-@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/mixins";
-@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/variables";
-@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/buttons";
-@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/button-groups";
-
+//mannually import app styles
 @import "main/main.style";
 
 @import "main/layouts.showtasks";

@@ -5,7 +5,7 @@ $task-space-wrapper-size: 600px;
 $_task-space-wrapper-size: 600px;
 $task-space-size: 33%;
 $transition: all .2s linear;
-
+$top: 170px;
 *{
   box-sizing: border-box;
 }
@@ -20,11 +20,11 @@ body {
 
 header {
 
-  position: relative;
+  position: absolute;
   width: 80%;
   left: 10%;
   margin-top: 70px;
-  overflow: auto;
+  overflow: visible;
   -webkit-transition: $transition;
 
   .header-button{
@@ -72,6 +72,72 @@ header {
     float: right;
   }
 
+  .pie-calendar {
+    z-index: 12;
+    width: 308px;
+    position: absolute;
+    top: 55px;
+    background-color: rgba(255, 255, 255, .5);
+
+    .md-calendar-scroll-mask, .md-calendar-scroll-container{
+      height: 264px;
+      width: 346px;
+    }
+
+    .md-calendar-scroll-container {
+      display: inline-block;
+      box-shadow: none;
+    }
+
+    .md-calendar-day-header{
+      background-color: rgba(255, 255, 255, .5);
+      color: $pie-dark-grey;
+      font-family: "apercu_bold", sans-serif;
+      font-size: 12px;
+
+      th {
+        height: 36px;
+      }
+
+      th.currentMonthYear {
+        height: auto;
+        padding-top: 20px;
+        padding-left: 23px;
+        padding-right: 23px;
+        padding-bottom: 0px;
+      }
+
+    }
+
+    .md-calendar-date{
+      font-family: "apercu_mono", monospace;
+      color: $pie-dark-grey;
+    }
+
+    .md-calendar-date.md-calendar-selected-date .md-calendar-date-selection-indicator {
+      background-color: $pie-orange-cream;
+    }
+
+    .md-calendar-date-today .md-calendar-date-selection-indicator{
+      border: none;
+      border-width: 2px;
+      background-color: white;
+    }
+
+    .md-calendar-date-selection-indicator{
+      border-radius: 0;
+
+      &:hover{
+        background-color: $pie-orange-cream;
+      }
+    }
+
+    .md-calendar-month-label {
+      height: 32px;
+    }
+
+  }
+
 }
 
 #Space{
@@ -92,6 +158,14 @@ header {
   -webkit-transform: translate3d(0, 0, 0);
   -webkit-transition: width .3s $easeInQuad;
   //border:1px solid red;
+}
+
+#wrapper{
+  width: 80%;
+  margin: auto;
+  top: $top;
+  //border: 1px solid blue;
+  position: relative;
 }
 
 .TaskDonut{

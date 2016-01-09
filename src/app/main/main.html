@@ -4,7 +4,7 @@
     <pre style="
     position:absolute;
     opacity: .4;
-    top: 0;
+    top: 100px;
     left: 0">
       {{ taskDataString }}
     </pre>
@@ -24,7 +24,7 @@
         </div>
       <button id="show-tasks-button" class="header-button" ng-click="toggleListView()">
         <div class="label" ng-hide="showListView">
-          {{ taskData.tasks.length || "No"  }} Item{{ taskData.tasks.length > 1 ? "s" : ""  }} Today
+          {{ numberOfUserTasks || "No"  }} Item{{ (numberOfUserTasks > 1 || 0) ? "s" : ""  }} Today
         </div>
         <div class="icon">
           <img ng-src="{{ showListView ? 'app/assets/x.svg' : 'app/assets/list.svg'}}">
@@ -34,7 +34,7 @@
 
     <div id="wrapper">
       <div id="big-day">
-        <task-donut index="1"></task-donut>
+        <svg id="task-donut" viewBox="0 0 200 200" class="TaskDonut"></svg>
       </div>
     </div>
 
@@ -46,7 +46,7 @@
           <input id="header" class="task-label" ng-model="newTaskName" autocomplete="off" name="newTaskNameInput" type="text" placeholder="Add an item:" autofocus=""/>
         </form>
         <ul id="taskList" ui-sortable="sortableOptions" ng-model="taskData.tasks">
-          <li ng-repeat="task in taskData.tasks" ng-click="selectTask($index)">
+          <li ng-repeat="task in taskData.tasks | filter:taskFilter" ng-click="selectTask($index)">
             <div class="task-item {{ task.taskType }}" ng-class="{'selected': $index == selectedTaskIndex}">
               <input type="text" class="task-label" ng-model="task.name">
             </div>

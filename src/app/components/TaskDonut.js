@@ -4,8 +4,10 @@
 
 import { BucketRing } from './BucketRing.js';
 import { TaskSlice } from './TaskSlice.js';
+import { PieUtilities } from './TaskDonutUtilities.js';
+import { Emitter } from './Emitter.js';
 
-export function TaskDonut(svgArea, _tasks) {
+export function TaskDonut(svgArea, _taskManager) {
 
   var self = this;
   var init;
@@ -19,96 +21,55 @@ export function TaskDonut(svgArea, _tasks) {
   var TASK_TYPES = ["sleep"];
   var REQUIRED_SLICE_KEYS = ["name", "startingAngle", "terminalAngle"];
   var pie_sleep = [];
+  var taskManager = _taskManager;
+  var initialLoad = false;
+  var tasks;
 
   self.dispatchedEvents = {};
+  self.taskManager = taskManager;
 
   init = function(){
+
+    tasks = taskManager.getTasks();
 
     patternImg = drawingArea.image("http://www.transparenttextures.com/patterns/debut-light.png", 0, 0, 100, 100).attr({"opacity": 1});
     pattern = patternImg.toPattern(0, 0, 100, 100);
 
-    self.tasks = self.tasks || _tasks;
     self.drawingArea = drawingArea;
     self.slices = [];
     self.total = 0;
 
-    if(self.validatePie()){
-      determineSize();
-      determineAngleOffset();
+    determineSize();
+    determineAngleOffset();
 
-      self.bucket_ring = new BucketRing(self);
-      self.draw();
+    self.p = drawingArea.circle(self.centerX, self.centerY, 10);
+    self.p.attr({transform: "rotate("+(self.angle_offset) + " " + self.centerX +" "+self.centerY+")"});
+
+    eve.on("taskListUpdated", tasksListUpdated);
+
+  };
+
+  var tasksListUpdated;
+  tasksListUpdated = function(){
+    if(taskManager.taskListIsValid()){
+      console.log("Tasks are valid, redrawing");
+      self.redrawSlices();
     }
   };
 
   determineAngleOffset = function(){
 
+    var pie_sleep = taskManager.getSleep();
     var totalConsecutiveSleepSize = 0;
 
     pie_sleep.forEach(function(sleep){
-      totalConsecutiveSleepSize += (sleep.terminalAngle - sleep.startingAngle);
+      totalConsecutiveSleepSize += (PieUtilities.toAngle(sleep.end) - PieUtilities.toAngle(sleep.start));
     });
 
-    var sleep_midpoint = (pie_sleep[pie_sleep.length-1].terminalAngle - (totalConsecutiveSleepSize/2));
-    self.angle_offset = Snap.deg((Snap.rad(-90) + sleep_midpoint));
-    console.log(self.angle_offset);
+    var sleep_midpoint = (PieUtilities.toAngle(pie_sleep[0]['end']) - (totalConsecutiveSleepSize/2));
 
-  };
+    self.angle_offset = (90 - sleep_midpoint);
 
-  self.validatePie = function(){
-
-    console.log("Validating Pie");
-
-    if(!validateTasks()){
-      console.log("Pie couldn't validate all tasks");
-      return false;
-    }
-
-    if(!(pie_sleep.length)){
-      console.log("Pie doesn't have require sleep tasks");
-      return false;
-    }
-
-    return true;
-
-  };
-
-  self.validateTask = function(task){
-
-    var valid = true;
-
-    REQUIRED_SLICE_KEYS.forEach(function(key, index, array){
-      if(!(key in task)){
-        console.log("task is missing required key: "+key);
-        valid = false;
-      }
-    });
-
-    if(task.type && (TASK_TYPES.indexOf(task.type) == -1)){
-      console.log("task "+task.name+" has an invalid task type "+task.type);
-      valid = false;
-    }
-
-    if(task.type == 'sleep'){
-      pie_sleep.push(task);
-    }
-
-    return valid;
-
-  };
-
-  validateTasks = function(){
-    console.log("Validating tasks");
-
-
-    var valid = true;
-
-    self.tasks.every(function(task, index, array){
-      valid = self.validateTask(task);
-      return valid;
-    });
-
-    return valid;
   };
 
   determineSize = function(){
@@ -125,6 +86,20 @@ export function TaskDonut(svgArea, _tasks) {
     self.centerX = self.outerRadius;
     self.centerY = self.outerRadius;
 
+  };
+
+  self.toXY = function(angleInRadians, r){
+    return {
+      x: self.centerX+r*Math.cos(angleInRadians),
+      y: self.centerY+r*Math.sin(angleInRadians)
+    }
+  };
+
+  self.toPolar = function(x, y){
+    return {
+      angle: Math.atan2(y, x).mod(Math.TWOPI),
+      r: math.distance([x, y], [self.centerX, self.centerY])
+    }
   };
 
   self.draw = function(){
@@ -160,11 +135,6 @@ export function TaskDonut(svgArea, _tasks) {
     //ring group
     self.donut_group = self.drawingArea.g();
 
-    //outermost ring, white border
-    //var outerCircle = drawingArea.circle();
-    //var shadow = drawingArea.filter(Snap.filter.shadow(0, 0, 2, "black", .17));
-    //outerCircle.attr({"cx":self.centerX, "cy":self.centerY, "r":self.outerRadius, stroke: "white", fill:"transparent", filter: shadow});
-
     //task ring, categories
     var circle = drawingArea.circle();
     circle.attr({"cx":self.centerX, "cy":self.centerY, "r":self.radius, "fill": "#fbfcfc", 'fill-opacity': ".23"});
@@ -175,18 +145,13 @@ export function TaskDonut(svgArea, _tasks) {
     var donutMask = drawingArea.g().add(donutMaskCircle, donutMaskInnerCircle);
     self.donut_group.add(circle);
 
-    //add task slices
-    self.tasks.forEach(function(element, index, array){
-      var task = element,
-        orderNumber = index,
-        tasksArray = array,
-        taskTheta = task.angleSize;
-      self.slices.push(new TaskSlice(self, index));
+    self.slices = tasks.map(function(task, taskIndex){
+      return new TaskSlice(self, taskIndex, task);
     });
 
     //draw task slices
-    self.slices.forEach(function(element, index, array){
-      self.slices[index].draw();
+    self.slices.forEach(function(slice, index, array){
+      slice.draw();
     });
 
     //draw task slice handles
@@ -246,8 +211,8 @@ export function TaskDonut(svgArea, _tasks) {
       *
       * */
 
-     self.slices.forEach(function(element, index, array){
-      self.slices[index].drawHandle();
+     self.slices.forEach(function(slice, index, array){
+       slice.drawHandle();
     });
 
     //apply masks
@@ -256,36 +221,15 @@ export function TaskDonut(svgArea, _tasks) {
 
   };
 
-  self.redistributeTaskAtIndex = function(index){
-    var slice = self.getSliceAtIndex(index);
-
-    if(slice.willCauseOverlap() == false){
-      slice._applyTempData();
-    }
-
-    slice.tempData = {};
-
-    self.redrawSlices();
-
-  };
-
-  self.redistributeTasks = function(){
-
-    self.tasks.forEach(function(task, index, array){
-      self.redistributeTaskAtIndex(index);
-    });
-
-    //self.redrawSlices();
-  };
-
   self.redraw = function(){
     self.drawingArea.clear();
     init();
+    self.draw();
   };
 
   self.redrawSlices = function(){
     //redraw slices for each task
-    self.tasks.forEach(function(element, index, array){
+    tasks.forEach(function(element, index, array){
       self.slices[index].redraw();
     });
 
@@ -294,10 +238,6 @@ export function TaskDonut(svgArea, _tasks) {
       self.slices[index].redrawHandle();
     });
 
-  };
-
-  self.getSliceAtIndex = function(i){
-    return self.slices[i];
   };
 
   /**
@@ -324,82 +264,9 @@ export function TaskDonut(svgArea, _tasks) {
    *
    * **/
 
-  self.updateTasks = function(newTaskSet){
-    self.tasks = newTaskSet;
-    self.redraw();
-  };
-
-  /*
-  * The default add task
-  * behavior will add a
-  * task the first place
-  * it has space
-  * */
-  self.addTask = function(task){
-
-    var canPlaceTask = false;
-    var newStartingAngle;
-    var placeIndex;
-
-    self.slices.every(function(slice, index, array){
-      var nextSlice = array[index + 1];
-      var terminalAngle = slice.terminalAngle;
-      newStartingAngle = Snap.rad(task.startingAngle) || terminalAngle;
-
-      if(nextSlice){
-        var nextStartingAngle = nextSlice.startingAngle;
-        if(nextStartingAngle >= (newStartingAngle + Snap.rad(task.angleSize))) {
-          placeIndex = index+1;
-          console.log("space available at "+placeIndex);
-          canPlaceTask  = true;
-          return false;
-        }
-      }else{
-        placeIndex = index+1;
-        console.log("no next slice, space available immediatly at "+placeIndex);
-        canPlaceTask = true;
-        return false;
-      }
-    });
-
-    if(canPlaceTask){
-      console.log("placing task");
-      task['startingAngle'] = Snap.deg(newStartingAngle);
-      self.tasks.splice(placeIndex, 0, task);
-      self.slices.splice(placeIndex, 0, new TaskSlice(self, placeIndex));
-      self.redistributeTasks();
-    }else{
-      console.log("No room for task");
-    }
-
-   };
-
-  self.onUserUpdatedDonutManually = function(eventHandlerFunction){
-    self.dispatchedEvents["userUpdatedDonutManually"] = eventHandlerFunction;
-  };
-
-  self.dispatch = function(eventName, argList){
-    if(self.dispatchedEvents[eventName] && self.dispatchedEvents[eventName].call){
-      self.dispatchedEvents[eventName].apply(self, argList);
-    }
-  };
-
-  self.setCoverText = function(text){
-    self.coverText = text;
-    self.svgCoverText.attr({"text": self.coverText});
-    self.coverGroup.node.style.display = "initial";
-    //var f = self.drawingArea.filter(Snap.filter.blur(5, 10));
-    //self.donut_group.attr({filter: f});
-  };
-
-  self.setTag = function(tagString){
-    self.tag = tagString;
-  };
-
-  self.setIndex = function(indexNumber){
-    self.index = indexNumber;
-  };
-
   init();
+  if(taskManager.taskListIsValid()){
+    self.draw();
+  }
 
 }

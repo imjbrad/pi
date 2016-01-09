@@ -92,6 +92,10 @@ PieUtilities.today_format_string = "YYYY MM DD";
 
 PieUtilities.today_string = moment().format("YYYY MM DD");
 
+PieUtilities.task_data_filter = function(task, index, array){
+    return !task.type;
+};
+
 PieUtilities.humanizeMinutes = function(_minutes){
 
     var duration = moment.duration(_minutes, 'minutes'),
@@ -127,27 +131,44 @@ PieUtilities.toAngleSize = function(minutes){
 };
 
 PieUtilities.toAngle = function(time_of_day){
+
     var startOfDay = moment(moment().format("YYYY MM DD")),
-        timeOfDay = moment(time_of_day, "h:mm a"),
+        timeOfDay = moment.isMoment(time_of_day) ? time_of_day : moment(time_of_day),
         minutes = moment.duration(timeOfDay.subtract(startOfDay)).asMinutes();
 
-    return PieUtilities.toAngleSize(minutes) * 0.0174533;
+    return PieUtilities.toAngleSize(minutes);
+};
+
+PieUtilities.todayAt = function(time_of_day){
+    return moment(time_of_day, "h:mm a").format();
+};
+
+PieUtilities.taskSize = function(_start, _end){
+
+    var start = moment(_start),
+        end = moment(_end),
+        duration = moment.duration(end.subtract(start)).asMinutes();
+
+  return duration;
 };
 
 PieUtilities.toTimeOfDay = function(angleInDegrees, _format){
 
-    var __format = "dddd, MMMM Do YYYY, h:mm:ss a";
+    var __format = "dddd, MMMM Do YYYY, h:mm a";
 
     var format = _format == true ? __format : "",
         minutes = PieUtilities.toMinutes(angleInDegrees),
-        startOfDay = moment(moment().format("YYYY MM DD")),
-        timeOfDay = startOfDay.add(minutes, 'minutes');
+        timeOfDay = moment(moment().format("YYYY MM DD")).add(minutes, 'm');
 
-    if(_format)
+    if(_format){
+        console.log("returning string");
         return timeOfDay.format(format);
+    }
 
-    return timeOfDay;
+    return moment(timeOfDay);
 };
+
+//console.log(PieUtilities.toTimeOfDay(111).format("h:mm a"));
 
 PieUtilities.colorForAngle = function(terminalAngleInDegrees){
     var roundedTerminalDegree = Math.ceil(terminalAngleInDegrees/1);

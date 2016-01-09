@@ -3,8 +3,10 @@
 import { config } from './index.config';
 import { routerConfig } from './index.route';
 import { runBlock } from './index.run';
-import { MainController } from './main/main.controller';
 
+import './components/eve.js';
+
+import { MainController } from './main/main.controller';
 import { TaskDonut } from './components/TaskDonut.js';
 import { TaskDonutDirective } from './components/TaskDonutDirective.js';
 import { TaskSlice } from './components/TaskSlice.js';

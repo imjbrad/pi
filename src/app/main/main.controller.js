@@ -18,6 +18,7 @@ export function MainController($scope, $timeout, $filter) {
     Math.TWOPI = 2 * Math.PI;
 
     var taskData = {
+        day: PieUtilities.today,
         tasks: [
             {
                 name: "Sleep_a",
@@ -41,13 +42,13 @@ export function MainController($scope, $timeout, $filter) {
             {
                 name: "class BS",
                 start: PieUtilities.todayAt("4:00 pm"),
-                end: PieUtilities.todayAt("4:20 pm"),
+                end: PieUtilities.todayAt("5:00 pm"),
                 tempData: {}
             },
             {
                 name: "class C",
-                start: PieUtilities.todayAt("4:30 pm"),
-                end: PieUtilities.todayAt("4:50 pm"),
+                start: PieUtilities.todayAt("7:00 pm"),
+                end: PieUtilities.todayAt("9:00 pm"),
                 tempData: {}
             },
             {
@@ -75,6 +76,10 @@ export function MainController($scope, $timeout, $filter) {
 
     $scope.Utilities = PieUtilities;
     $scope.taskFilter = PieUtilities.task_data_filter;
+
+    $scope.redraw = function(){
+        eve("taskListUpdated");
+    };
 
     $scope.selectTask = function (i) {
         $scope.selectedTaskDetail = taskManager.getTask(i);

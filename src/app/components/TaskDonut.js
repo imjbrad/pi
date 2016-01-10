@@ -228,6 +228,7 @@ export function TaskDonut(svgArea, _taskManager) {
   };
 
   self.redrawSlices = function(){
+
     //redraw slices for each task
     tasks.forEach(function(element, index, array){
       self.slices[index].redraw();

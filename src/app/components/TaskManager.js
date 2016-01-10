@@ -25,10 +25,9 @@ import { PieUtilities } from './TaskDonutUtilities.js';
     function init(_dayDataObject){
 
         console.log("TaskSet Controller initialized w/ a task data");
+        userDayObject = _dayDataObject;
 
-        if(_validateDay(_dayDataObject)) {
-
-            userDayObject = _dayDataObject;
+        if(_validateDay(userDayObject)) {
 
             window.setTimeout(function(){
                 _taskListUpdated();
@@ -37,45 +36,86 @@ import { PieUtilities } from './TaskDonutUtilities.js';
 
     }
 
-    function __taskWouldCauseOverlap(_task, _taskList){
-
-        var MINIMUM = 5; //Two minutes
-
-        var tasks = _taskList,
-            index = _task.id,
-            last = tasks.length - 1,
-            previousIndex = (index == 0) ? last : index - 1,
-            nextIndex = (index == last) ? 0 : index + 1,
-            task = _task,
-            previousTask = tasks[previousIndex],
-            nextTask = tasks[nextIndex],
-            nextStartTime = moment(nextTask.start),
-            previousEndTime = moment(previousTask.end),
-            startingTime = moment(task.start),
-            terminalTime = moment(task.end),
-            taskSize = PieUtilities.taskSize(task.start, task.end);
-
-        if(terminalTime.isBefore(startingTime) || startingTime.isAfter(terminalTime)){
-            console.log("Task cannot end before it starts", terminalTime, startingTime);
+    function ___taskWouldHappenOnTheWrongDay(startingTime, terminalTime){
+        if((terminalTime.get('date') != userDayObject.day.get('date')) ||
+            (startingTime.get('date') != userDayObject.day.get('date'))){
+            console.log("Task cannot happen on a day different than the one specified by the day object", terminalTime.get('date'), startingTime.get('date'), userDayObject.day.get('date'));
             return true;
         }
+        return false;
+    }
+
+    function ___taskWouldSpanSeveralDays(startingTime, terminalTime){
+        if(terminalTime.get('date') != startingTime.get('date')){
+            console.log("Task cannot span several days");
+            return true;
+        }
+        return false;
+    }
+
+    function ___taskWouldEndBeforeItStarts(startingTime, terminalTime){
+        if(terminalTime.isBefore(startingTime) || startingTime.isAfter(terminalTime)){
+            console.log("Task cannot end before it starts");
+            return true;
+        }
+        return false;
+    }
+
+    function ___taskWouldOverlapPreviousTask(task, taskList){
+        var index = task.id,
+            previousIndex = (index == 0) ? taskList.length - 1 : index - 1,
+            previousTask = taskList[previousIndex],
+            previousEndTime = moment(previousTask.end),
+            startingTime = moment(task.start);
 
         if(index > 0 && (startingTime.isBefore(previousEndTime))){
-            console.log("Task can't collide with previous task "+startingTime.format(PieUtilities.FULL_FORMAT_STRING)+", "+previousEndTime.format(PieUtilities.FULL_FORMAT_STRING));
+            console.log("Task can't collide with previous task");
             return true;
         }
+        return false;
+    }
+
+    function ___taskWouldOverlapNextTask(task, taskList, _nextID){
+        var index = task.id,
+            last = taskList.length - 1,
+            nextIndex = _nextID ? _nextID : ((index == last) ? 0 : index + 1),
+            nextTask = taskList[nextIndex],
+            nextStartTime = moment(nextTask.start),
+            terminalTime = moment(task.end);
 
         if(index < last && (nextStartTime.isBefore(terminalTime))){
-            console.log("Task can't collide with next task "+nextStartTime.format(PieUtilities.FULL_FORMAT_STRING)+", "+terminalTime.format(PieUtilities.FULL_FORMAT_STRING));
-            return true;
-        }
-
-        if(taskSize < MINIMUM){
-            console.log("Task "+task.name+" can't be too small: "+taskSize);
+            console.log("Task can't overlap next task: "+nextTask.name);
             return true;
         }
 
         return false;
+    }
+
+    function ___taskWouldBeTooSmall(task){
+        var MINIMUM = 5;
+        var taskSize = PieUtilities.taskSize(task.start, task.end);
+        if(taskSize < MINIMUM){
+            console.log("Task can't be too smaller than "+MINIMUM+" minimum");
+            return true;
+        }
+        return false
+    }
+
+    function __taskWouldCauseOverlap(_task, _taskList){
+        var task = _task,
+            taskList = _taskList,
+            startingTime = moment(task.start),
+            terminalTime = moment(task.end);
+
+        console.log("Validating: "+task.name);
+
+        return (
+            ___taskWouldHappenOnTheWrongDay(startingTime, terminalTime)||
+            ___taskWouldSpanSeveralDays(startingTime, terminalTime)||
+            ___taskWouldEndBeforeItStarts(startingTime, terminalTime)||
+            ___taskWouldOverlapNextTask(task, taskList) ||
+            ___taskWouldOverlapPreviousTask(task, taskList)||
+            ___taskWouldBeTooSmall(task));
     }
 
     function _validateTask(task, index, _taskList){
@@ -121,9 +161,11 @@ import { PieUtilities } from './TaskDonutUtilities.js';
         var list = __taskList,
             valid = true;
         sleep = [];
-        self._tasksListValid = true;
 
-        list.sort(function(taskA, taskB){
+        self._taskListIsValid = true;
+
+
+        list = list.sort(function(taskA, taskB){
             return moment(taskA.start).isAfter(moment(taskB.start));
         });
 
@@ -132,7 +174,7 @@ import { PieUtilities } from './TaskDonutUtilities.js';
             return valid;
         });
 
-        self._tasksListValid = valid;
+        self._taskListIsValid = valid;
         return valid;
     }
 
@@ -144,8 +186,9 @@ import { PieUtilities } from './TaskDonutUtilities.js';
 
         valid = _validateTaskListForDay(taskList);
 
-        if(valid)
+        if(valid){
             console.log("Passed Validation");
+        }
 
         return valid;
     }
@@ -158,30 +201,29 @@ import { PieUtilities } from './TaskDonutUtilities.js';
     * */
      function _updateTaskByRipple(_dirtyTask, rippleMethod){
 
-        var task = _dirtyTask;
+        var task = _dirtyTask,
+            startingTime = moment(task.start),
+            terminalTime = moment(task.end);
 
-        if(rippleMethod == "terminal-ripple"){
-            var prevHandle = moment(task.tempData.prevEnd);
-            var newHandle = moment(task.end);
-        }
+        console.log("starting ripple at "+PieUtilities.toAngle(task.end));
 
-        if(rippleMethod == "starting-ripple"){
-            var prevHandle = moment(task.tempData.prevStart);
-            var newHandle = moment(task.start);
-        }
+        var rippleHandle = rippleMethod.split('-')[0];
+
+         var prevHandle = moment(task.tempData['prev-'+rippleHandle]);
+         var newHandle = moment(task[rippleHandle]);
 
          var rippleDifferenceMs = newHandle.diff(prevHandle);
 
-         if(rippleMethod == "terminal-ripple"){
+         if(rippleMethod == "end-ripple"){
              for(var i = task.id+1; i < userDayObject.tasks.length-1; i++) {
-                 var nextTask = userDayObject.tasks[i];
-                 var taskSize = PieUtilities.taskSize(nextTask.start, nextTask.end);
-                 nextTask.start = moment(nextTask.start).add(rippleDifferenceMs, 'ms').format();
-                 nextTask.end = moment(nextTask.start).add(taskSize, 'minutes').format();
+                     var nextTask = userDayObject.tasks[i];
+                     var taskSize = PieUtilities.taskSize(nextTask.start, nextTask.end);
+                     nextTask.start = moment(nextTask.start).add(rippleDifferenceMs, 'ms').format();
+                     nextTask.end = moment(nextTask.start).add(taskSize, 'minutes').format();
              }
          }
 
-         if(rippleMethod == "starting-ripple"){
+         if(rippleMethod == "start-ripple"){
              for(var i = task.id-1; i > 0; i--){
                  var previousTask = userDayObject.tasks[i];
                  var taskSize = PieUtilities.taskSize(previousTask.start, previousTask.end);
@@ -190,24 +232,27 @@ import { PieUtilities } from './TaskDonutUtilities.js';
              }
          }
 
-         task.tempData = {};
-
         return _validateTaskListForDay(userDayObject.tasks);
     }
 
-    function _taskListUpdateFailed(){
-        console.log("task list update failed. using validated cache data");
+    function _taskListUpdateFailed() {
+        console.log("task list update failed, restoring using cached data");
         eve("taskListUpdateFailed");
-
-        userDayObject.tasks = JSON.parse(__temp);
-        self.updateTasks();
+        userDayObject.tasks = self.__temp();
+        _validateDay(userDayObject);
+        eve("taskListUpdated");
     }
 
     function _taskListUpdated() {
-        console.log("task list updated, caching validated data");
+        console.log("task list successfully updated, caching new validated data");
+        self._taskListIsDirty = false;
         __temp = JSON.stringify(userDayObject.tasks);
         eve("taskListUpdated");
     }
+
+    self.__temp = function(){
+        return JSON.parse(__temp)
+    };
 
     self.addTask = function(task) {
         userDayObject.tasks.push(task);
@@ -225,6 +270,8 @@ import { PieUtilities } from './TaskDonutUtilities.js';
     };
 
     self.updateTasks = function(_taskMap, _updateMethod) {
+
+        self._taskListIsDirty = true;
 
         var clean = false;
         var updateMethod = _updateMethod || "regular";
@@ -265,8 +312,29 @@ import { PieUtilities } from './TaskDonutUtilities.js';
     };
 
     self.taskListIsValid = function(){
-      return self._tasksListValid;
+      return self._taskListIsValid;
     };
+
+    self.taskListIsDirty = function(){
+        return self._taskListIsDirty;
+    };
+
+    utilities.taskIsValid = function(task) {
+         var startingTime = moment(task.start);
+         var terminalTime = moment(task.end);
+
+         if(___taskWouldHappenOnTheWrongDay(startingTime, terminalTime)||
+             ___taskWouldSpanSeveralDays(startingTime, terminalTime)||
+             ___taskWouldEndBeforeItStarts(startingTime, terminalTime)||
+             ___taskWouldOverlapNextTask(task, userDayObject.tasks)||
+             ___taskWouldBeTooSmall(task)){
+
+             console.log(task.name + " could not be validated");
+             return false;
+         }
+
+        return true;
+     };
 
     utilities.firstAvailableOpening = function(minutes){
         var canPlaceTask = false;

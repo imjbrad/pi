@@ -37,83 +37,65 @@ export function TaskSlice(TaskDonut, segmentIndex, task) {
   var _resizeTaskSliceByDraggingHandle;
   var resizeTaskSliceByDraggingStartingHandle;
   var resizeTaskSliceByDraggingTerminalHandle;
-  var dragTaskSliceByEmoji;
-  var stopDraggingTaskSliceByEmoji;
-  var init;
-  var HANDLE_SLICE_SIZE = 5;
-  var ghost_circle;
-  var ghost_emoji;
-  var ghost_emoji_width = 7;
-  var ghost_group;
-  var dropCanceled;
-  var timeGroup = TaskDonut.drawingArea.g();
+  var HANDLE_SLICE_SIZE = 3;
   var taskManager = TaskDonut.taskManager;
-  var lock = false;
-
   var task  = task;
-
+  var lock;
   var patternImg = TaskDonut.drawingArea.image("http://www.transparenttextures.com/patterns/debut-light.png", 0, 0, 100, 100).attr({"opacity": 1});
   var pattern = patternImg.toPattern(0, 0, 100, 100);
   var sleepGradient = TaskDonut.drawingArea.gradient("l(0, 0, 1, 0)#F8B978-#5C6879");
 
-  //exposed
   self.borderSlice = TaskDonut.drawingArea.path();
   self.mainSlice = TaskDonut.drawingArea.path();
   self.tempSlice = TaskDonut.drawingArea.path();
-
+  self.terminalHandle = TaskDonut.drawingArea.path();
+  self.startingHandle = TaskDonut.drawingArea.path();
   self.innerStartingVectorLine = TaskDonut.drawingArea.line();
   self.innerTerminalVectorLine = TaskDonut.drawingArea.line();
-
-  self.time = TaskDonut.drawingArea.text();
-  self.sun = TaskDonut.drawingArea.circle();
-
-  timeGroup.add(self.time, self.sun);
-  timeGroup.attr({opacity: 0});
-
   self.tempData = {};
 
   TaskDonut.donut_group.add(self.borderSlice, self.mainSlice,  self.tempSlice, self.innerStartingVectorLine, self.innerTerminalVectorLine);
 
-  init = function(task){
+  function _construct(task){
 
-    self.borderSliceIndex = self.borderSliceIndex || segmentIndex;
-    self.taskIndex = self.borderSliceIndex;
+    _linkTask();
+    _calculateSizeAndVectors(task);
+    _attachDragHandlers();
 
-    self.task = task;
+    self.draw();
 
-    self.startingAngle = Snap.rad(PieUtilities.toAngle(self.task.start)).mod(Math.TWOPI);
-    self.terminalAngle = Snap.rad(PieUtilities.toAngle(self.task.end)).mod(Math.TWOPI);
+  }
+
+  function _linkTask(task){
+    self.taskIndex = self.taskIndex || segmentIndex;
+    self.task = taskManager.getTask(self.taskIndex);
+  }
+  
+  function _calculateSizeAndVectors(_task){
+    self.startingAngle = Snap.rad(PieUtilities.toAngle(_task.start)).mod(Math.TWOPI);
+    self.terminalAngle = Snap.rad(PieUtilities.toAngle(_task.end)).mod(Math.TWOPI);
+    console.log("slice drawing end at "+PieUtilities.toAngle(_task.end));
     self.mainSliceRadius = TaskDonut.sliceBorderRadius;
     self.emojiRadius =  self.mainSliceRadius/1.1;
-
     self.startingVector = TaskDonut.toXY(self.startingAngle, TaskDonut.radius);
     self.terminalVector = TaskDonut.toXY(self.terminalAngle, TaskDonut.radius);
-    
     self.innerStartingVector = TaskDonut.toXY(self.startingAngle, self.mainSliceRadius);
     self.innerTerminalVector = TaskDonut.toXY(self.terminalAngle, self.mainSliceRadius);
-    
     self.startingHandleStartingVector = TaskDonut.toXY(self.startingAngle + Snap.rad(HANDLE_SLICE_SIZE), TaskDonut.radius);
     self.startingHandleTerminalVector = TaskDonut.toXY(self.startingAngle, TaskDonut.radius);
-
     self.terminalHandleStartingVector = TaskDonut.toXY(self.terminalAngle - Snap.rad(HANDLE_SLICE_SIZE), TaskDonut.radius);
     self.terminalHandleTerminalVector = TaskDonut.toXY(self.terminalAngle, TaskDonut.radius);
-
     self.emojiVector = TaskDonut.toXY(self.startingAngle + Snap.rad(self.angleSize/2), self.emojiRadius);
-
-  };
+  }
 
   self.redraw = function(){
-    //self.relinkToTask();
-    init(task);
+    _linkTask();
+    _calculateSizeAndVectors(self.task);
     self.draw();
   };
 
   self.redrawHandle = function(){
     self.drawHandle();
-  };
-
-  self.relinkToTask = function(){
-    self.borderSliceIndex = taskManager.getTasks().indexOf(self.task);
   };
 
   self.draw = function() {
@@ -125,7 +107,7 @@ export function TaskSlice(TaskDonut, segmentIndex, task) {
     var innerLineTo = "L"+self.innerStartingVector.x+","+self.innerStartingVector.y;
     var innerArc = "A"+self.mainSliceRadius+","+self.mainSliceRadius+" 0 "+sweep+" 1 "+self.innerTerminalVector.x+","+self.innerTerminalVector.y+" z";
     var mainSlice = [innerMoveTo, innerLineTo, innerArc].join(" ");
-    
+
     //border slice
     var borderSlice = makeSliceString(
         self.startingVector.x, self.startingVector.y,
@@ -135,39 +117,33 @@ export function TaskSlice(TaskDonut, segmentIndex, task) {
         self.innerTerminalVector.x, self.innerTerminalVector.y, sweep
     );
 
-    var fill = self.task.color;
-
     //emoji image
     self.emoji_uri = self.task.emoji;
-
     if(self.emoji){
       self.emoji.remove();
     }
 
     if(self.emoji_uri){
+
       var emojiWidth = 7,
-        emojiHeight = emojiWidth;
-      var emojiX = self.emojiVector.x - (emojiWidth/2);
-      var emojiY = self.emojiVector.y - (emojiWidth/2);
-      var emojiCenterX = emojiX + (emojiWidth/2);
-      var emojiCenterY = emojiY + (emojiHeight/2);
+        emojiHeight = emojiWidth,
+        emojiX = self.emojiVector.x - (emojiWidth/2),
+        emojiY = self.emojiVector.y - (emojiWidth/2),
+        emojiCenterX = emojiX + (emojiWidth/2),
+        emojiCenterY = emojiY + (emojiHeight/2);
 
       self.emoji = TaskDonut.drawingArea.image("app/assets/emojis/72x72/"+self.emoji_uri+".png", emojiX, emojiY, emojiWidth, emojiHeight);
       self.emoji.attr({transform: "rotate("+(-TaskDonut.angle_offset) + " " + emojiCenterX +" "+ emojiCenterY +")"});
-      TaskDonut.donut_group.add(self.emoji);
-
       self.emoji.drag(dragTaskSliceByEmoji, null, stopDraggingTaskSliceByEmoji);
 
-      var img = new Image(72, 72);
-      img.src = "app/assets/emojis/72x72/"+self.emoji_uri+".png";
+      TaskDonut.donut_group.add(self.emoji);
     }
 
     //apply attributes
-    self.innerStartingVectorLine.attr({x1: TaskDonut.centerX, y1: TaskDonut.centerY, x2: self.innerStartingVector.x, y2: self.innerStartingVector.y, stroke:"#cccccc", "stroke-width": .1});
+    self.innerStartingVectorLine. attr({x1: TaskDonut.centerX, y1: TaskDonut.centerY, x2: self.innerStartingVector.x, y2: self.innerStartingVector.y, stroke:"#cccccc", "stroke-width": .1});
     self.innerTerminalVectorLine.attr({x1: TaskDonut.centerX, y1: TaskDonut.centerY, x2: self.innerTerminalVector.x, y2: self.innerTerminalVector.y, stroke:"#cccccc", "stroke-width": .1});
     self.borderSlice.attr({"d": borderSlice, stroke:"transparent", "stroke-width": 0, "fill": PieUtilities.colors.pieOrangeCream});
     self.mainSlice.attr({"d": mainSlice, stroke:"white", "stroke-width": 0, "fill": "#FFFFFF"});
-
 
     //apply special types
     if(self.task.type && self.task.type == "break"){
@@ -183,19 +159,10 @@ export function TaskSlice(TaskDonut, segmentIndex, task) {
       self.borderSlice.attr({"fill": sleepGradient, opacity: .85, 'stroke-width': 0});
       self.mainSlice.attr({"fill": sleepGradient, opacity: .75, 'stroke-width': 0});
     }
-
   };
 
 
   self.drawHandle = function(){
-
-    if(self.terminalHandle || self.startingHandle){
-      self.terminalHandle.remove();
-      self.startingHandle.remove();
-    }
-
-    self.terminalHandle = TaskDonut.drawingArea.path();
-    self.startingHandle = TaskDonut.drawingArea.path();
 
     //starting handle slice
     var startingHandleMoveTo = "M"+TaskDonut.centerX+","+TaskDonut.centerY;
@@ -212,80 +179,20 @@ export function TaskSlice(TaskDonut, segmentIndex, task) {
     self.terminalHandle.attr({"d": terminalHandleSlice, "fill":"transparent", "opacity": 0.4});
     self.startingHandle.attr({"d": startingHandleSlice, "fill":"transparent", "opacity": 0.4});
 
-    self.startingHandle.undrag();
-    self.terminalHandle.undrag();
-
-    self.startingHandle.drag(resizeTaskSliceByDraggingStartingHandle);
-    self.terminalHandle.drag(resizeTaskSliceByDraggingTerminalHandle);
-
-    self.terminalHandle.dblclick(resizeTaskJointByDoubleClickingAndDragging);
-
+    //self.terminalHandle.dblclick(resizeTaskJointByDoubleClickingAndDragging);
     TaskDonut.donut_group.add(self.startingHandle, self.terminalHandle);
-
-    unlockSlice();
-
-  };
-
-  function lockSlice(){
-    lock = true;
-  }
-
-  function unlockSlice(){
-    if(taskManager.taskListIsValid()){
-      lock = false;
-    }
-  }
-
-  dragTaskSliceByEmoji = function(dx, dy, mx, my){
-    TaskDonut.bucket_ring.show();
-
-    dropCanceled = false;
-    var relativeMouse = findRelativeMousePoints(mx, my, TaskDonut, self.borderSlice);
-
-    //hide the slice
-    var animationAttributes = {opacity: 0};
-    self.mainSlice.attr(animationAttributes);
-    self.borderSlice.attr(animationAttributes);
-    self.emoji.attr(animationAttributes);
-
-    //turn the task into a circle
-    var cx = relativeMouse.x + 3,
-      cy = relativeMouse.y - 3,
-      r = 8;
-
-    var path = "M "+cx+" "+cy+" m "+(-r)+", 0 a "+r+","+r+" 0 1,0 "+(r * 2)+",0 a "+r+","+r+" 0 1,0"+(-r * 2)+",0";
-
-    if(!ghost_group){
-      ghost_circle = TaskDonut.drawingArea.path();
-      var ghost_emoji_box = self.emoji.getBBox();
-      ghost_emoji = TaskDonut.drawingArea.image("app/assets/emojis/72x72/"+self.emoji_uri+".png", ghost_emoji_box.x, ghost_emoji_box.y, ghost_emoji_box.w, ghost_emoji_box.h);
-
-      ghost_group = TaskDonut.drawingArea.group();
-      ghost_group.add(ghost_circle, ghost_emoji);
-    }
-
-    ghost_emoji.attr({"x": cx-(ghost_emoji_width/2), "y": cy-(ghost_emoji_width/2), "width": ghost_emoji_width, "height": ghost_emoji_width}) ;
-    ghost_circle.attr({"d": path, stroke: self.task.color, "stroke-width": 1, "fill":"white"});
-
-    //broadcast that the task is dragging
-    eve("taskSliceIsDragging", {}, self, relativeMouse.x, relativeMouse.y);
-
-  };
-
-  stopDraggingTaskSliceByEmoji = function(e){
-    TaskDonut.bucket_ring.hide();
-
-    var relativeMouse = findRelativeMousePoints(e.x, e.y, TaskDonut, self.borderSlice);
-    eve("taskSliceStoppedDragging", {}, self, relativeMouse.x, relativeMouse.y);
   };
 
   resizeTaskSliceByDraggingStartingHandle = function(){
-    _resizeTaskSliceByDraggingHandle.apply("startingHandle", arguments);
+    _resizeTaskSliceByDraggingHandle.apply("start-handle", arguments);
   };
 
   resizeTaskSliceByDraggingTerminalHandle = function(){
-    _resizeTaskSliceByDraggingHandle.apply("terminalHandle", arguments);
+    _resizeTaskSliceByDraggingHandle.apply("end-handle", arguments);
   };
+
+  self.startingHandle.drag(resizeTaskSliceByDraggingStartingHandle);
+  self.terminalHandle.drag(resizeTaskSliceByDraggingTerminalHandle);
 
   var resizeTaskJointByDoubleClickingAndDragging;
   var jointResizeMode,
@@ -294,7 +201,7 @@ export function TaskSlice(TaskDonut, segmentIndex, task) {
   function _cancelJointResizeMode(){
     jointResizeMode = false;
     _cancelJointResizeTimeout();
-    _restoreDragHandlers();
+    _attachDragHandlers();
     console.log("canceled joint mode");
   }
 
@@ -312,7 +219,7 @@ export function TaskSlice(TaskDonut, segmentIndex, task) {
     self.startingHandle.undrag();
   }
 
-  function _restoreDragHandlers(){
+  function _attachDragHandlers(){
     self.startingHandle.drag(resizeTaskSliceByDraggingStartingHandle);
     self.terminalHandle.drag(resizeTaskSliceByDraggingTerminalHandle);
   }
@@ -357,37 +264,47 @@ export function TaskSlice(TaskDonut, segmentIndex, task) {
 
   };
 
-  _resizeTaskSliceByDraggingHandle = function(dx, dy, mx, my){
+  function lockSlice(){
+    console.log("locking interface");
+    lock = true;
+  }
 
-    if(lock){
-      console.log("dragging is locked");
-      return false;
-    }
+  function unlockSlice(){
+    console.log("unlocking interface");
+    lock = false;
+  }
+
+  _resizeTaskSliceByDraggingHandle = function(dx, dy, mx, my){
 
     //this = terminal mode or starting mode
     var handleKey = this;
-
-    var relativeMousePoint = findRelativeMousePoints(mx, my, TaskDonut);
-    var mouseAngle = findRelativeMouseAngle(relativeMousePoint.x, relativeMousePoint.y, TaskDonut);
-
+    var handleKey = handleKey.split("-")[0];
     var taskIDs = [self.taskIndex];
+    var relativeMousePoint = findRelativeMousePoints(mx, my, TaskDonut);
+    var liveAngle = findRelativeMouseAngle(relativeMousePoint.x, relativeMousePoint.y, TaskDonut);
+    var liveTime = PieUtilities.toTimeOfDay(liveAngle);
 
-    if(handleKey == "startingHandle"){
-      self.task.tempData['prevStart'] = self.task.start;
-      self.task['start'] = PieUtilities.toTimeOfDay(mouseAngle).format();
-      TaskDonut.taskManager.updateTasks(taskIDs, "starting-ripple");
+    var prevHandleValue = self.task[handleKey];
+
+    if(taskManager.taskListIsDirty()){
+      console.log("dragging while the the task list is dirty");
+      self.task[handleKey] = liveTime.format();
+      if(taskManager.utilities.taskIsValid(self.task)){
+        console.log("the new live angle would pass, should use live value "+liveAngle);
+      }else{
+        self.task[handleKey] = prevHandleValue;
+        return false;
+      }
     }
 
-    if(handleKey == "terminalHandle"){
-      self.task.tempData['prevEnd'] = self.task.end;
-      self.task['end'] = PieUtilities.toTimeOfDay(mouseAngle).format();
-      TaskDonut.taskManager.updateTasks(taskIDs, "terminal-ripple");
-    }
+    self.task.tempData['prev-'+handleKey] = prevHandleValue;
+    self.task[handleKey] = liveTime.format();
+    TaskDonut.taskManager.updateTasks(taskIDs, handleKey+"-ripple");
 
   };
 
-  eve.on('taskListUpdateFailed', lockSlice);
 
-  init(task);
+  //constructor
+  _construct(task);
 
 }

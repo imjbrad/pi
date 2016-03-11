@@ -1,11 +1,10 @@
 $sleep-blue: #5B6778;
 $footer-size: 45px;
-//$task-space-wrapper-size: calc(100vw * .4);
-$task-space-wrapper-size: 600px;
-$_task-space-wrapper-size: 600px;
-$task-space-size: 33%;
 $transition: all .2s linear;
-$top: 170px;
+$top: 10vh;
+
+$task-space-width: 550px;
+
 *{
   box-sizing: border-box;
 }
@@ -18,13 +17,17 @@ html, body {
 body {
 }
 
-header {
-
-  position: absolute;
+#MainSpace, header{
   width: 80%;
-  left: 10%;
+  max-width: 1200px;
+  margin: auto;
+}
+
+
+header {
+  margin: auto;
   margin-top: 70px;
-  overflow: visible;
+  overflow: auto;
   -webkit-transition: $transition;
 
   .header-button{
@@ -36,8 +39,9 @@ header {
     -webkit-transition: $transition;
 
     .label{
-      background-color: rgba(255, 255, 255, .5);
-      color: $pie-dark-grey;
+      background-color: #7e3c46;
+      border-right: 1px solid white;
+      color: white;
       float: left;
       height: inherit;
       padding: 0px 27px;
@@ -48,7 +52,7 @@ header {
 
     .icon{
       float: left;
-      background-color: white;
+      background-color: #7e3c46;
       height: inherit;
       width: 50px;
       padding: 10px;
@@ -142,6 +146,7 @@ header {
 
 #Space{
   background : -webkit-linear-gradient(-50deg, rgba(248, 185, 120, 1) 0%, rgba(250, 204, 156, 1) 24.54%, rgba(254, 240, 227, 1) 76.02%, rgba(255, 255, 255, 1) 100%);
+  background: #faf7f1;
   width: 100vw;
   max-width: 100%;
   height: 100vh;
@@ -151,22 +156,25 @@ header {
   margin: auto;
 }
 
-#TaskSpace, #CircleSpace{
-  float: left;
-  height: 100%;
+#MainSpace {
   position: relative;
   -webkit-transform: translate3d(0, 0, 0);
   -webkit-transition: width .3s $easeInQuad;
-  //border:1px solid red;
+  top: $top;
+
+  .TaskDonut{
+    height: calc(100% - 1px);
+    width: calc(100% - 1px);
+  }
+
+  #big-day {
+    position: relative;
+    -webkit-transition: all .4s;
+  }
+
+
 }
 
-#wrapper{
-  width: 80%;
-  margin: auto;
-  top: $top;
-  //border: 1px solid blue;
-  position: relative;
-}
 
 .TaskDonut{
   overflow: visible;
@@ -184,17 +192,32 @@ header {
 
 #TaskSpace {
 
+  position: absolute;
+  right: 0;
+  top:0;
+
+  opacity: 0;
+
+  -webkit-transition: $transition;
+  -webkit-transform: translateX(100%);
+
   #task-space-wrapper {
-    margin-top: 70px;
-    width: $task-space-wrapper-size;
-    position: relative;
+    width: $task-space-width;
 
     #task-detail-wrapper {
       padding: 0 10px;
+      padding-right: 0px;
+    }
+
+    #task-list-wrapper{
+      width: 45%;
+    }
+
+    #task-detail-wrapper{
+      width: 55%;
     }
 
     #task-list-wrapper, #task-detail-wrapper{
-      width: 50%;
       float: left;
       overflow: auto;
     }
@@ -221,21 +244,6 @@ header {
   }
 
 }
-
-#CircleSpace{
-
-  .TaskDonut{
-    height: calc(100% - 1px);
-    width: calc(100% - 1px);
-  }
-
-  #big-day {
-    position: relative;
-    -webkit-transition: all .4s;
-  }
-
-}
-
 
 /**for ui sortable**/
 footer{

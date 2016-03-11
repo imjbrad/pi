@@ -75,16 +75,16 @@ import { PieUtilities } from './TaskDonutUtilities.js';
         return false;
     }
 
-    function ___taskWouldOverlapNextTask(task, taskList, _nextID){
+    function ___taskWouldOverlapNextTask(task, taskList){
         var index = task.id,
             last = taskList.length - 1,
-            nextIndex = _nextID ? _nextID : ((index == last) ? 0 : index + 1),
+            nextIndex = (index == last) ? 0 : index + 1,
             nextTask = taskList[nextIndex],
             nextStartTime = moment(nextTask.start),
             terminalTime = moment(task.end);
 
         if(index < last && (nextStartTime.isBefore(terminalTime))){
-            console.log("Task can't overlap next task: "+nextTask.name);
+            console.log(task.name+"("+task.id+") can't overlap next task: "+nextTask.name+"("+nextTask.id+")");
             return true;
         }
 
@@ -92,7 +92,7 @@ import { PieUtilities } from './TaskDonutUtilities.js';
     }
 
     function ___taskWouldBeTooSmall(task){
-        var MINIMUM = 5;
+        var MINIMUM = 10;
         var taskSize = PieUtilities.taskSize(task.start, task.end);
         if(taskSize < MINIMUM){
             console.log("Task can't be too smaller than "+MINIMUM+" minimum");
@@ -107,7 +107,7 @@ import { PieUtilities } from './TaskDonutUtilities.js';
             startingTime = moment(task.start),
             terminalTime = moment(task.end);
 
-        console.log("Validating: "+task.name);
+        //console.log("Validating: "+task.name);
 
         return (
             ___taskWouldHappenOnTheWrongDay(startingTime, terminalTime)||
@@ -160,17 +160,29 @@ import { PieUtilities } from './TaskDonutUtilities.js';
 
         var list = __taskList,
             valid = true;
+
         sleep = [];
 
         self._taskListIsValid = true;
 
+        list.sort(function(taskA, taskB){
+            var a = moment(taskA.start);
+            var b = moment(taskB.start);
 
-        list = list.sort(function(taskA, taskB){
-            return moment(taskA.start).isAfter(moment(taskB.start));
+            if(a.isBefore(b)){
+                return -1
+            }
+
+            if(a.isAfter(b)){
+                return 1;
+            }
+
+            return 0;
+
         });
 
         list.every(function(_task, _taskIndex, _taskList){
-            valid = _validateTask(_task, _taskIndex, list);
+            valid = _validateTask(_task, _taskIndex, _taskList);
             return valid;
         });
 
@@ -193,13 +205,92 @@ import { PieUtilities } from './TaskDonutUtilities.js';
         return valid;
     }
 
+    function _updateTasksByInsertAndRipple(taskA, taskB, _updateMethod){
+
+        var place = _updateMethod.split('-')[1];
+        console.log(place);
+
+        //first figure out if taskA is moving into the future or in the past
+        var moveDirection = moment(taskB.start).isAfter(taskA.start) ? "forward" : "past";
+
+        var taskASize = PieUtilities.taskSize(taskA.start, taskA.end);
+
+        //insert taskA at taskB
+        if(place == "before"){
+            taskA.start = taskB.start;
+            taskA.end = moment(taskA.start).add(taskASize, 'm').format();
+        }
+
+        else if(place == "after"){
+            taskA.start = taskB.end;
+            taskA.end = moment(taskA.start).add(taskASize, 'm').format();
+        }
+
+        //if taskA is moved into a time in the future...
+        if(moveDirection == "forward"){
+
+            /*
+            * If taskA is being inserted at the start of taskB, Push taskB and
+            * each task after it taskA-minutes into the future. If taskA is being
+            * inserted at the end of taskB, push each task after taskB taskA-minutes
+            * into the future
+            * */
+             var start = (place == "before") ? taskB.id : taskB.id+1;
+
+             for(var i=start; i<userDayObject.tasks.length-1; i++){
+                var task = self.getTask(i),
+                    taskSize = PieUtilities.taskSize(task.start, task.end);
+
+                    task.start = moment(task.start).add(taskASize, 'm').format();
+                    task.end = moment(task.start).add(taskSize, 'm').format();
+                    console.log("shifting forward "+task.name);
+            }
+
+            /*
+            * Then, each task after taskA's original position
+            * need to be shifted taskA-minutes earlier to re-balance
+            * the Pie
+            * */
+            for(var i=taskA.id; i<userDayObject.tasks.length-1; i++){
+                var task = self.getTask(i),
+                    taskSize = PieUtilities.taskSize(task.start, task.end);
+                task.start = moment(task.start).subtract(taskASize, 'm').format();
+                task.end = moment(task.start).add(taskSize, 'm').format();
+                console.log("shifting back "+task.name);
+            }
+        }
+
+         //If taskB is moved into the past
+         if(moveDirection == "past"){
+
+             /*
+              * If taskA is being inserted at the start of taskB, push taskB and
+              * each task after it, up to taskA's original position, taskA-minutes
+              * into the future to re-balance the Pie. If taskA is being inserted
+              * at the end of taskB, push each task after taskB, up to taskA's original
+              * position taskA-minutes into the future to re-balanace the Pie.
+              * */
+             var start = (place == "before") ? taskB.id : taskB.id+1;
+             for(var i=start; i<taskA.id; i++){
+                var task = self.getTask(i),
+                    taskSize = PieUtilities.taskSize(task.start, task.end);
+                task.start = moment(task.start).add(taskASize, 'm').format();
+                task.end = moment(task.start).add(taskSize, 'm').format();
+                console.log("shifting forward "+task.name);
+             }
+        }
+
+        return _validateTaskListForDay(userDayObject.tasks);
+
+    }
+
     /*
     * Similar to a ripple edit in Premiere
     * when you change the size of one task,
     * it shifts all the other tasks earlier
     * or later, accordingly
     * */
-     function _updateTaskByRipple(_dirtyTask, rippleMethod){
+     function _updateTaskByPushPull(_dirtyTask, rippleMethod){
 
         var task = _dirtyTask,
             startingTime = moment(task.start),
@@ -214,7 +305,7 @@ import { PieUtilities } from './TaskDonutUtilities.js';
 
          var rippleDifferenceMs = newHandle.diff(prevHandle);
 
-         if(rippleMethod == "end-ripple"){
+         if(rippleMethod == "end-push-pull"){
              for(var i = task.id+1; i < userDayObject.tasks.length-1; i++) {
                      var nextTask = userDayObject.tasks[i];
                      var taskSize = PieUtilities.taskSize(nextTask.start, nextTask.end);
@@ -223,7 +314,7 @@ import { PieUtilities } from './TaskDonutUtilities.js';
              }
          }
 
-         if(rippleMethod == "start-ripple"){
+         if(rippleMethod == "start-push-pull"){
              for(var i = task.id-1; i > 0; i--){
                  var previousTask = userDayObject.tasks[i];
                  var taskSize = PieUtilities.taskSize(previousTask.start, previousTask.end);
@@ -243,15 +334,18 @@ import { PieUtilities } from './TaskDonutUtilities.js';
         eve("taskListUpdated");
     }
 
-    function _taskListUpdated() {
+    function _taskListUpdated(_animate) {
         console.log("task list successfully updated, caching new validated data");
         self._taskListIsDirty = false;
         __temp = JSON.stringify(userDayObject.tasks);
-        eve("taskListUpdated");
+        eve("taskListUpdated", {}, _animate);
     }
 
     self.__temp = function(){
         return JSON.parse(__temp)
+    };
+
+    self._externalControllerUpdatedTasks = function(){
     };
 
     self.addTask = function(task) {
@@ -269,11 +363,12 @@ import { PieUtilities } from './TaskDonutUtilities.js';
     self.removeTask = function(){
     };
 
-    self.updateTasks = function(_taskMap, _updateMethod) {
+    self.updateTasks = function(_taskMap, _updateMethod, _animate) {
 
         self._taskListIsDirty = true;
 
         var clean = false;
+        var animate = (_animate == null || _animate == false) ? false : ((_animate == true) ? true : null);
         var updateMethod = _updateMethod || "regular";
         var dirtyTasks = (!_taskMap || _taskMap == [] || _taskMap == "all") ? userDayObject.tasks : _taskMap.map(function(id){
             return userDayObject.tasks[id];
@@ -281,9 +376,17 @@ import { PieUtilities } from './TaskDonutUtilities.js';
 
         console.log("Updating Tasks "+updateMethod, dirtyTasks);
 
-        if(updateMethod.includes("ripple")){
+        if(updateMethod.includes("insert")){
+
+            var taskA = dirtyTasks[0];
+            var taskB = dirtyTasks[1];
+
+            clean = _updateTasksByInsertAndRipple(taskA, taskB, updateMethod);
+        }
+
+        if(updateMethod.includes("push-pull")){
             clean = dirtyTasks.every(function(dirtyTask, index, array){
-                return _updateTaskByRipple(dirtyTask, updateMethod);
+                return _updateTaskByPushPull(dirtyTask, updateMethod);
             });
         }
 
@@ -292,7 +395,7 @@ import { PieUtilities } from './TaskDonutUtilities.js';
         }
 
         if(clean){
-            _taskListUpdated();
+            _taskListUpdated(animate);
         }else{
             _taskListUpdateFailed();
         }
@@ -343,29 +446,35 @@ import { PieUtilities } from './TaskDonutUtilities.js';
         userDayObject.tasks.every(function(task, index, array){
 
             var nextTask = array[index + 1];
-            newStartingTime = moment(task.end);
+            //console.log("looking at task "+task.name);
 
             if(nextTask){
-                var nextStartingTime = moment(nextTask.start);
-                if(nextStartingTime.isAfter(moment(newStartingTime).add(minutes, 'm'))) {
-                    console.log("space available after "+task.name);
-                    canPlaceTask  = true;
+                //console.log("and the task after that "+nextTask.name);
+                var nextTaskStart = moment(nextTask.start);
+                if(nextTaskStart.isAfter(moment(task.end).add(minutes, 'm'))){
+                    //console.log("there is space after "+task.name);
+                    canPlaceTask = true;
+                    newStartingTime = task.end;
                     return false;
                 }
-            }else{
-                console.log("no next slice, space available immediatly after "+task.name);
+            }else if(index == 0){
+                //console.log("there is space immediatly after "+task.name);
                 canPlaceTask = true;
+                newStartingTime = task.end;
                 return false;
             }
+
+            return true;
 
         });
 
         if(canPlaceTask){
             console.log("space available");
-            return newStartingTime.format();
+            return newStartingTime;
+        }else{
+            return false;
         }
 
-        return false;
 
     };
 

@@ -2,23 +2,29 @@
 
   &.single-day-view {
 
-    #CircleSpace {
+    #MainSpace {
       width: 100%;
 
       #big-day{
         height: 540px;
         width: 540px;
-        margin: auto;
-        -webkit-transform: translateX(0);
+        left: 50%;
+        -webkit-transform: translateX(-50%);
         -webkit-transition: $transition;
       }
 
     }
 
-    #TaskSpace {
-      width: 0;
-      overflow: hidden;
-    }
-
   }
+}
+
+.single-selection-mode-enabled {
+  stroke: #6fccdd;
+  stroke-width: 1 !important;
+  -webkit-transition: stroke .5s;
+}
+
+.swap-mode-enabled {
+  stroke: #6fccdd;
+  stroke-width: .5 !important;
 }

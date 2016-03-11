@@ -1,64 +1,39 @@
-#Space.single-day-view {
 
-  $partially-expanded-width: #{$_task-space-wrapper-size/1.85};
+#Space.single-day-view {
 
   &.show-list {
 
-    #CircleSpace {
-      width: calc(100% - #{$partially-expanded-width});
+    #MainSpace {
 
-      header{
-        width: 90%;
-        left: 10%;
+      #big-day {
+        left: 0%;
+        -webkit-transform: translateX(0%);
       }
 
       #show-tasks-button{
-        height: auto;
-        opacity: .4;
 
-        .icon{
-          height: 30px;
-          width: 30px;
+        .icon img{
+          margin-top: 10px;
+          width: 50%;
         }
 
       }
 
-      #big-day {
-        height: 540px;
-        width: 540px;
-        margin: auto;
+      #TaskSpace {
+        -webkit-transform: translateX(0%);
+        right: 0%;
+        opacity: 1;
       }
 
-    }
-
-    #TaskSpace {
-      width: $partially-expanded-width;
-      overflow: visible;
-
-      #task-space-wrapper {
-        position: relative;
-        border-left: 1px dotted rgba(255, 255, 255, 0.95);
-        padding-left: 5px;
-
+      #wrapper {
+        width: calc(100% - #{$task-space-width});
+        margin: initial;
       }
-    }
 
-    #wrapper {
-      width: 90%;
-      left: 10%;
-      margin: 0;
     }
 
     &.show-list-expanded {
-
-      #CircleSpace {
-        width: calc(100% - (#{$_task-space-wrapper-size} + 4vw));
-      }
-
-      #TaskSpace {
-        width: calc(#{$task-space-wrapper-size} + 4vw);
-      }
-
     }
+
   }
 }

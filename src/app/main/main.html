@@ -1,122 +1,126 @@
 <div id="Space" class="single-day-view" ng-class="{'show-list': showListView, 'show-list-expanded': selectedTaskDetail.name != null}">
-  <div id="CircleSpace">
 
-    <pre style="
+  <header>
+    <button id="day-picker-button" ng-click="showCalendar = !showCalendar" class="header-button">
+      <div class="label">
+        {{ showListView && selectedTaskDetail.name ? 'MON 12/16' : 'Monday, December 16' }}
+      </div>
+      <div class="icon">
+        <img src="app/assets/group.svg">
+      </div>
+    </button>
+
+    <div class="pie-calendar" ng-show="showCalendar">
+      <md-calendar ng-model="myDate"></md-calendar>
+    </div>
+    <button id="show-tasks-button" class="header-button" ng-click="toggleListView()">
+      <div class="label" ng-hide="showListView">
+        {{ numberOfUserTasks || "No"  }} Item{{ (numberOfUserTasks > 1 || 0) ? "s" : ""  }} Today
+      </div>
+      <div class="icon">
+        <img ng-src="{{ showListView ? 'app/assets/x.svg' : 'app/assets/list.svg'}}">
+      </div>
+    </button>
+  </header>
+
+      <pre style="
     position:absolute;
-    opacity: .4;
+    opacity: 0;
     top: 100px;
+    height: 200px;
+    overflow: auto;
     left: 0">
       {{ taskDataString }}
     </pre>
 
-    <button class="btn" style="position: absolute; z-index: 1000;" ng-click="redraw()">
-      redraw
-    </button>
+  <div id="MainSpace">
 
-    <header>
-        <button id="day-picker-button" ng-click="showCalendar = !showCalendar" class="header-button">
-          <div class="label">
-            {{ showListView && selectedTaskDetail.name ? 'MON 12/16' : 'Monday, December 16' }}
-          </div>
-          <div class="icon">
-            <img src="app/assets/group.svg">
-          </div>
-        </button>
+    <!--<button class="btn" style="position: absolute; z-index: 1000;" ng-click="redraw()">-->
+      <!--redraw-->
+    <!--</button>-->
 
-        <div class="pie-calendar" ng-show="showCalendar">
-          <md-calendar ng-model="myDate"></md-calendar>
-        </div>
-      <button id="show-tasks-button" class="header-button" ng-click="toggleListView()">
-        <div class="label" ng-hide="showListView">
-          {{ numberOfUserTasks || "No"  }} Item{{ (numberOfUserTasks > 1 || 0) ? "s" : ""  }} Today
-        </div>
-        <div class="icon">
-          <img ng-src="{{ showListView ? 'app/assets/x.svg' : 'app/assets/list.svg'}}">
-        </div>
-      </button>
-    </header>
-
-    <div id="wrapper">
-      <div id="big-day">
-        <svg id="task-donut" viewBox="0 0 200 200" class="TaskDonut"></svg>
-      </div>
+    <div id="big-day">
+      <svg id="task-donut" viewBox="0 0 200 200" class="TaskDonut"></svg>
     </div>
 
-  </div>
-  <div id="TaskSpace">
-    <div id="task-space-wrapper">
-      <div id="task-list-wrapper">
-        <form name="newTaskForm" class="task-item" ng-submit="createNewTask()">
-          <input id="header" class="task-label" ng-model="newTaskName" autocomplete="off" name="newTaskNameInput" type="text" placeholder="Add an item:" autofocus=""/>
-        </form>
-        <ul id="taskList" ui-sortable="sortableOptions" ng-model="taskData.tasks">
-          <li ng-repeat="task in taskData.tasks | filter:taskFilter" ng-click="selectTask($index)">
-            <div class="task-item {{ task.taskType }}" ng-class="{'selected': $index == selectedTaskIndex}">
-              <input type="text" class="task-label" ng-model="task.name">
-            </div>
-          </li>
-        </ul>
-      </div>
-      <div id="task-detail-wrapper">
-
-        <div id="task-detail" ng-class="{'selected': selectedTaskIndex}">
-          <input type="text" id="task-name" ng-model="selectedTaskDetail.name" />
-          <div id="task-details">
-            <div class="task-detail-item pick-emoji">
-              <div class="header">Pick an Emoji</div>
-              <div class="emoji-picker-container">
-                <emoji-picker selected-emoji-model="selectedTaskDetail.emoji"></emoji-picker>
-                <div class="white-gradient"></div>
+    <div id="TaskSpace">
+      <div id="task-space-wrapper">
+        <div id="task-list-wrapper">
+          <form name="newTaskForm" class="task-item" ng-submit="createNewTask()">
+            <input id="header" class="task-label" ng-model="newTaskName" autocomplete="off" name="newTaskNameInput" type="text" placeholder="Add an item:" autofocus=""/>
+          </form>
+          <ul id="taskList" ui-sortable="sortableOptions" ng-model="taskData.tasks">
+            <li class="task-li" ng-repeat="task in taskData.tasks" data-index="{{$index}}" data-task-id="{{ task.id }}" ng-click="selectTask($index)">
+              <div class="task-item {{ task.type }}" ng-class="{'selected': $index == selectedTaskIndex}">
+                <div class="handle"></div>
+                <input type="text" class="task-label" ng-model="task.name">
               </div>
-            </div>
+            </li>
+          </ul>
+        </div>
+        <div id="task-detail-wrapper">
 
-            <div class="task-detail-item time-allotment">
-              <div class="header">How much time should I put into this?</div>
+          <div id="task-detail" ng-class="{'selected': selectedTaskIndex}">
+            <input type="text" id="task-name" ng-model="selectedTaskDetail.name" />
+            <div id="task-details">
+              <div class="task-detail-item pick-emoji">
+                <div class="header">Pick an Emoji</div>
+                <div class="emoji-picker-container">
+                  <emoji-picker selected-emoji-model="selectedTaskDetail.emoji"></emoji-picker>
+                  <div class="white-gradient"></div>
+                </div>
+              </div>
 
-              <!--
-              i'm probably most excited about this little slider. a friend
-              has been saying he's confused because the slider doesn't reference
-              time specically... that's cause time is abstracted away... the number
-              of minutes i spend on something doesn't really matter to me... it
-              more about how much energy i put into it in proportion to other tasks...
-              time itself is arbitary anyway... the question "how much should i put
-              into this" led me to some other questions i want to use as labels for
-              the other task detail inputs: what does this represent?, anything else
-              to keep in mind?
-              -->
+              <div class="task-detail-item time-allotment">
+                <div class="header">How much time should I put into this?</div>
 
-              <div class="btn-group btn-group-justified pie-btn-group-justified time-allotment-btn-group">
-                <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(5)"><span>5<div class="unit">min</div></span></label>
-                <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(15)"><span>15<div class="unit">min</div></span></label>
-                <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(30)"><span>30<div class="unit">min</div></span></label>
-                <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(45)"><span>45<div class="unit">min</div></span></label>
-                <label id="plus" class="btn"
-                       ng-class="{
+                <!--
+                i'm probably most excited about this little slider. a friend
+                has been saying he's confused because the slider doesn't reference
+                time specically... that's cause time is abstracted away... the number
+                of minutes i spend on something doesn't really matter to me... it
+                more about how much energy i put into it in proportion to other tasks...
+                time itself is arbitary anyway... the question "how much should i put
+                into this" led me to some other questions i want to use as labels for
+                the other task detail inputs: what does this represent?, anything else
+                to keep in mind?
+                -->
+
+                <div class="btn-group btn-group-justified pie-btn-group-justified time-allotment-btn-group">
+                  <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(5)"><span>5<div class="unit">min</div></span></label>
+                  <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(15)"><span>15<div class="unit">min</div></span></label>
+                  <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(30)"><span>30<div class="unit">min</div></span></label>
+                  <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(45)"><span>45<div class="unit">min</div></span></label>
+                  <label id="plus" class="btn"
+                         ng-class="{
                        active: selectedTaskDetail.angleSize > Utilities.toAngleSize(45),
                        revealMinutes: selectedTaskDetail.angleSize > Utilities.toAngleSize(45)}"
-                       ng-click="selectedTaskDetail.angleSize = Utilities.toAngleSize(60)">
-                  <span><span class="minutes">{{ Utilities.humanizeMinutes(Utilities.toMinutes(selectedTaskDetail.angleSize)) }}</span><div class="unit">+</div></span>
-                </label>
+                         ng-click="selectedTaskDetail.angleSize = Utilities.toAngleSize(60)">
+                    <span><span class="minutes">{{ Utilities.humanizeMinutes(Utilities.toMinutes(selectedTaskDetail.angleSize)) }}</span><div class="unit">+</div></span>
+                  </label>
+                </div>
+                <div class="task-slider" ng-class="{ fadeOut: selectedTaskDetail.angleSize <= Utilities.toAngleSize(45) }">
+                  <slider  slider-value="selectedTaskDetail.angleSize" min="Utilities.toAngleSize(30)" max="360"></slider>
+                </div>
               </div>
-              <div class="task-slider" ng-class="{ fadeOut: selectedTaskDetail.angleSize <= Utilities.toAngleSize(45) }">
-                <slider  slider-value="selectedTaskDetail.angleSize" min="Utilities.toAngleSize(30)" max="360"></slider>
+
+              <div class="task-detail-item afterwards">
+                <div class="header">Afterwards?</div>
+                <label class="pie-task-detail-btn btn" ng-click="selectTaskAfter()" ng-model="selectedTaskDetail.afterward" uib-btn-radio="'Break'" uncheckable>TAKE A 30 MINUTE BREAK</label>
+                <label class="pie-task-detail-btn btn" ng-click="selectTaskAfter()" ng-model="selectedTaskDetail.afterward" uib-btn-radio="'Eat'" uncheckable>HAVE SOMETHING TO EAT</label>
+                <label class="pie-task-detail-btn btn" ng-click="selectTaskAfter()" ng-model="selectedTaskDetail.afterward" uib-btn-radio="'Exercise'" uncheckable>EXERCISE</label>
               </div>
-            </div>
 
-            <div class="task-detail-item afterwards">
-              <div class="header">Afterwards?</div>
-              <label class="pie-task-detail-btn btn" ng-click="selectTaskAfter()" ng-model="selectedTaskDetail.afterward" uib-btn-radio="'Break'" uncheckable>TAKE A 30 MINUTE BREAK</label>
-              <label class="pie-task-detail-btn btn" ng-click="selectTaskAfter()" ng-model="selectedTaskDetail.afterward" uib-btn-radio="'Eat'" uncheckable>HAVE SOMETHING TO EAT</label>
-              <label class="pie-task-detail-btn btn" ng-click="selectTaskAfter()" ng-model="selectedTaskDetail.afterward" uib-btn-radio="'Exercise'" uncheckable>EXERCISE</label>
-            </div>
+              <div class="task-detail-item danger-zone">
+                <button id="delete-button" ng-dblclick="deleteCurrentlySelectedTask()"><i class="fa fa-trash-o"></i></button>
+              </div>
 
-            <div class="task-detail-item danger-zone">
-              <button id="delete-button" ng-dblclick="deleteCurrentlySelectedTask()"><i class="fa fa-trash-o"></i></button>
             </div>
-
           </div>
         </div>
       </div>
     </div>
+
   </div>
+
 </div>

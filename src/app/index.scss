@@ -9,7 +9,9 @@
 @import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/button-groups";
 @import "../../bower_components/angular-material/angular-material.scss";
 
-* {}
+* {
+  //border: 1px solid red;
+}
 
 button {
   background: none;

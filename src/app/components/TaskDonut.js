@@ -12,17 +12,10 @@ export function TaskDonut(svgArea, _taskManager) {
   var self = this;
   var init;
   var determineSize;
-  var validateTasks;
-  var drawCircle;
-  var drawTasks;
   var determineAngleOffset;
   var drawingArea = svgArea;
   var pattern, patternImg;
-  var TASK_TYPES = ["sleep"];
-  var REQUIRED_SLICE_KEYS = ["name", "startingAngle", "terminalAngle"];
-  var pie_sleep = [];
   var taskManager = _taskManager;
-  var initialLoad = false;
   var tasks;
 
   self.dispatchedEvents = {};
@@ -49,13 +42,12 @@ export function TaskDonut(svgArea, _taskManager) {
 
   };
 
-  var tasksListUpdated;
-  tasksListUpdated = function(){
+  function tasksListUpdated(_animate){
     if(taskManager.taskListIsValid()){
       console.log("Tasks are valid, redrawing");
-      self.redrawSlices();
+      self.drawSlices(_animate);
     }
-  };
+  }
 
   determineAngleOffset = function(){
 
@@ -81,7 +73,7 @@ export function TaskDonut(svgArea, _taskManager) {
     self.sliceBorderRadius = self.radius/1.02;
     self.innerSliceRadius = self.radius/1.26;
 
-    self.pictureRadius = self.innerSliceRadius/1.1;
+    self.pictureRadius = self.innerSliceRadius/1.03;
 
     self.centerX = self.outerRadius;
     self.centerY = self.outerRadius;
@@ -104,21 +96,17 @@ export function TaskDonut(svgArea, _taskManager) {
 
   self.draw = function(){
 
-    //outer, blurred self portrait
-    var outerPictureWidth = self.innerSliceRadius*2;
-    var outerPictureHeight = outerPictureWidth;
-    var outerPictureX = self.centerX - outerPictureWidth/2;
-    var outerPictureY = self.centerY - outerPictureHeight/2;
-    var blur = drawingArea.filter(Snap.filter.blur(4, 4));
-    var outerPicture = drawingArea.image("app/assets/andrew.jpg", outerPictureX, outerPictureY, outerPictureWidth, outerPictureHeight)
-        .attr({filter: blur});
+    //outermost circle, white border w/ drop shadow
+    var borderCircle = drawingArea.circle();
+    var shadow = drawingArea.filter(Snap.filter.shadow(0, 0, 2, 'black', .2));
+    borderCircle.attr({"cx":self.centerX, "cy":self.centerY, "r":self.outerRadius, "fill": "white", 'fill-opacity': "1"});
 
     //self portrait
     var pictureWidth = self.pictureRadius*2;
     var pictureHeight = pictureWidth;
     var pictureX = self.centerX - pictureWidth/2;
     var pictureY = self.centerY - pictureHeight/2;
-    var picture = drawingArea.image("app/assets/andrew.jpg", pictureX, pictureY, pictureWidth, pictureHeight)
+    var picture = drawingArea.image("app/assets/terron.jpg", pictureX, pictureY, pictureWidth, pictureHeight)
         //.attr({filter: drawingArea.filter(Snap.filter.grayscale(.5))})
         ;
 
@@ -127,32 +115,20 @@ export function TaskDonut(svgArea, _taskManager) {
     pictureMask.attr({"cx":self.centerX, "cy":self.centerY, "r":self.pictureRadius, "fill":"white"});
     picture.attr({mask: pictureMask});
 
-    //mask outer self portrait
-    var outerPictureMask = drawingArea.circle();
-    outerPictureMask.attr({"cx":self.centerX, "cy":self.centerY, "r":self.innerSliceRadius, "fill":"white"});
-    outerPicture.attr({mask: outerPictureMask, opacity: .6});
-
     //ring group
     self.donut_group = self.drawingArea.g();
 
     //task ring, categories
     var circle = drawingArea.circle();
-    circle.attr({"cx":self.centerX, "cy":self.centerY, "r":self.radius, "fill": "#fbfcfc", 'fill-opacity': ".23"});
+    circle.attr({"cx":self.centerX, "cy":self.centerY, "r":self.radius, "fill": "#7e3c46", 'fill-opacity': ".1"});
 
     //create mask
     var donutMaskCircle = drawingArea.circle(self.centerX, self.centerY, self.outerRadius+5).attr({"fill":"white"});
     var donutMaskInnerCircle = drawingArea.circle(self.centerX, self.centerY, self.innerSliceRadius);
     var donutMask = drawingArea.g().add(donutMaskCircle, donutMaskInnerCircle);
-    self.donut_group.add(circle);
+    self.donut_group.add(borderCircle, circle);
 
-    self.slices = tasks.map(function(task, taskIndex){
-      return new TaskSlice(self, taskIndex, task);
-    });
-
-    //draw task slices
-    self.slices.forEach(function(slice, index, array){
-      slice.draw();
-    });
+    self.drawSlices();
 
     //draw task slice handles
     /*
@@ -211,10 +187,6 @@ export function TaskDonut(svgArea, _taskManager) {
       *
       * */
 
-     self.slices.forEach(function(slice, index, array){
-       slice.drawHandle();
-    });
-
     //apply masks
     self.donut_group.attr({mask: donutMask});
     self.donut_group.attr({transform: "rotate("+self.angle_offset + " " + self.centerX +" "+self.centerY+")"});
@@ -223,20 +195,27 @@ export function TaskDonut(svgArea, _taskManager) {
 
   self.redraw = function(){
     self.drawingArea.clear();
+
     init();
     self.draw();
   };
 
-  self.redrawSlices = function(){
+  self.drawSlices = function(_animate){
 
     //redraw slices for each task
     tasks.forEach(function(element, index, array){
-      self.slices[index].redraw();
-    });
 
-    //redraw handles
-    self.slices.forEach(function(element, index, array){
-      self.slices[index].redrawHandle();
+      var slice = self.slices[index];
+
+      if(!slice){
+        //instantiate a slice for the first time
+        slice = new TaskSlice(self, index);
+        self.slices.push(slice);
+      }else{
+        //redraw an existing slice
+        slice.redraw(_animate);
+      }
+
     });
 
   };
@@ -266,6 +245,7 @@ export function TaskDonut(svgArea, _taskManager) {
    * **/
 
   init();
+
   if(taskManager.taskListIsValid()){
     self.draw();
   }

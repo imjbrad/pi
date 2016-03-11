@@ -17,52 +17,61 @@ export function MainController($scope, $timeout, $filter) {
 
     Math.TWOPI = 2 * Math.PI;
 
-    var taskData = {
+    var taskDonut,
+        taskManager;
+
+    $scope.taskData = {
         day: PieUtilities.today,
         tasks: [
             {
-                name: "Sleep_a",
-                start: PieUtilities.todayAt("12:00 am"),
-                end: PieUtilities.todayAt("07:30 am"),
-                type: "sleep",
-                tempData: {}
-            },
-            {
-                name: "class A",
-                start: PieUtilities.todayAt("12:00 pm"),
+                name: "Work at the Studio",
+                start: PieUtilities.todayAt("7:30 am"),
                 end: PieUtilities.todayAt("1:30 pm"),
+                emoji: '1f3c0.png',
                 tempData: {}
             },
             {
-                name: "class B",
-                start: PieUtilities.todayAt("2:00 pm"),
+                name: "Gym",
+                start: PieUtilities.todayAt("3:00 pm"),
                 end: PieUtilities.todayAt("4:00 pm"),
+                color: '#7e3c46',
+                emoji: '1f4d0.png',
                 tempData: {}
             },
             {
-                name: "class BS",
+                name: "Return rentals",
                 start: PieUtilities.todayAt("4:00 pm"),
                 end: PieUtilities.todayAt("5:00 pm"),
+                emoji: '1f4de.png',
                 tempData: {}
             },
             {
-                name: "class C",
-                start: PieUtilities.todayAt("7:00 pm"),
-                end: PieUtilities.todayAt("9:00 pm"),
+                name: "Finish Paper",
+                start: PieUtilities.todayAt("8:00 pm"),
+                end: PieUtilities.todayAt("11:30 pm"),
+                emoji: '1f62d.png',
                 tempData: {}
             },
             {
-                name: "Sleep_b",
+                name: "Sleep_B",
                 start: PieUtilities.todayAt("11:30 pm"),
                 end: PieUtilities.todayAt("11:59 pm"),
+                color: '#7e3c46',
+                type: 'sleep',
+                tempData: {}
+            },
+            {
+                name: "Sleep_A",
+                start: PieUtilities.todayAt("12:00 am"),
+                end: PieUtilities.todayAt("07:30 am"),
                 type: "sleep",
                 tempData: {}
             }
         ]
     };
 
-    var taskManager = new TaskSetController(taskData);
-    var taskDonut = new TaskDonut(Snap("#task-donut"), taskManager);
+    taskManager = new TaskSetController($scope.taskData);
+    taskDonut = new TaskDonut(Snap("#task-donut"), taskManager);
 
     $scope.selectedTask = null;
     $scope.selectedTaskDetail = {};
@@ -70,7 +79,7 @@ export function MainController($scope, $timeout, $filter) {
     eve.on("taskListUpdated", taskListUpdated);
 
     function taskListUpdated(){
-        $scope.taskDataString = JSON.stringify(taskManager.getTasks(), null, 4);
+        $scope.taskDataString = JSON.stringify($scope.taskData, null, 4);
         $scope.numberOfUserTasks = taskManager.getTaskCount();
     }
 
@@ -98,25 +107,17 @@ export function MainController($scope, $timeout, $filter) {
     };
 
     $scope.createNewTask = function () {
-
         var firstAvailableTime = taskManager.utilities.firstAvailableOpening(15);
-
-        console.log(firstAvailableTime);
-
         if(firstAvailableTime){
-
             taskManager.addTask({
                 name: $scope.newTaskName,
                 start: firstAvailableTime,
                 end: moment(firstAvailableTime).add(15, 'm').format(),
                 color: "#9ec2e1"
             });
-
             $scope.newTaskName = "";
             $scope.selectLastTask();
-
         }
-
     };
 
     $scope.deleteCurrentlySelectedTask = function () {
@@ -205,9 +206,9 @@ export function MainController($scope, $timeout, $filter) {
     };
 
     $scope.$watch('selectedTaskDetail.emoji', function () {
-        var newEmoji = $scope.selectedTaskDetail.emoji;
+        //var newEmoji = $scope.selectedTaskDetail.emoji;
         if (newEmoji) {
-            $scope.taskDonuts[0].redraw();
+            //taskDonut.redraw();
         }
     });
 
@@ -222,32 +223,38 @@ export function MainController($scope, $timeout, $filter) {
         }
     });
 
+    var prevIndex;
+
     $scope.sortableOptions = {
-
-        start: function () {
+        cancel: 'input',
+        start: function (e, ui) {
+            prevIndex = ui.item.index();
         },
 
-        update: function (event) {
-            $timeout(function () {
-                //$scope.taskDonuts[0].redraw();
-            })
+        update: function (event, ui) {
+
+            $timeout(function(){
+                var taskID = parseInt($(ui.item).attr('data-task-id'));
+                var swapID = parseInt($('.task-li[data-index='+prevIndex+']').attr('data-task-id'));
+
+                prevIndex = null;
+
+                var task = $scope.taskData.tasks[taskID],
+                    _oldTaskStart = task.start;
+
+                var swap = $scope.taskData.tasks[swapID];
+                
+                task.start = swap.start;
+                task.end = moment(task.start).add(PieUtilities.taskSize(_oldTaskStart, task.end), 'm').format();
+
+                taskManager.updateTasks([taskID], "end-ripple");
+            });
+
         },
 
-        out: function () {
-            $timeout(function () {
-                //$scope.taskDonuts[0].bucket_ring.show();
-            })
-        },
-
-        over: function () {
-            $timeout(function () {
-            })
-        },
-
-        stop: function () {
-            $timeout(function () {
-                $scope.taskDonuts[0].bucket_ring.hide();
-            })
+        stop: function (e, ui) {
+            //console.log(ui.item.index(), t);
+            //taskManager.updateTasks();
         }
 
     };

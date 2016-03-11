@@ -3,26 +3,31 @@
   border: 1px solid rgba(229, 229, 229, 0.9);
   margin-bottom: 5px;
   cursor: pointer;
+  background: rgba(255, 255, 255, 1);
+  position: relative;
+  display: flex;
 
-  &.selected {
-    background: rgba(255, 255, 255, .5);
-    padding: 4px;
-    border: none;
-  }
-
-  &.standardSleep {
+  &.sleep {
     display: none;
   }
 
+  .handle {
+    width: 13px;
+    background-color: $pie-off-white;
+    top:0;
+    bottom: 0;
+    left:0;
+  }
+
   .task-label {
-    width: 100%;
-    background: rgba(255, 255, 255, 1);
     font: 12px 'source_sans_prosemibold', sans-serif !important;
     outline: none;
     color: grey;
+    background-color: transparent;
     padding: 15px 20px;
     overflow-wrap: break-word;
     border: none;
+    flex-grow: 1;
   }
 
 }

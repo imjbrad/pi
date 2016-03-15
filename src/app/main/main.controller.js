@@ -1,6 +1,7 @@
-import { PieUtilities } from '../components/TaskDonutUtilities.js';
+import { PieUtilities } from '../components/PiUtilities.js';
 import { TaskSetController } from '../components/TaskManager.js';
 import { TaskDonut } from '../components/TaskDonut.js';
+import { TaskStrip } from '../components/TaskStrip/TaskStrip.js';
 
 export function MainController($scope, $timeout, $filter) {
 
@@ -18,10 +19,12 @@ export function MainController($scope, $timeout, $filter) {
     Math.TWOPI = 2 * Math.PI;
 
     var taskDonut,
-        taskManager;
+        taskManager,
+        taskStrip;
 
     $scope.taskData = {
         day: PieUtilities.today,
+        sleepGoal: "08:30",
         tasks: [
             {
                 name: "Work at the Studio",
@@ -72,6 +75,8 @@ export function MainController($scope, $timeout, $filter) {
 
     taskManager = new TaskSetController($scope.taskData);
     taskDonut = new TaskDonut(Snap("#task-donut"), taskManager);
+    taskStrip = new TaskStrip(Snap("#task-strip"), taskManager);
+
 
     $scope.selectedTask = null;
     $scope.selectedTaskDetail = {};
@@ -207,9 +212,9 @@ export function MainController($scope, $timeout, $filter) {
 
     $scope.$watch('selectedTaskDetail.emoji', function () {
         //var newEmoji = $scope.selectedTaskDetail.emoji;
-        if (newEmoji) {
+        //if (newEmoji) {
             //taskDonut.redraw();
-        }
+        //}
     });
 
     $scope.$watch('selectedTaskDetail.angleSize', function () {

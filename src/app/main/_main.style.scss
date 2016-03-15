@@ -158,18 +158,25 @@ header {
 
 #MainSpace {
   position: relative;
-  -webkit-transform: translate3d(0, 0, 0);
   -webkit-transition: width .3s $easeInQuad;
   top: $top;
-
-  .TaskDonut{
-    height: calc(100% - 1px);
-    width: calc(100% - 1px);
-  }
 
   #big-day {
     position: relative;
     -webkit-transition: all .4s;
+    display: none;
+
+    .TaskDonut{
+      height: calc(100% - 1px);
+      width: calc(100% - 1px);
+    }
+
+  }
+
+  #strip {
+    //height: 540px;
+    width: 900px;
+    margin: auto;
   }
 
 
@@ -193,13 +200,14 @@ header {
 #TaskSpace {
 
   position: absolute;
-  right: 0;
+  right: -100%;
   top:0;
+  display: none;
 
   opacity: 0;
 
   -webkit-transition: $transition;
-  -webkit-transform: translateX(100%);
+  //-webkit-transform: translateX(100%);
 
   #task-space-wrapper {
     width: $task-space-width;
@@ -263,3 +271,6 @@ g.dragOver {
     stroke: black;
   }
 }
+
+
+.TaskStrip {}

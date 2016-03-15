@@ -1,4 +1,4 @@
-import { PieUtilities } from '../TaskDonutUtilities.js';
+import { PieUtilities } from '../PiUtilities.js';
 
 export function SliderDirective(){
 

@@ -1,4 +1,4 @@
-import { PieUtilities } from './TaskDonutUtilities.js';
+import { PieUtilities } from './PiUtilities.js';
 
 /*This serves as
 * the main controller
@@ -95,7 +95,7 @@ import { PieUtilities } from './TaskDonutUtilities.js';
         var MINIMUM = 10;
         var taskSize = PieUtilities.taskSize(task.start, task.end);
         if(taskSize < MINIMUM){
-            console.log("Task can't be too smaller than "+MINIMUM+" minimum");
+            console.log("Task can't be too smaller than "+MINIMUM+" minimum", taskSize);
             return true;
         }
         return false
@@ -296,7 +296,7 @@ import { PieUtilities } from './TaskDonutUtilities.js';
             startingTime = moment(task.start),
             terminalTime = moment(task.end);
 
-        console.log("starting ripple at "+PieUtilities.toAngle(task.end));
+        console.log("starting ripple");
 
         var rippleHandle = rippleMethod.split('-')[0];
 
@@ -304,6 +304,8 @@ import { PieUtilities } from './TaskDonutUtilities.js';
          var newHandle = moment(task[rippleHandle]);
 
          var rippleDifferenceMs = newHandle.diff(prevHandle);
+
+         console.log(newHandle.diff(prevHandle, 'm'));
 
          if(rippleMethod == "end-push-pull"){
              for(var i = task.id+1; i < userDayObject.tasks.length-1; i++) {
@@ -318,6 +320,7 @@ import { PieUtilities } from './TaskDonutUtilities.js';
              for(var i = task.id-1; i > 0; i--){
                  var previousTask = userDayObject.tasks[i];
                  var taskSize = PieUtilities.taskSize(previousTask.start, previousTask.end);
+                 var oldEnd = previousTask.end;
                  previousTask.end = moment(previousTask.end).add(rippleDifferenceMs, 'ms').format();
                  previousTask.start = moment(previousTask.end).subtract(taskSize, 'minutes').format();
              }
@@ -345,8 +348,6 @@ import { PieUtilities } from './TaskDonutUtilities.js';
         return JSON.parse(__temp)
     };
 
-    self._externalControllerUpdatedTasks = function(){
-    };
 
     self.addTask = function(task) {
         userDayObject.tasks.push(task);
@@ -410,8 +411,24 @@ import { PieUtilities } from './TaskDonutUtilities.js';
         return userDayObject.tasks.length;
     };
 
-    self.getSleep = function(){
+    self.getSleepTasks = function (){
         return sleep;
+    };
+
+    self.getSleepGoalInMinutes = function(){
+        return moment.duration(userDayObject.sleepGoal).asMinutes();
+    };
+
+    //sum of am and pm sleep minutes
+    self.getSleepTimeInMinutes = function(){
+        var sleep = self.getSleepTasks();
+        var sumSleepTimeInMinutes = 0;
+
+        sleep.forEach(function(e, i, a){
+            sumSleepTimeInMinutes+=PieUtilities.taskSize(e.start, e.end);
+        });
+
+        return sumSleepTimeInMinutes;
     };
 
     self.taskListIsValid = function(){

@@ -13,6 +13,8 @@ import { TaskSlice } from './components/TaskSlice.js';
 import { Bucket } from './components/Bucket.js';
 import { BucketRing } from './components/BucketRing.js';
 
+import { TaskStrip, TaskStripDirective } from './components/TaskStrip/TaskStrip.js';
+
 import { EmojiPicker } from './components/emoji-picker/emojipicker.directives.js';
 import { SliderDirective } from './components/slider/directives.slider.js';
 
@@ -28,6 +30,7 @@ angular.module('app', ['ngResource', 'ui.router', 'ui.bootstrap','ui.sortable', 
 
   .directive('emojiPicker', EmojiPicker)
   .directive('taskDonut', TaskDonutDirective)
+  .directive('taskStrip', TaskStripDirective)
   .directive('slider', SliderDirective)
 
   ;

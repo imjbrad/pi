@@ -4,7 +4,7 @@
 
 import { BucketRing } from './BucketRing.js';
 import { TaskSlice } from './TaskSlice.js';
-import { PieUtilities } from './TaskDonutUtilities.js';
+import { PieUtilities } from './PiUtilities.js';
 import { Emitter } from './Emitter.js';
 
 export function TaskDonut(svgArea, _taskManager) {
@@ -51,7 +51,7 @@ export function TaskDonut(svgArea, _taskManager) {
 
   determineAngleOffset = function(){
 
-    var pie_sleep = taskManager.getSleep();
+    var pie_sleep = taskManager.getSleepTasks();
     var totalConsecutiveSleepSize = 0;
 
     pie_sleep.forEach(function(sleep){

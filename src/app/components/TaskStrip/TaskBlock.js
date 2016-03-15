@@ -49,8 +49,8 @@ export function TaskBlock(TaskStrip, _blockIndex) {
         var task = self.task || _task;
 
         return {
-            "startingPosition": (PieUtilities.toLinearPosition(task.start, TaskStrip.scale.min, TaskStrip.scale.max) * TaskStrip.stripWidth) + TaskStrip.stripLeftOffset,
-            "terminalPosition": (PieUtilities.toLinearPosition(task.end, TaskStrip.scale.min, TaskStrip.scale.max) * TaskStrip.stripWidth) + TaskStrip.stripLeftOffset
+            "startingPosition": (PieUtilities.toLinearPositionFromTimeOfDay(task.start, TaskStrip.scale.min, TaskStrip.scale.max) * TaskStrip.stripWidth) + TaskStrip.stripLeftOffset,
+            "terminalPosition": (PieUtilities.toLinearPositionFromTimeOfDay(task.end, TaskStrip.scale.min, TaskStrip.scale.max) * TaskStrip.stripWidth) + TaskStrip.stripLeftOffset
         }
     }
 
@@ -66,8 +66,15 @@ export function TaskBlock(TaskStrip, _blockIndex) {
         //this = terminal mode or starting mode
         var handleKey = handle.split("-")[0],
             taskIDs = [self.taskIndex],
-            horizontalMousePosition = drawingArea.getLiveMousePositionOrAPreviouslyValidMousePosition(mx, my, (mx, my) => {return drawingArea.relativeMousePoints(mx, my).x}, taskManager),
-            newTime = PieUtilities.toTimeOfDayFromLinearScale(horizontalMousePosition/100, taskStrip.scale.min, taskStrip.scale.max);
+
+            horizontalMousePosition = drawingArea.getUIValueFromMousePosition({
+               mouseX: mx,
+               mouseY: my,
+               valueFn: (mx, my) => {return drawingArea.relativeMousePoints(mx, my).x}
+            });
+
+
+        var newTime = PieUtilities.toTimeOfDayFromLinearScale(horizontalMousePosition/100, taskStrip.scale.min, taskStrip.scale.max);
 
         self.task.tempData['prev-'+handleKey] = self.task[handleKey];
         self.task[handleKey] = newTime;
@@ -126,8 +133,20 @@ export function TaskBlock(TaskStrip, _blockIndex) {
             return;
         }
 
-        var horizontalMousePosition = drawingArea.relativeMousePoints(mx, my).x;
-        self.task.end = PieUtilities.toTimeOfDayFromLinearScale(horizontalMousePosition/100, taskStrip.scale.min, taskStrip.scale.max);
+        var tod = taskManager.getTask(self.taskIndex + 1).start;
+        var linearPosition = PieUtilities.toLinearPositionFromTimeOfDay(tod, taskStrip.scale.min, taskStrip.scale.max);
+
+        console.log(linearPosition, PieUtilities.toLinearPositionFromTimeOfDay(tod, taskStrip.scale.min, taskStrip.scale.max));
+
+        var horizontalMousePosition = drawingArea.getUIValueFromMousePosition({
+            mouseX: mx,
+            mouseY: my,
+            valueFn: (mx, my) => {return drawingArea.relativeMousePoints(mx, my).x/100},
+            max: PieUtilities.toLinearPositionFromTimeOfDay(taskManager.getTask(self.taskIndex + 1).start, taskStrip.scale.min, taskStrip.scale.max),
+            min: PieUtilities.toLinearPositionFromTimeOfDay((moment(self.task.start).add(taskManager.MINIMUM_TASK_SIZE, 'minutes').format()), taskStrip.scale.min, taskStrip.scale.max)
+        });
+
+        self.task.end = PieUtilities.toTimeOfDayFromLinearScale(horizontalMousePosition, taskStrip.scale.min, taskStrip.scale.max);
         taskManager.updateTasks();
     }
 

@@ -24,7 +24,7 @@ export function MainController($scope, $timeout, $filter) {
 
     $scope.taskData = {
         day: PieUtilities.today,
-        sleepGoal: "08:30",
+        sleepGoal: "08:00",
         tasks: [
             {
                 name: "Work at the Studio",

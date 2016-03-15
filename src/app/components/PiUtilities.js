@@ -1,5 +1,5 @@
 var fullFormatString = "dddd, MMMM Do YYYY, h:mm:ss a";
-var lastValidatedUIValue, pausingLiveAngleWhileTaskListIsDirty;
+var lastValidatedUIValue;
 
 Snap.plugin(function (Snap, Element, Paper, global, Fragment) {
 
@@ -14,31 +14,24 @@ Snap.plugin(function (Snap, Element, Paper, global, Fragment) {
         return transformedPoint;
     };
 
-    Paper.prototype.getLiveMousePositionOrAPreviouslyValidMousePosition = function(mx, my, transformFn, taskManager){
+    Paper.prototype.getUIValueFromMousePosition = function (settings) {
 
-        var liveValue = transformFn(mx, my);
-        var sign = lastValidatedUIValue - liveValue;
-        var value = liveValue;
+        var liveValue = settings.valueFn(settings.mouseX, settings.mouseY),
+            maxValue = settings.max || liveValue,
+            minValue = settings.min || liveValue;
 
-        if(taskManager.taskListIsDirty()){
-            pausingLiveAngleWhileTaskListIsDirty = false;
-            if(sign < 0 && liveValue >= lastValidatedUIValue){
-                value = lastValidatedUIValue;
-                console.log("moving too far forward, using last successful value");
-                pausingLiveAngleWhileTaskListIsDirty = true;
+            if(liveValue > maxValue){
+                lastValidatedUIValue = maxValue;
+                console.log("moving too far forward, using max validated value");
+            } else if(liveValue < minValue){
+                lastValidatedUIValue = minValue;
+                console.log("going to far backward, using min validated value");
+            } else {
+                lastValidatedUIValue = liveValue;
+                console.log("using live value: "+liveValue);
             }
-            if(sign > 0 && liveValue <= lastValidatedUIValue){
-                value = lastValidatedUIValue;
-                console.log("going to far backward, using last successful value");
-                pausingLiveAngleWhileTaskListIsDirty = true;
-            }
-        } else {
-            lastValidatedUIValue = liveValue;
-            pausingLiveAngleWhileTaskListIsDirty = false;
-            console.log("using live value: "+liveValue);
-        }
 
-        return value;
+        return lastValidatedUIValue;
     };
 
 
@@ -133,7 +126,7 @@ PieUtilities.taskSize = function(_start, _end){
 
     var start = moment(_start),
         end = moment(_end),
-        duration = moment.duration(end.diff(start)).asMinutes();
+        duration = end.diff(start, "minutes");
 
   return duration;
 };
@@ -155,7 +148,7 @@ PieUtilities.toTimeOfDay = function(angleInDegrees, _format){
 };
 
 
-PieUtilities.toLinearPosition = function(time, scaleMinTime, scaleMaxTime){
+PieUtilities.toLinearPositionFromTimeOfDay = function (time, scaleMinTime, scaleMaxTime){
     var time = moment(time);
 
     var minTime = scaleMinTime ? moment(scaleMinTime) : moment().startOf("day");
@@ -183,6 +176,6 @@ PieUtilities.toTimeOfDayFromLinearScale = function(linearScaleFactor, scaleMinTi
 
 };
 
-PieUtilities.interface.getLiveMousePositionOrAPreviouslyValidMousePosition = function(mx, my) {
+PieUtilities.interface.getLiveUIValueOrAPreviouslyValidUIValue = function(mx, my) {
 
 };

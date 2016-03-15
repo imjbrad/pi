@@ -20,7 +20,9 @@ import { PieUtilities } from './PiUtilities.js';
     var REQUIRED_TASK_KEYS = ["name", "start", "end"],
         TASK_TYPES = ["sleep", "temp"];
 
-     var __temp = "";
+    var __temp = "";
+
+    self.MINIMUM_TASK_SIZE = 10;
 
     function init(_dayDataObject){
 

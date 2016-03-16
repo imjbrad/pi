@@ -34,6 +34,20 @@ Snap.plugin(function (Snap, Element, Paper, global, Fragment) {
         return lastValidatedUIValue;
     };
 
+    Paper.prototype.getCurrentPixelRatio = function(){
+
+        /*determine the relationship between the real width/height and the svg viewbox width/height.
+        this is similar to the viewport meta tag wherein a local viewport is specified
+        and may be different from the pysical device width/height*/
+
+        var viewBox = this.node.attributes[1].nodeValue.split(" ");
+            console.log(viewBox);
+        return {
+            x: viewBox[2]/this.node.clientWidth,
+            y: viewBox[3]/this.node.clientHeight
+        }
+    };
+
 
 });
 

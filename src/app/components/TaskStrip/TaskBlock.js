@@ -58,7 +58,7 @@ export function TaskBlock(TaskStrip, _blockIndex) {
     function attachUIHandlersAndEvents(){
         blockStartingHandle.drag(resizeTaskSliceByDraggingStartingHandle);
         blockTerminalHandle.drag(resizeTaskSliceByDraggingTerminalHandle);
-        blockMiddleHandle.drag(moveTaskLeftOrRightByDraggingMiddleHandle);
+        blockMiddleHandle.drag(moveTaskLeftOrRightByDraggingMiddleHandle, start_moveTaskLeftOrRightByDraggingMiddleHandle, cancelMoveTaskLeftOrRightByDraggingMiddleHandle);
     }
 
     function pushPullTaskByDraggingStartOrEndHandle(handle, dx, dy, mx, my){
@@ -82,24 +82,34 @@ export function TaskBlock(TaskStrip, _blockIndex) {
         taskManager.updateTasks(taskIDs, handleKey+"-push-pull");
     }
 
-    var distanceFromStart = null;
+    var originalStartingPosition;
+
+    function start_moveTaskLeftOrRightByDraggingMiddleHandle(){
+        originalStartingPosition = self.startingPosition;
+        console.log(originalStartingPosition);
+    }
+
     function moveTaskLeftOrRightByDraggingMiddleHandle(dx, dy, mx, my, e){
 
-        var horizontalMousePosition = drawingArea.relativeMousePoints(mx, my).x;
+        var scaled_dx = (dx * drawingArea.getCurrentPixelRatio().x);
 
-        if(!distanceFromStart){
-            var startingPosition = self.startingPosition;
-            distanceFromStart = horizontalMousePosition - startingPosition;
-        }
-
-        var newStartingPosition = horizontalMousePosition - distanceFromStart;
         var taskSize = PieUtilities.taskSize(self.task.start, self.task.end);
 
+        var maxStartingPosition = PieUtilities.toLinearPositionFromTimeOfDay(moment(taskManager.getTask(self.taskIndex+1).start).subtract(taskSize, 'minutes'), taskStrip.scale.min, taskStrip.scale.max);
+        var minStartingPosition = PieUtilities.toLinearPositionFromTimeOfDay(taskManager.getTask(self.taskIndex-1).end, taskStrip.scale.min, taskStrip.scale.max);
+
+        var newStartingPosition = (originalStartingPosition + scaled_dx) / 100;
+
+        if(scaled_dx > 0 && newStartingPosition > maxStartingPosition ){
+            newStartingPosition = maxStartingPosition;
+        }else if(scaled_dx < 0 && newStartingPosition < minStartingPosition) {
+            newStartingPosition = minStartingPosition
+        }
 
         self.task.tempData['prev-start'] = self.task.start;
         self.task.tempData['prev-end'] = self.task.end;
 
-        self.task.start = PieUtilities.toTimeOfDayFromLinearScale(newStartingPosition/100, taskStrip.scale.min, taskStrip.scale.max);
+        self.task.start = PieUtilities.toTimeOfDayFromLinearScale(newStartingPosition, taskStrip.scale.min, taskStrip.scale.max);
         self.task.end = moment(self.task.start).add(taskSize, 'm').format();
 
         if(e.shiftKey){
@@ -114,6 +124,10 @@ export function TaskBlock(TaskStrip, _blockIndex) {
 
     }
 
+    function cancelMoveTaskLeftOrRightByDraggingMiddleHandle() {
+        originalStartingPosition = null;
+    }
+
     function resizeTaskSliceByDraggingStartingHandle(dx, dy, mx, my, e){
 
         if(e.shiftKey){
@@ -121,8 +135,15 @@ export function TaskBlock(TaskStrip, _blockIndex) {
             return;
         }
 
-        var horizontalMousePosition = drawingArea.relativeMousePoints(mx, my).x;
-        self.task.start = PieUtilities.toTimeOfDayFromLinearScale(horizontalMousePosition/100, taskStrip.scale.min, taskStrip.scale.max);
+        var horizontalMousePosition = drawingArea.getUIValueFromMousePosition({
+            mouseX: mx,
+            mouseY: my,
+            valueFn: (mx, my) => {return drawingArea.relativeMousePoints(mx, my).x/100},
+            max: PieUtilities.toLinearPositionFromTimeOfDay((moment(self.task.end).subtract(taskManager.MINIMUM_TASK_SIZE, 'minutes').format()), taskStrip.scale.min, taskStrip.scale.max),
+            min: PieUtilities.toLinearPositionFromTimeOfDay(taskManager.getTask(self.taskIndex-1).end, taskStrip.scale.min, taskStrip.scale.max)
+        });
+
+        self.task.start = PieUtilities.toTimeOfDayFromLinearScale(horizontalMousePosition, taskStrip.scale.min, taskStrip.scale.max);
         taskManager.updateTasks();
     }
 
@@ -132,11 +153,6 @@ export function TaskBlock(TaskStrip, _blockIndex) {
             pushPullTaskByDraggingStartOrEndHandle("end-handle", dx, dy, mx, my);
             return;
         }
-
-        var tod = taskManager.getTask(self.taskIndex + 1).start;
-        var linearPosition = PieUtilities.toLinearPositionFromTimeOfDay(tod, taskStrip.scale.min, taskStrip.scale.max);
-
-        console.log(linearPosition, PieUtilities.toLinearPositionFromTimeOfDay(tod, taskStrip.scale.min, taskStrip.scale.max));
 
         var horizontalMousePosition = drawingArea.getUIValueFromMousePosition({
             mouseX: mx,

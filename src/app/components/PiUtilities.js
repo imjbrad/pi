@@ -184,7 +184,7 @@ PieUtilities.toTimeOfDayFromLinearScale = function(linearScaleFactor, scaleMinTi
 
     var minutesSinceMinTime = linearScaleFactor * totalTimeInMinutes;
 
-    var time = minTime.add(minutesSinceMinTime, "minutes");
+    var time = minTime.add(minutesSinceMinTime, "minutes").seconds(0);
 
     return time.format();
 

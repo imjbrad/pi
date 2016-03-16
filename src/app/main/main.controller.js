@@ -84,8 +84,10 @@ export function MainController($scope, $timeout, $filter) {
     eve.on("taskListUpdated", taskListUpdated);
 
     function taskListUpdated(){
-        $scope.taskDataString = JSON.stringify($scope.taskData, null, 4);
-        $scope.numberOfUserTasks = taskManager.getTaskCount();
+        $scope.$apply(function(){
+            $scope.taskDataString = JSON.stringify($scope.taskData, null, 4);
+            $scope.numberOfUserTasks = taskManager.getTaskCount();
+        });
     }
 
     $scope.Utilities = PieUtilities;

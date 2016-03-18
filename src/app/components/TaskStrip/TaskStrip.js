@@ -3,6 +3,7 @@
  */
 
 import { TaskBlock } from './TaskBlock';
+import { ThreeSegmentButton } from './SleepAdjustmentButton';
 
 Snap.plugin(function (Snap, Element, Paper, global, Fragment) {
 
@@ -43,64 +44,125 @@ Snap.plugin(function (Snap, Element, Paper, global, Fragment) {
 
 export function TaskStrip(svgArea, _taskManager) {
 
-    var tasks,
-        drawingArea = svgArea;
+    var self = this,
+        tasks,
+        drawingArea = svgArea,
+        taskManager = _taskManager;
+        self.drawingArea = drawingArea;
+
+    var stripBarBorderRadius;
+
+    var viewBox;
 
     var tabWidth,
         tabHeight,
         tabTopOffset;
 
-    var stripBarBorderRadius;
-
     var sleepBarHeight,
         sleepBarWidth,
         sleepBarTopOffset,
-        sleepBarLeftOffset;
+        sleepBarLeftOffset,
+        sleepBarLabelTopOffset,
+        sleepBarLabelLeftOffset,
+        sleepBarLabelWidth,
+        sleepBarLabelTextSize,
+        sleepBarLabelHeight;
+
+    var morningTab = drawingArea.rect(),
+        nightTab = drawingArea.rect(),
+        strip = drawingArea.rect(),
+        roundedRectangleMask = drawingArea.rect(),
+        sleepBarLabel = drawingArea.text(),
+        sleepGradient = drawingArea.gradient("l(0, 0, 1, 0)#F8B978-#5C6879"),
+        totalBar = drawingArea.rect(),
+        sleepBar = drawingArea.rect();
+
+        self.group = drawingArea.g();
+        self.group.add(strip);
+        self.group.attr({mask: roundedRectangleMask});
 
     function init() {
 
+        viewBox = drawingArea.node.attributes[1].nodeValue.split(" ");
+
         self.taskManager = _taskManager;
-        self.drawingArea = drawingArea;
-        self.group = self.drawingArea.g();
 
-        tasks = taskManager.getTasks();
+        tasks = self.taskManager.getTasks();
 
-        var viewBox = drawingArea.node.attributes[1].nodeValue.split(" ");
+        self.totalWidth = viewBox[2]; // should be 100
+        self.totalHeight = viewBox[3]; // should be 25
 
-        self.totalWidth = viewBox[2];
-        self.totalHeight = viewBox[3];
         self.blocks = [];
 
-        var sleep = self.taskManager.getSleepTasks();
+        self.scale = determineScale();
 
-        self.scale = {
-            min: sleep[0].end,
-            max: sleep[1].start
-        };
+        //values assuming a 100 by 25 responsive viewbox
 
+        tabTopOffset = 0;
         tabWidth = 0;
-        sleepBarHeight = .75;
-
-        self.stripLeftOffset = tabWidth;
-        self.stripWidth = self.totalWidth - (2*self.stripLeftOffset);
-        self.stripHeight = self.totalHeight - (sleepBarHeight*((.18*self.totalHeight)/sleepBarHeight));
+        tabHeight = 0;
 
         stripBarBorderRadius = .75;
 
-        sleepBarWidth = self.stripWidth - (2*stripBarBorderRadius);
-        sleepBarLeftOffset = self.stripLeftOffset + stripBarBorderRadius;
-        sleepBarTopOffset = self.totalHeight - sleepBarHeight;
+        self.sleepAdjustmentButtonLeftOffset = tabWidth + stripBarBorderRadius;
+        self.sleepAdjustmentButtonTopOffset = 0;
+        self.sleepAdjustmentButtonWidth = 7.899;
+        self.sleepAdjustmentButtonHeight = 2.774;
 
-        tabHeight = self.stripHeight * (3/4);
-        tabTopOffset = self.stripHeight * (1/8);
+        self.stripTopOffset = 4.5;
+        self.stripLeftOffset = tabWidth;
+        self.stripWidth = self.totalWidth - (2*self.stripLeftOffset);
+        self.stripHeight = 13;
+
+        sleepBarHeight = .81;
+
+        sleepBarLabelTopOffset = self.totalHeight - sleepBarHeight;
+        sleepBarLabelLeftOffset = stripBarBorderRadius;
+        sleepBarLabelWidth = 4.5;
+        sleepBarLabelTextSize = 1;
+        sleepBarLabelHeight = sleepBarHeight;
+
+        sleepBarWidth = self.stripWidth - (2*stripBarBorderRadius + sleepBarLabelWidth);
+        sleepBarLeftOffset = (sleepBarLabelLeftOffset + sleepBarLabelWidth);
+        sleepBarTopOffset = (self.totalHeight - sleepBarHeight) - 0.2;
+
+        if(taskManager.taskListIsValid()){
+            draw();
+        }
+
+        var morningSleepAdjustmentButton = new ThreeSegmentButton(self, {
+            x: self.sleepAdjustmentButtonLeftOffset,
+            y: self.sleepAdjustmentButtonTopOffset,
+            width: self.sleepAdjustmentButtonWidth,
+            height: self.sleepAdjustmentButtonHeight,
+            image: "app/assets/sun.png"
+        });
+
+        var nightSleepAdjustmentButton = new ThreeSegmentButton(self, {
+            x: (self.totalWidth-stripBarBorderRadius) - self.sleepAdjustmentButtonWidth,
+            y: self.sleepAdjustmentButtonTopOffset,
+            width: self.sleepAdjustmentButtonWidth,
+            height: self.sleepAdjustmentButtonHeight,
+            image: "app/assets/moon.png"
+        });
+
+        morningSleepAdjustmentButton.leftButton.click(wakeUpEarlier);
 
         eve.on("taskListUpdated", taskListUpdated);
     }
 
     function taskListUpdated(){
         if(taskManager.taskListIsValid()){
-            drawBlocks();
+            self.redraw();
         }
+    }
+
+    function determineScale(){
+        var sleep = self.taskManager.getSleepTasks();
+        return {
+            min: sleep[0].end,
+            max: sleep[1].start
+        };
     }
 
     function drawBlocks() {
@@ -123,39 +185,43 @@ export function TaskStrip(svgArea, _taskManager) {
         return self.taskManager.getSleepTimeInMinutes()/self.taskManager.getSleepGoalInMinutes();
     }
 
-    self.draw = function(){
+    self.redraw = function (){
+        self.scale = determineScale();
+        draw();
+    };
 
-        var morningTab = drawingArea.rect(0, tabTopOffset, tabWidth, tabHeight);
-        morningTab.attr({fill: "#f8b978"});
+    function draw(){
 
-        var nightTab = drawingArea.rect(self.stripWidth+tabWidth, tabTopOffset, tabWidth, tabHeight);
-        nightTab.attr({fill: "#37445c"});
+        morningTab.attr({x: 0, y: tabTopOffset, width: tabWidth, height: tabHeight, fill: "#f8b978"});
 
-        var strip = drawingArea.rect(self.stripLeftOffset, 0, self.stripWidth, self.stripHeight);
-        strip.attr({"fill": "#7e3c46", "fill-opacity": .1});
+        nightTab.attr({x: self.stripWidth+tabWidth, y:tabTopOffset, width: tabWidth, height: tabHeight, fill: "#37445c"});
 
-        self.group.add(strip);
+        strip.attr({x: self.stripLeftOffset, y: self.stripTopOffset, width: self.stripWidth, height: self.stripHeight, "fill": "#7e3c46", "fill-opacity": .1});
+
         drawBlocks();
 
-        //apply the mask
-        var roundedRectangleMask = drawingArea.rect(self.stripLeftOffset, 0, self.stripWidth, self.stripHeight);
-        roundedRectangleMask.attr({rx: stripBarBorderRadius, ry: stripBarBorderRadius, fill: "white"});
-        self.group.attr({mask: roundedRectangleMask});
+        roundedRectangleMask.attr({x:self.stripLeftOffset, y:self.stripTopOffset, width: self.stripWidth, height: self.stripHeight, rx: stripBarBorderRadius, ry: stripBarBorderRadius, fill: "white"});
 
-        var sleepGradient = drawingArea.gradient("l(0, 0, 1, 0)#F8B978-#5C6879");
-        var totalBar = drawingArea.rect(sleepBarLeftOffset, sleepBarTopOffset, sleepBarWidth, sleepBarHeight);
-        var sleepBar = drawingArea.rect(sleepBarLeftOffset, sleepBarTopOffset, sleepBarWidth * calculateSleepBarScaleFactor(), sleepBarHeight);
+        sleepBarLabel.attr({x: sleepBarLabelLeftOffset, y: sleepBarLabelTopOffset, text:"Sleep:", fontSize: 1.31, width: sleepBarLabelWidth, alignmentBaseline: "central", fontFamily: "apercu_medium", fill: "#808080"});
+
+        totalBar.attr({x: sleepBarLeftOffset, y: sleepBarTopOffset, width: sleepBarWidth, height: sleepBarHeight});
+        sleepBar.attr({x: sleepBarLeftOffset, y: sleepBarTopOffset, width: (sleepBarWidth * calculateSleepBarScaleFactor()), height: sleepBarHeight});
 
         sleepBar.attr({rx: sleepBarHeight/2, ry: sleepBarHeight/2, "fill": sleepGradient});
         totalBar.attr({rx: sleepBarHeight/2, ry: sleepBarHeight/2, "fill": "#7e3c46", "fill-opacity": .1});
 
     };
 
-    init();
+    function wakeUpEarlier() {
+        //create more time for tasks in the morning
+        console.log("waking up earlier");
+        var sleep = taskManager.getSleepTasks();
 
-    if(taskManager.taskListIsValid()){
-        self.draw();
+        sleep[0].end = moment(sleep[0].end).subtract(30, "minutes").format();
+        taskManager.updateTasks();
     }
+
+    init();
 
 }
 

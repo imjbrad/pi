@@ -14,11 +14,38 @@ Snap.plugin(function (Snap, Element, Paper, global, Fragment) {
         return transformedPoint;
     };
 
+    Paper.prototype.limitUIValueIfNecessary = function(liveValue, min, max){
+
+        var maxValue = (max != undefined) ? max : liveValue,
+            minValue = (min != undefined) ? min : liveValue;
+
+        console.log("min is: "+min);
+        console.log("max is: "+max);
+        console.log("live is: "+liveValue);
+
+        if(liveValue >= maxValue){
+            lastValidatedUIValue = maxValue;
+            console.log("moving too far forward, using max validated value");
+        } else if(liveValue <= minValue){
+            lastValidatedUIValue = minValue;
+            console.log("going to far backward, using min validated value");
+        } else {
+            lastValidatedUIValue = liveValue;
+            console.log("using live value: "+liveValue);
+        }
+
+        return lastValidatedUIValue;
+    };
+
+    //deprecated
     Paper.prototype.getUIValueFromMousePosition = function (settings) {
 
         var liveValue = settings.valueFn(settings.mouseX, settings.mouseY),
-            maxValue = settings.max || liveValue,
-            minValue = settings.min || liveValue;
+            maxValue = (settings.max != undefined) ? settings.max : liveValue,
+            minValue = (settings.min != undefined) ? settings.min : liveValue;
+
+            console.log("min is: "+settings.min);
+            console.log("max is: "+settings.max);
 
             if(liveValue > maxValue){
                 lastValidatedUIValue = maxValue;
@@ -162,7 +189,7 @@ PieUtilities.toTimeOfDay = function(angleInDegrees, _format){
 };
 
 
-PieUtilities.toLinearPositionFromTimeOfDay = function (time, scaleMinTime, scaleMaxTime){
+PieUtilities.toLinearPosition0to1FromTimeOfDay = function (time, scaleMinTime, scaleMaxTime){
     var time = moment(time);
 
     var minTime = scaleMinTime ? moment(scaleMinTime) : moment().startOf("day");
@@ -176,7 +203,7 @@ PieUtilities.toLinearPositionFromTimeOfDay = function (time, scaleMinTime, scale
     return linearScaleFactor;
 };
 
-PieUtilities.toTimeOfDayFromLinearScale = function(linearScaleFactor, scaleMinTime, scaleMaxTime){
+PieUtilities.toTimeOfDayFromLinearPosition0to1 = function (linearScaleFactor, scaleMinTime, scaleMaxTime){
 
     var minTime = scaleMinTime ? moment(scaleMinTime) : moment().startOf("day");
     var maxTime = scaleMaxTime ? moment(scaleMaxTime) : moment().endOf("day");
@@ -190,6 +217,10 @@ PieUtilities.toTimeOfDayFromLinearScale = function(linearScaleFactor, scaleMinTi
 
 };
 
-PieUtilities.interface.getLiveUIValueOrAPreviouslyValidUIValue = function(mx, my) {
+PieUtilities.toLinearPosition0to1FromArbitraryXPosition = function (xPosition, linearWidth){
+    return xPosition / linearWidth;
+};
 
+PieUtilities.toXPositionFromLinearPosition0to1 = function (linearPosition, linearWidth){
+    return linearPosition * linearWidth;
 };

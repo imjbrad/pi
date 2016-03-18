@@ -94,7 +94,7 @@ export function TaskDonut(svgArea, _taskManager) {
     }
   };
 
-  self.draw = function(){
+  self.drawStrip = function(){
 
     //outermost circle, white border w/ drop shadow
     var borderCircle = drawingArea.circle();
@@ -197,7 +197,7 @@ export function TaskDonut(svgArea, _taskManager) {
     self.drawingArea.clear();
 
     init();
-    self.draw();
+    self.drawStrip();
   };
 
   self.drawSlices = function(_animate){
@@ -247,7 +247,7 @@ export function TaskDonut(svgArea, _taskManager) {
   init();
 
   if(taskManager.taskListIsValid()){
-    self.draw();
+    self.drawStrip();
   }
 
 }

@@ -30,7 +30,7 @@ export function Bucket(_taskDonut, _startingAngle, _angularSize) {
   init = function(startingAngle, angularSize, angularRotation) {
 
     _initVectors(startingAngle, angularSize, angularRotation);
-    self.draw();
+    self.drawStrip();
     bucket_group.add(slice, text);
   };
 
@@ -94,7 +94,7 @@ export function Bucket(_taskDonut, _startingAngle, _angularSize) {
     };
   };
 
-  self.draw = function(){
+  self.drawStrip = function(){
     var drawingAttributes = _calculateDrawingAttributes();
 
     slice.attr(drawingAttributes);
@@ -125,7 +125,7 @@ export function Bucket(_taskDonut, _startingAngle, _angularSize) {
 
   self.setText = function(_text){
     self.textLabel = _text;
-    self.draw();
+    self.drawStrip();
   };
 
   self.g = function(){

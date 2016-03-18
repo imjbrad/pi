@@ -70,7 +70,7 @@ export function TaskSlice(TaskDonut, _sliceIndex) {
     attachUIClasses();
 
     var drawingAngles = findDrawingAngles();
-    self.draw(drawingAngles.startingAngle, drawingAngles.terminalAngle);
+    self.drawStrip(drawingAngles.startingAngle, drawingAngles.terminalAngle);
 
   }
 
@@ -388,13 +388,13 @@ export function TaskSlice(TaskDonut, _sliceIndex) {
     var drawingAngles = findDrawingAngles();
     var speed = _animate ? 200 : 0;
 
-    self.draw(drawingAngles.startingAngle, drawingAngles.terminalAngle, function () {
+    self.drawStrip(drawingAngles.startingAngle, drawingAngles.terminalAngle, function () {
     }, speed);
 
   };
 
 
-  self.draw = function (newStartAngle, newEndAngle, callback, _speed){
+  self.drawStrip = function (newStartAngle, newEndAngle, callback, _speed){
     var speed = _speed || 0;
     return Snap.animate([self.startingAngle, self.terminalAngle], [newStartAngle, newEndAngle], function(val){
 

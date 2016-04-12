@@ -41,12 +41,14 @@ button {
 //mannually import app styles
 @import "main/main.style";
 
-@import "main/layouts.showtasks";
+@import "components/TaskDetailPanel/layouts.showtasks";
 @import "main/layouts.singleday";
 
 @import "components/emoji-picker/emojipicker";
 @import "components/slider/slider";
 
-@import "main/taskitem.style";
-@import "main/taskdetail.style";
+@import "components/TaskStrip/TaskStrip";
+
+@import "components/TaskDetailPanel/taskitem.style";
+@import "components/TaskDetailPanel/taskdetail.style";
 

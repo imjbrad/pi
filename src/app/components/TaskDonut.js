@@ -4,7 +4,7 @@
 
 import { BucketRing } from './BucketRing.js';
 import { TaskSlice } from './TaskSlice.js';
-import { PieUtilities } from './PiUtilities.js';
+import { PiUtilities } from './PiUtilities.js';
 import { Emitter } from './Emitter.js';
 
 export function TaskDonut(svgArea, _taskManager) {
@@ -55,10 +55,10 @@ export function TaskDonut(svgArea, _taskManager) {
     var totalConsecutiveSleepSize = 0;
 
     pie_sleep.forEach(function(sleep){
-      totalConsecutiveSleepSize += (PieUtilities.toAngle(sleep.end) - PieUtilities.toAngle(sleep.start));
+      totalConsecutiveSleepSize += (PiUtilities.toAngle(sleep.end) - PiUtilities.toAngle(sleep.start));
     });
 
-    var sleep_midpoint = (PieUtilities.toAngle(pie_sleep[0]['end']) - (totalConsecutiveSleepSize/2));
+    var sleep_midpoint = (PiUtilities.toAngle(pie_sleep[0]['end']) - (totalConsecutiveSleepSize/2));
 
     self.angle_offset = (90 - sleep_midpoint);
 
@@ -244,10 +244,10 @@ export function TaskDonut(svgArea, _taskManager) {
    *
    * **/
 
-  init();
-
-  if(taskManager.taskListIsValid()){
-    self.drawStrip();
-  }
+  //init();
+  //
+  //if(taskManager.taskListIsValid()){
+  //  self.drawStrip();
+  //}
 
 }

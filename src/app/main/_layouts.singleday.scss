@@ -28,3 +28,19 @@
   stroke: #6fccdd;
   stroke-width: .5 !important;
 }
+
+body.in-single-selection-mode .task-block{
+
+  &.in-single-selection-mode{
+    opacity: .2;
+  }
+
+  &:not(.in-single-selection-mode){
+    opacity: .3;
+  }
+
+  &.task-block-clone{
+    opacity: 1;
+  }
+
+}

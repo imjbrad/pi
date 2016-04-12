@@ -4,17 +4,26 @@ $transition: all .2s linear;
 $top: 10vh;
 
 $task-space-width: 550px;
+$task-detail-height: 250px;
+$task-list-inset: 30px;
 
 *{
   box-sizing: border-box;
 }
 
-html, body {
-  margin: 0;
-  font-family: 'source_sans_prosemibold', sans-serif !important;
+
+html {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
 body {
+  height: 100%;
+  padding: 0;
+  overflow: auto;
+  margin: 0;
+  -webkit-overflow-scrolling: touch;
 }
 
 #MainSpace, header{
@@ -199,57 +208,74 @@ header {
 
 #TaskSpace {
 
-  position: absolute;
-  right: -100%;
-  top:0;
-  display: none;
-
   opacity: 0;
-
-  -webkit-transition: $transition;
-  //-webkit-transform: translateX(100%);
+  overflow: auto;
+  -webkit-transition: all .2s $easeInOutBack;
+  width: 850px;
+  margin: auto;
+  margin-top: 50px;
+  -webkit-transform: scale(.95) translateY(20%);
 
   #task-space-wrapper {
-    width: $task-space-width;
+    overflow: auto;
 
     #task-detail-wrapper {
-      padding: 0 10px;
-      padding-right: 0px;
+      background-color: white;
+      #task-detail{
+        height: $task-detail-height;
+      }
     }
 
     #task-list-wrapper{
-      width: 45%;
+      overflow: hidden;
+      border-width: 1px 1px 1px 0px;
+      border-style: solid;
+      border-color: $pie-light-grey;
+      display: flex;
+      flex-direction: column;
+      width: 30%;
+      top: $task-list-inset/2;
+      position: relative;
+      height: calc(#{$task-detail-height - $task-list-inset});
+
+      .shadow {
+        box-shadow: inset -2px 0px 13px 0px #E5E5E5;
+        position: absolute;
+        width: 280px;
+        left: 0;
+        top: -21px;
+        bottom: -21px;
+        pointer-events: none;
+        z-index: 100;
+      }
+
+      #taskList{
+        list-style: none;
+        overflow: auto;
+        padding: 0;
+        margin: 0;
+        height: auto;
+        flex-grow: 1;
+
+        li {
+          overflow: auto;
+        }
+
+      }
+
     }
 
     #task-detail-wrapper{
-      width: 55%;
+      width: 70%;
     }
 
     #task-list-wrapper, #task-detail-wrapper{
       float: left;
-      overflow: auto;
     }
 
   }
 
-  form {
-    overflow: auto;
-  }
-
-  #taskList::-webkit-scrollbar { width: 0 !important }
-
-  #taskList{
-    list-style: none;
-    padding: 0;
-    margin: auto;
-    height: calc(100% - 140px);
-    overflow-y: auto;
-
-    li {
-      overflow: auto;
-    }
-
-  }
+  #taskList::-webkit-scrollbar { width: 0 !important; display: none; }
 
 }
 

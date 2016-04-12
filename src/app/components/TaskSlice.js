@@ -1,4 +1,4 @@
-import { PieUtilities } from './PiUtilities.js';
+import { PiUtilities } from './PiUtilities.js';
 
 //translate the mouse coordinates to the svg viewbox coordinates
 function findRelativeMousePoints(mx, my, TaskDonut){
@@ -103,8 +103,8 @@ export function TaskSlice(TaskDonut, _sliceIndex) {
   function findDrawingAngles(_task){
     var task = self.task || _task;
     return {
-      "startingAngle": Snap.rad(PieUtilities.toAngle(task.start)).mod(Math.TWOPI),
-      "terminalAngle": Snap.rad(PieUtilities.toAngle(task.end)).mod(Math.TWOPI)
+      "startingAngle": Snap.rad(PiUtilities.toAngle(task.start)).mod(Math.TWOPI),
+      "terminalAngle": Snap.rad(PiUtilities.toAngle(task.end)).mod(Math.TWOPI)
     }
   }
   
@@ -205,13 +205,13 @@ export function TaskSlice(TaskDonut, _sliceIndex) {
 
     self.terminalHandle.drag(function(dx, dy, mx, my){
       var mouseAngle = findRelativeMouseAngle(mx, my, TaskDonut);
-      self.task.end = PieUtilities.toTimeOfDay(mouseAngle).format();
+      self.task.end = PiUtilities.toTimeOfDay(mouseAngle).format();
       taskManager.updateTasks();
     });
 
     self.startingHandle.drag(function(dx, dy, mx, my){
       var mouseAngle = findRelativeMouseAngle(mx, my, TaskDonut);
-      self.task.start = PieUtilities.toTimeOfDay(mouseAngle).format();
+      self.task.start = PiUtilities.toTimeOfDay(mouseAngle).format();
       taskManager.updateTasks();
     });
 
@@ -225,8 +225,8 @@ export function TaskSlice(TaskDonut, _sliceIndex) {
       }
 
       var newStartAngle = mouseAngle - distanceFromStart;
-      var taskSize = PieUtilities.taskSize(self.task.start, self.task.end);
-      self.task.start = PieUtilities.toTimeOfDay(newStartAngle).format();
+      var taskSize = PiUtilities.taskSize(self.task.start, self.task.end);
+      self.task.start = PiUtilities.toTimeOfDay(newStartAngle).format();
       self.task.end = moment(self.task.start).add(taskSize, 'm').format();
 
       taskManager.updateTasks();
@@ -329,8 +329,8 @@ export function TaskSlice(TaskDonut, _sliceIndex) {
             var relativeMousePoint = findRelativeMousePoints(mx, my, TaskDonut);
             var angle = findRelativeMouseAngle(relativeMousePoint.x, relativeMousePoint.y, TaskDonut); //_lastSuccessfulUIAngle("end-handle", mx, my);
 
-            self.task.end = PieUtilities.toTimeOfDay(angle).format();
-            nextTask.start = PieUtilities.toTimeOfDay(angle).format();
+            self.task.end = PiUtilities.toTimeOfDay(angle).format();
+            nextTask.start = PiUtilities.toTimeOfDay(angle).format();
             //console.log("setting me "+self.task.name+" to:"+angle);
             //console.log("setting "+nextTask.name+" to:"+angle);
 
@@ -359,7 +359,7 @@ export function TaskSlice(TaskDonut, _sliceIndex) {
     var handleKey = handleKey.split("-")[0];
     var taskIDs = [self.taskIndex];
     var liveAngle = findRelativeMouseAngle(mx, my, TaskDonut);
-    var liveTime = PieUtilities.toTimeOfDay(liveAngle);
+    var liveTime = PiUtilities.toTimeOfDay(liveAngle);
 
     var prevHandleValue = self.task[handleKey];
 
@@ -450,7 +450,7 @@ export function TaskSlice(TaskDonut, _sliceIndex) {
         TaskDonut.donut_group.add(self.emoji);
       }
 
-      self.borderSlice.attr({stroke:"transparent", "stroke-width": 0, "fill": self.task.color || PieUtilities.colors.pieOrangeCream, 'd': borderSlice});
+      self.borderSlice.attr({stroke:"transparent", "stroke-width": 0, "fill": self.task.color || PiUtilities.colors.pieOrangeCream, 'd': borderSlice});
       self.mainSlice.attr({'d': slice, stroke:"white", 'fill-opacity': 1, "stroke-width": 0, "fill": "#FFFFFF"});
 
       self.terminalHandle.attr({"d": terminalHandleSlice, "fill":"transparent", "opacity": 0.4});

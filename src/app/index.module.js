@@ -14,11 +14,14 @@ import { Bucket } from './components/Bucket.js';
 import { BucketRing } from './components/BucketRing.js';
 
 import { TaskStrip, TaskStripDirective } from './components/TaskStrip/TaskStrip.js';
+import { TaskDetailPanelDirective } from './components/TaskDetailPanel/TaskDetailPanelDirective';
 
 import { EmojiPicker } from './components/emoji-picker/emojipicker.directives.js';
 import { SliderDirective } from './components/slider/directives.slider.js';
 
 import './components/datepicker/datepicker.js';
+
+import './components/PiSnapPlugins.js';
 
 angular.module('app', ['ngResource', 'ui.router', 'ui.bootstrap','ui.sortable', 'material.components.datepicker'])
   .constant('moment', moment)
@@ -28,6 +31,7 @@ angular.module('app', ['ngResource', 'ui.router', 'ui.bootstrap','ui.sortable', 
 
   .controller('MainController', MainController)
 
+  .directive('taskDetailPanel', TaskDetailPanelDirective)
   .directive('emojiPicker', EmojiPicker)
   .directive('taskDonut', TaskDonutDirective)
   .directive('taskStrip', TaskStripDirective)

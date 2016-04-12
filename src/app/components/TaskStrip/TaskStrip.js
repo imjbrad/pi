@@ -3,44 +3,9 @@
  */
 
 import { TaskBlock } from './TaskBlock';
-import { ThreeSegmentButton } from './SleepAdjustmentButton';
-
-Snap.plugin(function (Snap, Element, Paper, global, Fragment) {
-
-    //modified from http://stackoverflow.com/questions/12115691/svg-d3-js-rounded-corner-on-one-corner-of-a-rectangle
-    Paper.prototype.roundedRect = function rounded_rect(x, y, w, h, tl, tr, bl, br) {
-
-        var retval;
-
-        retval  = "M" + (x + r) + "," + y;
-
-        retval += "h" + (w - 2*r);
-
-        if (tr) { retval += "a" + r + "," + r + " 0 0 1 " + r + "," + r; }
-        else { retval += "h" + r; retval += "v" + r; }
-
-        retval += "v" + (h - 2*r);
-
-        if (br) { retval += "a" + r + "," + r + " 0 0 1 " + -r + "," + r; }
-        else { retval += "v" + r; retval += "h" + -r; }
-
-        retval += "h" + (2*r - w);
-
-        if (bl) { retval += "a" + r + "," + r + " 0 0 1 " + -r + "," + -r; }
-        else { retval += "h" + -r; retval += "v" + -r; }
-
-        retval += "v" + (2*r - h);
-
-        if (tl) { retval += "a" + r + "," + r + " 0 0 1 " + r + "," + -r; }
-        else { retval += "v" + -r; retval += "h" + r; }
-
-        retval += "z";
-
-        return this.path(retval);
-    }
-
-});
-
+import { ThreeSegmentButton } from './ThreeSegmentButton';
+import  { PiUtilities } from '../PiUtilities';
+import { Day } from '../DayHelper'
 
 export function TaskStrip(svgArea, _taskManager) {
 
@@ -68,6 +33,8 @@ export function TaskStrip(svgArea, _taskManager) {
         sleepBarLabelTextSize,
         sleepBarLabelHeight;
 
+    var _selectedTask;
+
     var morningTab = drawingArea.rect(),
         nightTab = drawingArea.rect(),
         strip = drawingArea.rect(),
@@ -75,19 +42,21 @@ export function TaskStrip(svgArea, _taskManager) {
         sleepBarLabel = drawingArea.text(),
         sleepGradient = drawingArea.gradient("l(0, 0, 1, 0)#F8B978-#5C6879"),
         totalBar = drawingArea.rect(),
-        sleepBar = drawingArea.rect();
+        sleepBar = drawingArea.rect(),
+        morningSleepAdjustmentButton,
+        nightSleepAdjustmentButton;
 
         self.group = drawingArea.g();
         self.group.add(strip);
         self.group.attr({mask: roundedRectangleMask});
+
+    var now = moment(new Day().at("2:30pm"));
 
     function init() {
 
         viewBox = drawingArea.node.attributes[1].nodeValue.split(" ");
 
         self.taskManager = _taskManager;
-
-        tasks = self.taskManager.getTasks();
 
         self.totalWidth = viewBox[2]; // should be 100
         self.totalHeight = viewBox[3]; // should be 25
@@ -112,13 +81,13 @@ export function TaskStrip(svgArea, _taskManager) {
         self.stripTopOffset = 4.5;
         self.stripLeftOffset = tabWidth;
         self.stripWidth = self.totalWidth - (2*self.stripLeftOffset);
-        self.stripHeight = 13;
+        self.stripHeight = 12.5;
 
         sleepBarHeight = .81;
 
         sleepBarLabelTopOffset = self.totalHeight - sleepBarHeight;
         sleepBarLabelLeftOffset = stripBarBorderRadius;
-        sleepBarLabelWidth = 4.5;
+        sleepBarLabelWidth = 0;
         sleepBarLabelTextSize = 1;
         sleepBarLabelHeight = sleepBarHeight;
 
@@ -130,79 +99,186 @@ export function TaskStrip(svgArea, _taskManager) {
             draw();
         }
 
-        var morningSleepAdjustmentButton = new ThreeSegmentButton(self, {
-            x: self.sleepAdjustmentButtonLeftOffset,
-            y: self.sleepAdjustmentButtonTopOffset,
-            width: self.sleepAdjustmentButtonWidth,
-            height: self.sleepAdjustmentButtonHeight,
-            image: "app/assets/sun.png"
-        });
-
-        var nightSleepAdjustmentButton = new ThreeSegmentButton(self, {
-            x: (self.totalWidth-stripBarBorderRadius) - self.sleepAdjustmentButtonWidth,
-            y: self.sleepAdjustmentButtonTopOffset,
-            width: self.sleepAdjustmentButtonWidth,
-            height: self.sleepAdjustmentButtonHeight,
-            image: "app/assets/moon.png"
-        });
-
-        morningSleepAdjustmentButton.leftButton.click(wakeUpEarlier);
-
         eve.on("taskListUpdated", taskListUpdated);
+
+        strip.click(createNewTaskInEmptySpace);
+
+        $(document).click(function(e){
+            var target = e.target;
+            if($("#MainSpace").is(target) || $("#Space").is(target)){
+                eve("userClickedOutsideOfStrip");
+                console.log("clicked outside of strip");
+            }
+        })
     }
 
-    function taskListUpdated(){
+    function taskListUpdated(_animateBlocks){
+        console.log("Task list updated, redrawing");
         if(taskManager.taskListIsValid()){
-            self.redraw();
+            self.redraw(_animateBlocks);
         }
     }
 
     function determineScale(){
-        var sleep = self.taskManager.getSleepTasks();
+
+        var sleep = self.taskManager.getSleepDetails(),
+            scaleStart = sleep.wakeUpTime,
+            scaleEnd = sleep.bedTime,
+            scaleTruncated = false;
+
+        /*but you're creating a plan for
+        today, you've obviously are already
+        awake.. so the scale needs to start
+        right now
+        */
+
+        var dayPlanIsForToday = moment(self.taskManager.getDay()).startOf("day").isSame(moment(now).startOf("day"));
+
+        if(moment(sleep.wakeUpTime).isBefore(now) && dayPlanIsForToday){
+            scaleStart = now.format();
+            scaleTruncated = true;
+            console.log("the user is planning today but wake up time has already passed. starting strip at current moment");
+        }
+
+        console.log("Scale", moment(scaleStart).format(PiUtilities.full_format), moment(scaleEnd).format(PiUtilities.full_format));
+
         return {
-            min: sleep[0].end,
-            max: sleep[1].start
+            truncated: scaleTruncated,
+            min: scaleStart,
+            max: scaleEnd
         };
     }
 
-    function drawBlocks() {
-        tasks.forEach(function (element, index, array) {
-            var block = self.blocks[index];
-            if (!block) {
-                block = new TaskBlock(self, index);
-                self.blocks.push(block);
-            } else {
-                block.redraw();
-            }
-        });
+    function disableMorningSleepAdjustment() {
+        morningSleepAdjustmentButton.hide();
     }
 
     function calculateSleepBarScaleFactor() {
-        //determine how much of the sleep goal can be acheived given the current schedule
-        var sleepTime = self.taskManager.getSleepTimeInMinutes(),
-            sleepGoal = self.taskManager.getSleepGoalInMinutes();
-        console.log(sleepTime, sleepGoal);
-        return self.taskManager.getSleepTimeInMinutes()/self.taskManager.getSleepGoalInMinutes();
+
+        /*
+        * find the amount of time betwen
+        * todays bedTime and tomorrows
+        * wake up time, if set
+        * */
+
+        var sleep = self.taskManager.getSleepDetails(),
+            todayBedTime = sleep.bedTime,
+
+            /*this should query storage
+            for tomorrows schedule and
+            uses tomorrows wake up time
+            not todays wake up time. but
+            for now we're just gonna
+            assume they're the same
+             */
+
+            tomorrowWakeTime = new Day(self.taskManager.getDay()).nextDay().at(moment(sleep.wakeUpTime).format("h:mm a")),
+            sleepTimeInMinutes = moment(tomorrowWakeTime).diff(moment(todayBedTime), "minutes");
+
+        var sleepBarScaleFactor = sleepTimeInMinutes/self.taskManager.getSleepGoalInMinutes();
+
+        if(sleepBarScaleFactor > 1)
+            sleepBarScaleFactor = 1;
+
+        return sleepBarScaleFactor;
     }
 
-    self.redraw = function (){
-        self.scale = determineScale();
-        draw();
+    self.selectedTaskBlock = function(id){
+
+        if(id){
+            _selectedTask = id;
+            eve("taskBlockSelected", {}, id);
+        }
+
+        return _selectedTask;
     };
 
-    function draw(){
+    self.redraw = function(_animateBlocks){
+        self.scale = determineScale();
+        draw(_animateBlocks);
+    };
+
+    function createNewTaskInEmptySpace(e, mx, my){
+        var scaled_mx = drawingArea.relativeMousePoints(mx, my).x/self.stripWidth;
+        var halfSize = PiUtilities.toLinearSizeFromTaskSize(taskManager.MINIMUM_TASK_SIZE, self.scale.min, self.scale.max)/2;
+        var startingPosition = scaled_mx - halfSize;
+
+        var newTask = taskManager.addTask({
+            name: "New Task",
+            start: PiUtilities.toTimeOfDayFromLinearPosition0to1(startingPosition, self.scale.min, self.scale.max),
+            end: PiUtilities.toTimeOfDayFromLinearPosition0to1(scaled_mx + halfSize, self.scale.min, self.scale.max),
+            emoji: '1f3c0.png',
+            tempData: {}
+        })
+
+    }
+
+    function draw(_animateBlocks){
 
         morningTab.attr({x: 0, y: tabTopOffset, width: tabWidth, height: tabHeight, fill: "#f8b978"});
-
         nightTab.attr({x: self.stripWidth+tabWidth, y:tabTopOffset, width: tabWidth, height: tabHeight, fill: "#37445c"});
 
         strip.attr({x: self.stripLeftOffset, y: self.stripTopOffset, width: self.stripWidth, height: self.stripHeight, "fill": "#7e3c46", "fill-opacity": .1});
 
-        drawBlocks();
+
+        //only create the buttons once
+        if(!morningSleepAdjustmentButton){
+            morningSleepAdjustmentButton = new ThreeSegmentButton(self, {
+                x: self.sleepAdjustmentButtonLeftOffset,
+                y: self.sleepAdjustmentButtonTopOffset,
+                width: self.sleepAdjustmentButtonWidth,
+                height: self.sleepAdjustmentButtonHeight,
+                image: "app/assets/sun.png",
+                leftIcon: "app/assets/plus.svg",
+                rightIcon: "app/assets/minus.svg"
+            });
+            morningSleepAdjustmentButton.leftButton.click(wakeUpEarlier);
+            morningSleepAdjustmentButton.rightButton.click(wakeUpLater);
+        }
+
+        if(!nightSleepAdjustmentButton){
+            nightSleepAdjustmentButton = new ThreeSegmentButton(self, {
+                x: (self.totalWidth-stripBarBorderRadius) - self.sleepAdjustmentButtonWidth,
+                y: self.sleepAdjustmentButtonTopOffset,
+                width: self.sleepAdjustmentButtonWidth,
+                height: self.sleepAdjustmentButtonHeight,
+                image: "app/assets/moon.png",
+                leftIcon: "app/assets/minus.svg",
+                rightIcon: "app/assets/plus.svg"
+            });
+
+            nightSleepAdjustmentButton.leftButton.click(goToBedEarlier);
+            nightSleepAdjustmentButton.rightButton.click(goToBedLater);
+        }
+
+        if(self.scale.truncated) {
+            disableMorningSleepAdjustment();
+        }
+
+        var tasks = taskManager.getTasks();
+
+        tasks.forEach(function (task, index, array) {
+
+            var block = self.blocks.find(function(block, blockIndex, blackArray){
+                return block.task.id == task.id
+            });
+
+            if (!block) {
+                block = new TaskBlock(self, task.id);
+                self.blocks.push(block);
+            } else {
+                block.redraw(_animateBlocks);
+            }
+
+            console.log(block.task.name, block.task.id, block.task.index);
+
+        });
+
+        console.log(self.blocks);
 
         roundedRectangleMask.attr({x:self.stripLeftOffset, y:self.stripTopOffset, width: self.stripWidth, height: self.stripHeight, rx: stripBarBorderRadius, ry: stripBarBorderRadius, fill: "white"});
 
-        sleepBarLabel.attr({x: sleepBarLabelLeftOffset, y: sleepBarLabelTopOffset, text:"Sleep:", fontSize: 1.31, width: sleepBarLabelWidth, alignmentBaseline: "central", fontFamily: "apercu_medium", fill: "#808080"});
+        //sleepBarLabel.attr({x: sleepBarLabelLeftOffset, y: sleepBarLabelTopOffset, text:"Sleep:", fontSize: 1.31, width: sleepBarLabelWidth, alignmentBaseline: "central", fontFamily: "apercu_medium", fill: "#808080"});
 
         totalBar.attr({x: sleepBarLeftOffset, y: sleepBarTopOffset, width: sleepBarWidth, height: sleepBarHeight});
         sleepBar.attr({x: sleepBarLeftOffset, y: sleepBarTopOffset, width: (sleepBarWidth * calculateSleepBarScaleFactor()), height: sleepBarHeight});
@@ -216,8 +292,29 @@ export function TaskStrip(svgArea, _taskManager) {
         //create more time for tasks in the morning
         console.log("waking up earlier");
         var sleep = taskManager.getSleepTasks();
-
         sleep[0].end = moment(sleep[0].end).subtract(30, "minutes").format();
+        taskManager.updateTasks();
+    }
+
+    function wakeUpLater() {
+        //take away time for tasks in the morning
+        console.log("waking up later");
+        var sleep = taskManager.getSleepTasks();
+        sleep[0].end = moment(sleep[0].end).add(30, "minutes").format();
+        taskManager.updateTasks();
+    }
+
+    function goToBedEarlier() {
+        //take away time for tasks in the morning
+        console.log("go to bed earlier");
+        taskManager.bedTime(moment(taskManager.bedTime()).subtract(30, "minutes").format());
+        taskManager.updateTasks();
+    }
+
+    function goToBedLater() {
+        //take away time for tasks in the morning
+        console.log("go to bed later");
+        taskManager.bedTime(moment(taskManager.bedTime()).add(30, "minutes").format());
         taskManager.updateTasks();
     }
 

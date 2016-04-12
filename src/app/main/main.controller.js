@@ -1,7 +1,8 @@
-import { PieUtilities } from '../components/PiUtilities.js';
+import { PiUtilities } from '../components/PiUtilities.js';
 import { TaskSetController } from '../components/TaskManager.js';
 import { TaskDonut } from '../components/TaskDonut.js';
 import { TaskStrip } from '../components/TaskStrip/TaskStrip.js';
+import { Day } from '../components/DayHelper.js';
 
 export function MainController($scope, $timeout, $filter) {
 
@@ -22,52 +23,41 @@ export function MainController($scope, $timeout, $filter) {
         taskManager,
         taskStrip;
 
+    var today = new Day();
+
     $scope.taskData = {
-        day: PieUtilities.today,
+        day: today.string,
+        wakeUpTime: today.at("7:30 am"),
+        bedTime: today.nextDay().at("2:00 am"),
         sleepGoal: "08:00",
         tasks: [
             {
                 name: "Work at the Studio",
-                start: PieUtilities.todayAt("7:30 am"),
-                end: PieUtilities.todayAt("1:30 pm"),
+                start: today.at("7:30 am"),
+                end: today.at("1:30 pm"),
                 emoji: '1f3c0.png',
                 tempData: {}
             },
             {
                 name: "Gym",
-                start: PieUtilities.todayAt("3:00 pm"),
-                end: PieUtilities.todayAt("4:00 pm"),
+                start: today.at("3:00 pm"),
+                end: today.at("4:00 pm"),
                 color: '#7e3c46',
                 emoji: '1f4d0.png',
                 tempData: {}
             },
             {
                 name: "Return rentals",
-                start: PieUtilities.todayAt("4:00 pm"),
-                end: PieUtilities.todayAt("5:00 pm"),
+                start: today.at("4:00 pm"),
+                end: today.at("5:00 pm"),
                 emoji: '1f4de.png',
                 tempData: {}
             },
             {
                 name: "Finish Paper",
-                start: PieUtilities.todayAt("8:00 pm"),
-                end: PieUtilities.todayAt("11:30 pm"),
+                start: today.at("8:00 pm"),
+                end: today.at("11:30 pm"),
                 emoji: '1f62d.png',
-                tempData: {}
-            },
-            {
-                name: "Sleep_B",
-                start: PieUtilities.todayAt("11:30 pm"),
-                end: PieUtilities.todayAt("11:59 pm"),
-                color: '#7e3c46',
-                type: 'sleep',
-                tempData: {}
-            },
-            {
-                name: "Sleep_A",
-                start: PieUtilities.todayAt("12:00 am"),
-                end: PieUtilities.todayAt("07:30 am"),
-                type: "sleep",
                 tempData: {}
             }
         ]
@@ -77,58 +67,70 @@ export function MainController($scope, $timeout, $filter) {
     taskDonut = new TaskDonut(Snap("#task-donut"), taskManager);
     taskStrip = new TaskStrip(Snap("#task-strip"), taskManager);
 
-
     $scope.selectedTask = null;
     $scope.selectedTaskDetail = {};
 
     eve.on("taskListUpdated", taskListUpdated);
+    eve.on("taskBlockSelected", taskBlockSelected);
+    eve.on("userClickedOutsideOfStrip", userClickedOutsideOfStrip);
 
     function taskListUpdated(){
-        $scope.$apply(function(){
+        $timeout(function(){
             $scope.taskDataString = JSON.stringify($scope.taskData, null, 4);
             $scope.numberOfUserTasks = taskManager.getTaskCount();
+        })
+    }
+
+    function taskBlockSelected(taskID){
+        console.log("task block clicked");
+        $timeout(function(){
+            $scope.selectedTaskDetail = taskManager.getTask(taskID);
+            $scope.showListView = true;
         });
     }
 
-    $scope.Utilities = PieUtilities;
-    $scope.taskFilter = PieUtilities.task_data_filter;
+    function userClickedOutsideOfStrip(){
+        $scope.$apply(function(){
+            $scope.selectedTaskDetail = null;
+            $scope.showListView = false;
+        });
+    }
+
+    $scope.Utilities = PiUtilities;
+    $scope.taskFilter = PiUtilities.task_data_filter;
 
     $scope.redraw = function(){
         eve("taskListUpdated");
     };
 
-    $scope.selectTask = function (i) {
-        $scope.selectedTaskDetail = taskManager.getTask(i);
-        $scope.selectedTaskIndex = i;
-        console.log($scope.selectedTaskIndex);
-    };
-
-    $scope.selectLastTask = function () {
-        $scope.selectTask(taskManager.getTaskCount() - 1);
+    $scope.selectTask = function (id) {
+        $scope.selectedTaskDetail = taskManager.getTask(id);
+        $scope.selectedTaskID = id;
+        taskStrip.selectedTaskBlock(id);
     };
 
     $scope.deselectTasks = function () {
         $scope.selectedTaskDetail = null;
-        $scope.selectedTaskIndex = null;
-        console.log($scope.selectedTaskIndex);
+        $scope.selectedTaskID = null;
+        console.log($scope.selectedTaskID);
     };
 
     $scope.createNewTask = function () {
-        var firstAvailableTime = taskManager.utilities.firstAvailableOpening(15);
+        var firstAvailableTime = taskManager.utilities.firstAvailableOpening(taskManager.MINIMUM_TASK_SIZE, taskStrip.scale.min, taskStrip.scale.max);
         if(firstAvailableTime){
-            taskManager.addTask({
+            var taskID = taskManager.addTask({
                 name: $scope.newTaskName,
                 start: firstAvailableTime,
                 end: moment(firstAvailableTime).add(15, 'm').format(),
                 color: "#9ec2e1"
             });
             $scope.newTaskName = "";
-            $scope.selectLastTask();
+            $scope.selectTask(taskID);
         }
     };
 
     $scope.deleteCurrentlySelectedTask = function () {
-        $scope.taskData.tasks.splice($scope.selectedTaskIndex, 1);
+        $scope.taskData.tasks.splice($scope.selectedTaskID, 1);
         if ($scope.taskData.tasks.length - 1 > 0) {
             $scope.selectTask($scope.taskData.tasks.length - 1);
         } else {
@@ -137,8 +139,9 @@ export function MainController($scope, $timeout, $filter) {
         $scope.taskDonuts[0].redraw();
     };
 
+
     function insertTaskAfterCurrentlySelectedTask(task) {
-        var nextTaskIndex = $scope.selectedTaskIndex + 1;
+        var nextTaskIndex = $scope.selectedTaskID + 1;
         var nextTask = $scope.taskData.tasks[nextTaskIndex];
         if (nextTask) {
             console.log("next: " + nextTask.name);
@@ -155,19 +158,19 @@ export function MainController($scope, $timeout, $filter) {
     }
 
     $scope.removeTaskAfter = function () {
-        var nextTask = $scope.taskData.tasks[$scope.selectedTaskIndex + 1];
+        var nextTask = $scope.taskData.tasks[$scope.selectedTaskID + 1];
         if (nextTask && nextTask.insertedAfterward) {
-            $scope.taskData.tasks.splice($scope.selectedTaskIndex + 1, 1);
+            $scope.taskData.tasks.splice($scope.selectedTaskID + 1, 1);
             $scope.taskDonuts[0].redraw();
         }
-        $scope.selectTask($scope.selectedTaskIndex);
+        $scope.selectTask($scope.selectedTaskID);
     };
 
     $scope.insertBreakTask = function () {
         var newBreakTask = {
             name: '30 Minute Break',
-            angleSize: PieUtilities.toAngleSize(30),
-            color: PieUtilities.colors.night,
+            angleSize: PiUtilities.toAngleSize(30),
+            color: PiUtilities.colors.night,
             type: 'break',
             insertedAfterward: true
         };
@@ -177,8 +180,8 @@ export function MainController($scope, $timeout, $filter) {
     $scope.insertEatTask = function () {
         var newEatTask = {
             name: 'Eat',
-            angleSize: PieUtilities.toAngleSize(45),
-            color: PieUtilities.colors.day,
+            angleSize: PiUtilities.toAngleSize(45),
+            color: PiUtilities.colors.day,
             type: 'break',
             insertedAfterward: true
         };
@@ -188,8 +191,8 @@ export function MainController($scope, $timeout, $filter) {
     $scope.insertExerciseTask = function () {
         var newExerciseTask = {
             name: 'Exercise',
-            angleSize: PieUtilities.toAngleSize(45),
-            color: PieUtilities.colors.day,
+            angleSize: PiUtilities.toAngleSize(45),
+            color: PiUtilities.colors.day,
             insertedAfterward: true
         };
         insertTaskAfterCurrentlySelectedTask(newExerciseTask);
@@ -222,11 +225,11 @@ export function MainController($scope, $timeout, $filter) {
     $scope.$watch('selectedTaskDetail.angleSize', function () {
         var newTimeAllotment = $scope.selectedTaskDetail.angleSize;
         if (newTimeAllotment) {
-            var slice = $scope.taskDonuts[0].slices[$scope.selectedTaskIndex];
+            var slice = $scope.taskDonuts[0].slices[$scope.selectedTaskID];
             slice.update({
                 angleSize: newTimeAllotment
             });
-            console.log("Angle " + newTimeAllotment + " Minutes: " + PieUtilities.toMinutes(newTimeAllotment));
+            console.log("Angle " + newTimeAllotment + " Minutes: " + PiUtilities.toMinutes(newTimeAllotment));
         }
     });
 
@@ -252,7 +255,7 @@ export function MainController($scope, $timeout, $filter) {
                 var swap = $scope.taskData.tasks[swapID];
                 
                 task.start = swap.start;
-                task.end = moment(task.start).add(PieUtilities.taskSize(_oldTaskStart, task.end), 'm').format();
+                task.end = moment(task.start).add(PiUtilities.taskSize(_oldTaskStart, task.end), 'm').format();
 
                 taskManager.updateTasks([taskID], "end-ripple");
             });

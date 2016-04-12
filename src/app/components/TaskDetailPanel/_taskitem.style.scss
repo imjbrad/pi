@@ -1,7 +1,20 @@
+.task-li:last-of-type{
+  .task-item{
+    border-bottom: none;
+  }
+}
+
+form.task-item {
+  display: block;
+
+  .task-input {
+    padding-left: 15px;
+    width: 100%;
+  }
+}
+
 .task-item {
-  border-radius: 3px;
-  border: 1px solid rgba(229, 229, 229, 0.9);
-  margin-bottom: 5px;
+  border-bottom: 1px solid rgba(229, 229, 229, 0.85);
   cursor: pointer;
   background: rgba(255, 255, 255, 1);
   position: relative;
@@ -12,8 +25,7 @@
   }
 
   .handle {
-    width: 13px;
-    background-color: $pie-off-white;
+    width: 15px;
     top:0;
     bottom: 0;
     left:0;
@@ -24,7 +36,8 @@
     outline: none;
     color: grey;
     background-color: transparent;
-    padding: 15px 20px;
+    padding: 15px;
+    padding-left: 0px;
     overflow-wrap: break-word;
     border: none;
     flex-grow: 1;

@@ -1,0 +1,52 @@
+<div id="task-space-wrapper">
+    <div id="task-detail-wrapper">
+        <div id="task-detail" ng-class="{'selected': selectedTaskIndex}">
+
+            <div class="task-detail-header">
+                <div class="emoji"><img ng-src="app/assets/emojis/72x72/{{ selectedTaskDetail.emoji }}"></div>
+                <input type="text" class="task-name" ng-model="selectedTaskDetail.name" />
+                <div class="due-date"><span class="date-label">Aprl 1</span><button class="check-button"></button></div>
+            </div>
+
+            <div id="task-details">
+                <div class="col-1">
+                    <div class="task-detail-item description">
+                        <div class="description-input" contenteditable></div>
+                    </div>
+                    <div class="task-detail-item time-allotment">
+                        <div class="btn-group btn-group-justified pie-btn-group-justified time-allotment-btn-group">
+                            <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(5)"><span>5<div class="unit">min</div></span></label>
+                            <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(15)"><span>15<div class="unit">min</div></span></label>
+                            <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(30)"><span>30<div class="unit">min</div></span></label>
+                            <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(45)"><span>45<div class="unit">min</div></span></label>
+                            <label id="plus" class="btn"
+                                   ng-class="{
+                       active: selectedTaskDetail.angleSize > Utilities.toAngleSize(45),
+                       revealMinutes: selectedTaskDetail.angleSize > Utilities.toAngleSize(45)}"
+                                   ng-click="selectedTaskDetail.angleSize = Utilities.toAngleSize(60)">
+                                <span><span class="minutes">{{ Utilities.humanizeMinutes(Utilities.toMinutes(selectedTaskDetail.angleSize)) }}</span><div class="unit">+</div></span>
+                            </label>
+                        </div>
+                        <div class="task-slider" ng-class="{ fadeOut: selectedTaskDetail.angleSize <= Utilities.toAngleSize(45) }">
+                            <slider  slider-value="selectedTaskDetail.angleSize" min="Utilities.toAngleSize(30)" max="360"></slider>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="task-list-wrapper">
+        <div class="shadow"></div>
+        <form name="newTaskForm" class="task-item" ng-submit="createNewTask()">
+            <input id="header" class="task-input task-label" ng-model="newTaskName" autocomplete="off" name="newTaskNameInput" type="text" placeholder="Add an item:" autofocus=""/>
+        </form>
+        <ul id="taskList" ui-sortable="sortableOptions" ng-model="taskData.tasks">
+            <li class="task-li" ng-repeat="task in taskData.tasks" data-index="{{$index}}" data-task-id="{{ task.id }}" ng-click="selectTask(task.id)">
+                <div class="task-item {{ task.type }}" ng-class="{'selected': $index == selectedTaskIndex}">
+                    <div class="handle"></div>
+                    <input type="text" class="task-label" ng-model="task.name">
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>

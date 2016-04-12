@@ -1,33 +1,90 @@
+$task-detail-header-height: 52px;
+
 #task-detail {
   width: 100%;
   border-radius: 2px;
   position: relative;
   border: 1px solid $pie-light-grey;
 
-  #task-name {
-    background-color: white;
-    font-family: source_sans_probold, sans-serif;
-    padding: 15px 20px;
-    font-size: 15px;
-    color: $pie-dark-grey;
-    overflow-wrap: break-word;
-    border: none;
-    display: block;
+  .task-detail-header {
+
     width: 100%;
-    word-wrap: break-word;
-    border-bottom: 1px solid $pie-light-grey;
-    outline: none;
+    display: flex;
+    height: $task-detail-header-height;
+
+    .emoji, .task-name, .due-date{
+      height: 100%;
+      border-style: solid;
+      border-width: 0 0 1px 0;
+      border-color: $pie-light-grey;
+    }
+
+    .emoji{
+      width: $task-detail-header-height;
+      img {
+        width: 100%;
+        height: auto;
+        padding: 15px;
+      }
+    }
+
+    .task-name{
+      background-color: white;
+      font-family: source_sans_prosemibold, sans-serif;
+      padding: 15px 20px;
+      font-size: 15px;
+      color: $pie-dark-grey;
+      overflow-wrap: break-word;
+      display: block;
+      word-wrap: break-word;
+      border-width: 0 1px 1px 1px;
+      border-color: $pie-light-grey;
+      outline: none;
+      flex-grow: 1;
+    }
+
+    .due-date{
+      background-color: white;
+      padding: 0 20px 0 20px;
+
+      .date-label{
+        font-family: source_sans_prosemibold, sans-serif;
+        float: left;
+        font-size: 13px;
+        margin-right: 15px;
+        color: $pie-dark-grey;
+        position: relative;
+        top: 50%;
+        -webkit-transform: translateY(-50%);
+      }
+
+      .check-button{
+        float: right;
+        width: 25px;
+        height: 100%;
+        background-image: url("assets/check.svg");
+        background-size: contain;
+        background-position: center center;
+        position: relative;
+        background-repeat: no-repeat;
+      }
+    }
   }
 
   #task-details {
-    min-height: 250px;
     background-color: rgba(255, 255, 255, 1);
     padding: 15px;
+    height: calc(100% - #{$task-detail-header-height});
+
+    .col-1 {
+      float: left;
+      width: 250px;
+    }
 
     .task-detail-item {
 
       &:not(:last-of-type){
-        margin-bottom: 20px;
+        margin-bottom: 15px;
       }
 
       .header {
@@ -39,6 +96,21 @@
 
     }
 
+  }
+
+  .description {
+    .description-input {
+      border: 1px solid $pie-light-grey;
+      min-height: 80px;
+      padding: 10px;
+      font-family: apercu, sans-serif;
+      font-size: 12px;
+      color: $pie-dark-grey;
+
+      &:focus {
+        outline: none;
+      }
+    }
   }
 
   .time-allotment{

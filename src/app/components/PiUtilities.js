@@ -1,94 +1,10 @@
-var fullFormatString = "dddd, MMMM Do YYYY, h:mm:ss a";
-var lastValidatedUIValue;
+export var PiUtilities = {};
 
-Snap.plugin(function (Snap, Element, Paper, global, Fragment) {
-
-    Paper.prototype.relativeMousePoints = function (mx, my) {
-        var root = this.node;
-        var mousePoint = root.createSVGPoint();
-        mousePoint.x = mx;
-        mousePoint.y = my;
-        var p = this.circle();
-        var transformedPoint = mousePoint.matrixTransform(p.node.getScreenCTM().inverse());
-        p.remove();
-        return transformedPoint;
-    };
-
-    Paper.prototype.limitUIValueIfNecessary = function(liveValue, min, max){
-
-        var maxValue = (max != undefined) ? max : liveValue,
-            minValue = (min != undefined) ? min : liveValue;
-
-        console.log("min is: "+min);
-        console.log("max is: "+max);
-        console.log("live is: "+liveValue);
-
-        if(liveValue >= maxValue){
-            lastValidatedUIValue = maxValue;
-            console.log("moving too far forward, using max validated value");
-        } else if(liveValue <= minValue){
-            lastValidatedUIValue = minValue;
-            console.log("going to far backward, using min validated value");
-        } else {
-            lastValidatedUIValue = liveValue;
-            console.log("using live value: "+liveValue);
-        }
-
-        return lastValidatedUIValue;
-    };
-
-    //deprecated
-    Paper.prototype.getUIValueFromMousePosition = function (settings) {
-
-        var liveValue = settings.valueFn(settings.mouseX, settings.mouseY),
-            maxValue = (settings.max != undefined) ? settings.max : liveValue,
-            minValue = (settings.min != undefined) ? settings.min : liveValue;
-
-            console.log("min is: "+settings.min);
-            console.log("max is: "+settings.max);
-
-            if(liveValue > maxValue){
-                lastValidatedUIValue = maxValue;
-                console.log("moving too far forward, using max validated value");
-            } else if(liveValue < minValue){
-                lastValidatedUIValue = minValue;
-                console.log("going to far backward, using min validated value");
-            } else {
-                lastValidatedUIValue = liveValue;
-                console.log("using live value: "+liveValue);
-            }
-
-        return lastValidatedUIValue;
-    };
-
-    Paper.prototype.getCurrentPixelRatio = function(){
-
-        /*determine the relationship between the real width/height and the svg viewbox width/height.
-        this is similar to the viewport meta tag wherein a local viewport is specified
-        and may be different from the pysical device width/height*/
-
-        var viewBox = this.node.attributes[1].nodeValue.split(" ");
-            console.log(viewBox);
-        return {
-            x: viewBox[2]/this.node.clientWidth,
-            y: viewBox[3]/this.node.clientHeight
-        }
-    };
-
-
-});
-
-export function PieUtilities(){
-
-}
-
-PieUtilities.interface = {};
-
-PieUtilities.themes = {
+PiUtilities.themes = {
 
 };
 
-PieUtilities.colors = {
+PiUtilities.colors = {
     day: "#f37342",
     night: "#37445c",
     pieOffWhite: "#FBFBFB",
@@ -104,66 +20,46 @@ PieUtilities.colors = {
     pieYellow: "#f7ce6e"
 };
 
-PieUtilities.FULL_FORMAT_STRING = "dddd, MMMM Do YYYY, h:mm:ss a";
+PiUtilities.today = moment().format("YYYY MM DD");
 
-PieUtilities.today = moment().startOf("day");
+PiUtilities.tomorrow = moment().startOf("day").add(1, 'd').format("YYYY MM DD");
 
-PieUtilities.today_format_string = "YYYY MM DD";
+PiUtilities.full_format = "dddd, MMMM Do YYYY, h:mm:ss a";
 
-PieUtilities.today_string = moment().format("YYYY MM DD");
+PiUtilities.short_format = "YYYY MM DD";
 
-PieUtilities.task_data_filter = function(task, index, array){
+PiUtilities.today_yyyy_mm_dd = moment().format("YYYY MM DD");
+
+PiUtilities.task_data_filter = function(task, index, array){
     return !task.type;
 };
 
-PieUtilities.humanizeMinutes = function(_minutes){
-
-    var duration = moment.duration(_minutes, 'minutes'),
-        hours = duration.hours(),
-        minutes = duration.minutes(),
-        string = "";
-
-    //special case
-    if(hours == 0 && duration.asMinutes() > 0){
-        hours = 24
-    }
-
-    if(hours){
-        string += hours+"hr";
-    }
-
-    if(minutes){
-        string += (" "+minutes+"min");
-    }else{
-        string = hours+" Hours";
-    }
-
-    return string;
-
-};
-
-PieUtilities.toMinutes = function(angleInDegrees){
+PiUtilities.toMinutes = function(angleInDegrees){
     return (angleInDegrees*4);
 };
 
-PieUtilities.toAngleSize = function(minutes){
+PiUtilities.toAngleSize = function(minutes){
     return (minutes*.25);
 };
 
-PieUtilities.toAngle = function(time_of_day){
+PiUtilities.toAngle = function(time_of_day){
 
     var startOfDay = moment(moment().format("YYYY MM DD")),
         timeOfDay = moment.isMoment(time_of_day) ? time_of_day : moment(time_of_day),
         minutes = moment.duration(timeOfDay.subtract(startOfDay)).asMinutes();
 
-    return PieUtilities.toAngleSize(minutes);
+    return PiUtilities.toAngleSize(minutes);
 };
 
-PieUtilities.todayAt = function(time_of_day){
+PiUtilities.thisDayAt = function (time_of_day){
     return moment(time_of_day, "h:mm a").format();
 };
 
-PieUtilities.taskSize = function(_start, _end){
+PiUtilities.tomorrowAt = function(time_of_day){
+    return moment(PiUtilities.tomorrow+" "+time_of_day, "YYYY MM DD h:mm a").format();
+};
+
+PiUtilities.taskSize = function(_start, _end){
 
     var start = moment(_start),
         end = moment(_end),
@@ -172,12 +68,12 @@ PieUtilities.taskSize = function(_start, _end){
   return duration;
 };
 
-PieUtilities.toTimeOfDay = function(angleInDegrees, _format){
+PiUtilities.toTimeOfDay = function(angleInDegrees, _format){
 
     var __format = "dddd, MMMM Do YYYY, h:mm a";
 
     var format = _format == true ? __format : "",
-        minutes = PieUtilities.toMinutes(angleInDegrees),
+        minutes = PiUtilities.toMinutes(angleInDegrees),
         timeOfDay = moment(moment().format("YYYY MM DD")).add(minutes, 'm');
 
     if(_format){
@@ -188,8 +84,17 @@ PieUtilities.toTimeOfDay = function(angleInDegrees, _format){
     return moment(timeOfDay);
 };
 
+PiUtilities.toLinearSize = function(start, end, scaleMinTime, scaleMaxTime){
+    var startPosition = PiUtilities.toLinearPosition0to1FromTimeOfDay(start, scaleMinTime, scaleMaxTime);
+    var terminalPosition = PiUtilities.toLinearPosition0to1FromTimeOfDay(end, scaleMinTime, scaleMaxTime);
+    return terminalPosition - startPosition;
+};
 
-PieUtilities.toLinearPosition0to1FromTimeOfDay = function (time, scaleMinTime, scaleMaxTime){
+PiUtilities.toLinearSizeFromTaskSize = function(minutes, scaleMinTime, scaleMaxTime){
+    return PiUtilities.toLinearPosition0to1FromTimeOfDay(moment(scaleMinTime).add(minutes, "minutes").format(), scaleMinTime, scaleMaxTime)
+};
+
+PiUtilities.toLinearPosition0to1FromTimeOfDay = function (time, scaleMinTime, scaleMaxTime){
     var time = moment(time);
 
     var minTime = scaleMinTime ? moment(scaleMinTime) : moment().startOf("day");
@@ -203,7 +108,7 @@ PieUtilities.toLinearPosition0to1FromTimeOfDay = function (time, scaleMinTime, s
     return linearScaleFactor;
 };
 
-PieUtilities.toTimeOfDayFromLinearPosition0to1 = function (linearScaleFactor, scaleMinTime, scaleMaxTime){
+PiUtilities.toTimeOfDayFromLinearPosition0to1 = function (linearScaleFactor, scaleMinTime, scaleMaxTime){
 
     var minTime = scaleMinTime ? moment(scaleMinTime) : moment().startOf("day");
     var maxTime = scaleMaxTime ? moment(scaleMaxTime) : moment().endOf("day");
@@ -217,10 +122,10 @@ PieUtilities.toTimeOfDayFromLinearPosition0to1 = function (linearScaleFactor, sc
 
 };
 
-PieUtilities.toLinearPosition0to1FromArbitraryXPosition = function (xPosition, linearWidth){
+PiUtilities.toLinearPosition0to1FromArbitraryXPosition = function (xPosition, linearWidth){
     return xPosition / linearWidth;
 };
 
-PieUtilities.toXPositionFromLinearPosition0to1 = function (linearPosition, linearWidth){
+PiUtilities.toXPositionFromLinearPosition0to1 = function (linearPosition, linearWidth){
     return linearPosition * linearWidth;
 };

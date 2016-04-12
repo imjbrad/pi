@@ -1,4 +1,4 @@
-import { PieUtilities } from '../PiUtilities.js';
+import { PiUtilities } from '../PiUtilities.js';
 
 export function SliderDirective(){
 
@@ -72,7 +72,7 @@ export function SliderDirective(){
                         var value = _findValue(slider_bar[0], point);
                         //snap every 15 minutes
                         var raw = value.raw;
-                        raw = snap(raw, PieUtilities.toAngleSize(15));
+                        raw = snap(raw, PiUtilities.toAngleSize(15));
                         $scope.sliderValue = raw;
                         $scope.$apply();
                     }

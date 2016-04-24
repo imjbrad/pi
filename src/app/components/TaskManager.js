@@ -1,16 +1,17 @@
 import { PiUtilities } from './PiUtilities.js';
+import { Day } from './DayHelper.js';
 
 /*This serves as
-* the main controller
-* for set of data
-* for one day. it enforces the
-* model, validates data,
-* provides an API for
-* updating data, and will eventually
-* persist data to Parse
-* */
+ * the main controller
+ * for set of data
+ * for one day. it enforces the
+ * model, validates data,
+ * provides an API for
+ * updating data, and will eventually
+ * persist data to Parse
+ * */
 
- export function TaskSetController(_dayDataObject) {
+export function TaskManager(_dayDataObject) {
 
     var self = this,
         userDayObject,
@@ -26,14 +27,14 @@ import { PiUtilities } from './PiUtilities.js';
 
     self.MINIMUM_TASK_SIZE = 15;
 
-    function init(_dayDataObject){
+    function init(_dayDataObject) {
 
         console.log("TaskSet Controller initialized w/ a task data");
-        userDayObject = _dayDataObject;
+        userDayObject = _dayDataObject || utilities.defaultDayObject();
 
-        if(_validateDay(userDayObject)) {
+        if (_validateDay(userDayObject)) {
 
-            window.setTimeout(function(){
+            window.setTimeout(function () {
                 _taskListUpdated();
             }, 0);
         }
@@ -59,62 +60,62 @@ import { PiUtilities } from './PiUtilities.js';
     //     var o = { 'public': 'foo' };
     //     o[privateName] = 'bar';
 
-     var ID = function () {
-         // Math.random should be unique because of its seeding algorithm.
-         // Convert it to base 36 (numbers + letters), and grab the first 9 characters
-         // after the decimal.
-         return '_' + Math.random().toString(36).substr(2, 9);
-     };
+    var ID = function () {
+        // Math.random should be unique because of its seeding algorithm.
+        // Convert it to base 36 (numbers + letters), and grab the first 9 characters
+        // after the decimal.
+        return '_' + Math.random().toString(36).substr(2, 9);
+    };
 
-    function ___taskWouldHappenOnTheWrongDay(startingTime, terminalTime){
-        if((terminalTime.get('date') != userDayObject.day.get('date')) ||
-            (startingTime.get('date') != userDayObject.day.get('date'))){
+    function ___taskWouldHappenOnTheWrongDay(startingTime, terminalTime) {
+        if ((terminalTime.get('date') != userDayObject.day.get('date')) ||
+            (startingTime.get('date') != userDayObject.day.get('date'))) {
             console.log("Task cannot happen on a day different than the one specified by the day object", terminalTime.get('date'), startingTime.get('date'), userDayObject.day.get('date'));
             return true;
         }
         return false;
     }
 
-    function ___taskWouldNeitherStartOrEndOnTheRightDay(startingTime, terminalTime){
-         if((terminalTime.get('date') != userDayObject.day.get('date')) &&
-             (startingTime.get('date') != userDayObject.day.get('date'))){
-             console.log("Task would neither start or end on the day specified by the day object", terminalTime.get('date'), startingTime.get('date'), userDayObject.day.get('date'));
-             return true;
-         }
-         return false;
+    function ___taskWouldNeitherStartOrEndOnTheRightDay(startingTime, terminalTime) {
+        if ((terminalTime.get('date') != userDayObject.day.get('date')) &&
+            (startingTime.get('date') != userDayObject.day.get('date'))) {
+            console.log("Task would neither start or end on the day specified by the day object", terminalTime.get('date'), startingTime.get('date'), userDayObject.day.get('date'));
+            return true;
+        }
+        return false;
     }
 
-    function ___taskWouldSpanSeveralDays(startingTime, terminalTime){
-        if(terminalTime.get('date') != startingTime.get('date')){
+    function ___taskWouldSpanSeveralDays(startingTime, terminalTime) {
+        if (terminalTime.get('date') != startingTime.get('date')) {
             console.log("Task cannot span several days");
             return true;
         }
         return false;
     }
 
-    function ___taskWouldEndBeforeItStarts(startingTime, terminalTime){
-        if(terminalTime.isBefore(startingTime) || startingTime.isAfter(terminalTime)){
+    function ___taskWouldEndBeforeItStarts(startingTime, terminalTime) {
+        if (terminalTime.isBefore(startingTime) || startingTime.isAfter(terminalTime)) {
             console.log("Task cannot end before it starts");
             return true;
         }
         return false;
     }
 
-    function ___taskWouldOverlapPreviousTask(task, taskList){
+    function ___taskWouldOverlapPreviousTask(task, taskList) {
         var index = task.index,
             previousIndex = (index == 0) ? taskList.length - 1 : index - 1,
             previousTask = taskList[previousIndex],
             previousEndTime = moment(previousTask.end),
             startingTime = moment(task.start);
 
-        if(index > 0 && (startingTime.isBefore(previousEndTime))){
+        if (index > 0 && (startingTime.isBefore(previousEndTime))) {
             console.log("Task can't collide with previous task");
             return true;
         }
         return false;
     }
 
-    function ___taskWouldOverlapNextTask(task, taskList){
+    function ___taskWouldOverlapNextTask(task, taskList) {
         var index = task.index,
             last = taskList.length - 1,
             nextIndex = (index == last) ? 0 : index + 1,
@@ -122,25 +123,25 @@ import { PiUtilities } from './PiUtilities.js';
             nextStartTime = moment(nextTask.start),
             terminalTime = moment(task.end);
 
-        if(index < last && (nextStartTime.isBefore(terminalTime))){
-            console.log(task.name+"("+task.index+") can't overlap next task: "+nextTask.name+"("+nextTask.index+")");
+        if (index < last && (nextStartTime.isBefore(terminalTime))) {
+            console.log(task.name + "(" + task.index + ") can't overlap next task: " + nextTask.name + "(" + nextTask.index + ")");
             return true;
         }
 
         return false;
     }
 
-    function ___taskWouldBeTooSmall(task){
+    function ___taskWouldBeTooSmall(task) {
         var MINIMUM = 10;
         var taskSize = PiUtilities.taskSize(task.start, task.end);
-        if(taskSize < MINIMUM){
-            console.log("Task can't be too smaller than "+MINIMUM+" minimum", taskSize);
+        if (taskSize < MINIMUM) {
+            console.log("Task can't be too smaller than " + MINIMUM + " minimum", taskSize);
             return true;
         }
         return false
     }
 
-    function __taskWouldBreakPositioningRules(_task, _taskList){
+    function __taskWouldBreakPositioningRules(_task, _taskList) {
         var task = _task,
             taskList = _taskList,
             startingTime = moment(task.start),
@@ -150,48 +151,48 @@ import { PiUtilities } from './PiUtilities.js';
             //___taskWouldHappenOnTheWrongDay(startingTime, terminalTime)||
             //___taskWouldNeitherStartOrEndOnTheRightDay(startingTime, terminalTime) ||
             //___taskWouldSpanSeveralDays(startingTime, terminalTime)||
-            ___taskWouldEndBeforeItStarts(startingTime, terminalTime)||
-            ___taskWouldOverlapNextTask(task, taskList) ||
-            ___taskWouldOverlapPreviousTask(task, taskList)||
-            ___taskWouldBeTooSmall(task));
+        ___taskWouldEndBeforeItStarts(startingTime, terminalTime) ||
+        ___taskWouldOverlapNextTask(task, taskList) ||
+        ___taskWouldOverlapPreviousTask(task, taskList) ||
+        ___taskWouldBeTooSmall(task));
     }
 
-    function _validateTask(task, index, _taskList){
+    function _validateTask(task, index, _taskList) {
         var valid = true;
 
         //task has temp data
-        if(!task.tempData)
+        if (!task.tempData)
             task.tempData = {};
 
         //task has required keys
-        REQUIRED_TASK_KEYS.forEach(function(key, index, array){
-            if(!(key in task)){
-                console.log("task is missing required key: "+key);
+        REQUIRED_TASK_KEYS.forEach(function (key, index, array) {
+            if (!(key in task)) {
+                console.log("task is missing required key: " + key);
                 valid = false;
             }
         });
 
         //task has an invalid task type
-        if(task.type && (TASK_TYPES.indexOf(task.type) == -1)){
-            console.log("task "+task.name+" has an invalid task type "+task.type);
+        if (task.type && (TASK_TYPES.indexOf(task.type) == -1)) {
+            console.log("task " + task.name + " has an invalid task type " + task.type);
             valid = false;
         }
 
         //task won't cause overlap
-        if(__taskWouldBreakPositioningRules(task, _taskList)){
+        if (__taskWouldBreakPositioningRules(task, _taskList)) {
             console.log("task would cause an overlap " + task.name);
             valid = false;
         }
 
         //push sleep
-        if(task.type == 'sleep'){
+        if (task.type == 'sleep') {
             sleep.push(task);
         }
 
         return valid;
     }
 
-    function _validateTaskListForDay(__taskList){
+    function _validateTaskListForDay(__taskList) {
 
         var list = __taskList,
             valid = true;
@@ -200,15 +201,15 @@ import { PiUtilities } from './PiUtilities.js';
 
         self._taskListIsValid = true;
 
-        list.sort(function(taskA, taskB){
+        list.sort(function (taskA, taskB) {
             var a = moment(taskA.start);
             var b = moment(taskB.start);
 
-            if(a.isBefore(b)){
+            if (a.isBefore(b)) {
                 return -1
             }
 
-            if(a.isAfter(b)){
+            if (a.isAfter(b)) {
                 return 1;
             }
 
@@ -219,9 +220,9 @@ import { PiUtilities } from './PiUtilities.js';
         console.log(list);
 
         //make sure each task has an id and an index
-        list.forEach(function(task, index){
+        list.forEach(function (task, index) {
             //task has an ID
-            if(!task.id){
+            if (!task.id) {
                 console.log("No ID:", task.name);
                 task.id = ID();
             }
@@ -230,7 +231,7 @@ import { PiUtilities } from './PiUtilities.js';
         });
 
         //make sure each task doesn't break any positioning rules
-        list.every(function(_task, _taskIndex, _taskList){
+        list.every(function (_task, _taskIndex, _taskList) {
             valid = _validateTask(_task, _taskIndex, _taskList);
             return valid;
         });
@@ -239,7 +240,7 @@ import { PiUtilities } from './PiUtilities.js';
         return valid;
     }
 
-    function _validateDay(__dayData){
+    function _validateDay(__dayData) {
         console.log("Validating Day");
 
         var valid = true,
@@ -247,14 +248,14 @@ import { PiUtilities } from './PiUtilities.js';
 
         valid = _validateTaskListForDay(taskList);
 
-        if(valid){
+        if (valid) {
             console.log("Passed Validation");
         }
 
         return valid;
     }
 
-    function _updateTasksByInsertAndRipple(taskA, taskB, _updateMethod){
+    function _updateTasksByInsertAndRipple(taskA, taskB, _updateMethod) {
 
         var place = _updateMethod.split('-')[1];
         console.log(place);
@@ -265,79 +266,79 @@ import { PiUtilities } from './PiUtilities.js';
         var taskASize = PiUtilities.taskSize(taskA.start, taskA.end);
 
         //insert taskA at taskB
-        if(place == "before"){
+        if (place == "before") {
             taskA.start = taskB.start;
             taskA.end = moment(taskA.start).add(taskASize, 'm').format();
         }
 
-        else if(place == "after"){
+        else if (place == "after") {
             taskA.start = taskB.end;
             taskA.end = moment(taskA.start).add(taskASize, 'm').format();
         }
 
         //if taskA is moved into a time in the future...
-        if(moveDirection == "forward"){
+        if (moveDirection == "forward") {
 
             /*
-            * If taskA is being inserted at the start of taskB, Push taskB and
-            * each task after it taskA-minutes into the future. If taskA is being
-            * inserted at the end of taskB, push each task after taskB taskA-minutes
-            * into the future
-            * */
-             var start = (place == "before") ? taskB.index : taskB.index+1;
+             * If taskA is being inserted at the start of taskB, Push taskB and
+             * each task after it taskA-minutes into the future. If taskA is being
+             * inserted at the end of taskB, push each task after taskB taskA-minutes
+             * into the future
+             * */
+            var start = (place == "before") ? taskB.index : taskB.index + 1;
 
-             for(var i=start; i<userDayObject.tasks.length; i++){
+            for (var i = start; i < userDayObject.tasks.length; i++) {
                 var task = self.getTaskAtIndex(i),
                     taskSize = PiUtilities.taskSize(task.start, task.end);
 
-                    task.start = moment(task.start).add(taskASize, 'm').format();
-                    task.end = moment(task.start).add(taskSize, 'm').format();
-                    console.log("shifting forward "+task.name);
+                task.start = moment(task.start).add(taskASize, 'm').format();
+                task.end = moment(task.start).add(taskSize, 'm').format();
+                console.log("shifting forward " + task.name);
             }
 
             /*
-            * Then, each task after taskA's original position
-            * need to be shifted taskA-minutes earlier to re-balance
-            * the Pie
-            * */
-            for(var i=taskA.index; i<userDayObject.tasks.length; i++){
+             * Then, each task after taskA's original position
+             * need to be shifted taskA-minutes earlier to re-balance
+             * the Pie
+             * */
+            for (var i = taskA.index; i < userDayObject.tasks.length; i++) {
                 var task = self.getTaskAtIndex(i),
                     taskSize = PiUtilities.taskSize(task.start, task.end);
                 task.start = moment(task.start).subtract(taskASize, 'm').format();
                 task.end = moment(task.start).add(taskSize, 'm').format();
-                console.log("shifting back "+task.name);
+                console.log("shifting back " + task.name);
             }
         }
 
-         //If taskB is moved into the past
-         if(moveDirection == "past"){
+        //If taskB is moved into the past
+        if (moveDirection == "past") {
 
-             /*
-              * If taskA is being inserted at the start of taskB, push taskB and
-              * each task after it, up to taskA's original position, taskA-minutes
-              * into the future to re-balance the Pie. If taskA is being inserted
-              * at the end of taskB, push each task after taskB, up to taskA's original
-              * position taskA-minutes into the future to re-balanace the Pie.
-              * */
-             var start = (place == "before") ? taskB.index : taskB.index+1;
-             for(var i=start; i<taskA.index; i++){
+            /*
+             * If taskA is being inserted at the start of taskB, push taskB and
+             * each task after it, up to taskA's original position, taskA-minutes
+             * into the future to re-balance the Pie. If taskA is being inserted
+             * at the end of taskB, push each task after taskB, up to taskA's original
+             * position taskA-minutes into the future to re-balanace the Pie.
+             * */
+            var start = (place == "before") ? taskB.index : taskB.index + 1;
+            for (var i = start; i < taskA.index; i++) {
                 var task = self.getTaskAtIndex(i),
                     taskSize = PiUtilities.taskSize(task.start, task.end);
                 task.start = moment(task.start).add(taskASize, 'm').format();
                 task.end = moment(task.start).add(taskSize, 'm').format();
-                console.log("shifting forward "+task.name);
-             }
+                console.log("shifting forward " + task.name);
+            }
         }
 
     }
 
     /*
-    * Similar to a ripple edit in Premiere
-    * when you change the size of one task,
-    * it shifts all the other tasks earlier
-    * or later, accordingly
-    * */
-     function _updateTaskByPushPull(_dirtyTask, rippleMethod){
+     * Similar to a ripple edit in Premiere
+     * when you change the size of one task,
+     * it shifts all the other tasks earlier
+     * or later, accordingly
+     * */
+    function _updateTaskByPushPull(_dirtyTask, rippleMethod) {
 
         var task = _dirtyTask,
             startingTime = moment(task.start),
@@ -347,31 +348,31 @@ import { PiUtilities } from './PiUtilities.js';
 
         var rippleHandle = rippleMethod.split('-')[0];
 
-         var prevHandle = moment(task.tempData['prev-'+rippleHandle]);
-         var newHandle = moment(task[rippleHandle]);
+        var prevHandle = moment(task.tempData['prev-' + rippleHandle]);
+        var newHandle = moment(task[rippleHandle]);
 
-         var rippleDifferenceMs = newHandle.diff(prevHandle);
+        var rippleDifferenceMs = newHandle.diff(prevHandle);
 
-         console.log(newHandle.diff(prevHandle, 'm'));
+        console.log(newHandle.diff(prevHandle, 'm'));
 
-         if(rippleMethod == "end-push-pull"){
-             for(var i = task.index+1; i < userDayObject.tasks.length; i++) {
-                     var nextTask = userDayObject.tasks[i];
-                     var taskSize = PiUtilities.taskSize(nextTask.start, nextTask.end);
-                     nextTask.start = moment(nextTask.start).add(rippleDifferenceMs, 'ms').format();
-                     nextTask.end = moment(nextTask.start).add(taskSize, 'minutes').format();
-             }
-         }
+        if (rippleMethod == "end-push-pull") {
+            for (var i = task.index + 1; i < userDayObject.tasks.length; i++) {
+                var nextTask = userDayObject.tasks[i];
+                var taskSize = PiUtilities.taskSize(nextTask.start, nextTask.end);
+                nextTask.start = moment(nextTask.start).add(rippleDifferenceMs, 'ms').format();
+                nextTask.end = moment(nextTask.start).add(taskSize, 'minutes').format();
+            }
+        }
 
-         if(rippleMethod == "start-push-pull"){
-             for(var i = task.index-1; i > 0; i--){
-                 var previousTask = userDayObject.tasks[i];
-                 var taskSize = PiUtilities.taskSize(previousTask.start, previousTask.end);
-                 var oldEnd = previousTask.end;
-                 previousTask.end = moment(previousTask.end).add(rippleDifferenceMs, 'ms').format();
-                 previousTask.start = moment(previousTask.end).subtract(taskSize, 'minutes').format();
-             }
-         }
+        if (rippleMethod == "start-push-pull") {
+            for (var i = task.index - 1; i > 0; i--) {
+                var previousTask = userDayObject.tasks[i];
+                var taskSize = PiUtilities.taskSize(previousTask.start, previousTask.end);
+                var oldEnd = previousTask.end;
+                previousTask.end = moment(previousTask.end).add(rippleDifferenceMs, 'ms').format();
+                previousTask.start = moment(previousTask.end).subtract(taskSize, 'minutes').format();
+            }
+        }
 
     }
 
@@ -390,35 +391,35 @@ import { PiUtilities } from './PiUtilities.js';
         eve("taskListUpdated", {}, updateOptions.animate);
     }
 
-    self.__temp = function(){
+    self.__temp = function () {
         return JSON.parse(__temp)
     };
 
 
-    self.addTask = function(task) {
+    self.addTask = function (task) {
         userDayObject.tasks.push(task);
         self.updateTasks();
         return task.id;
     };
 
-    self.getTask = function(taskID) {
+    self.getTask = function (taskID) {
         return userDayObject.tasks.find(function (task) {
             return task.id == taskID
         })
     };
 
-     self.getTaskAtIndex = function(taskIndex){
-         return userDayObject.tasks[taskIndex];
-     };
-
-
-    self.removeTask = function(){
+    self.getTaskAtIndex = function (taskIndex) {
+        return userDayObject.tasks[taskIndex];
     };
 
-    self.updateTasks = function(options) {
+
+    self.removeTask = function () {
+    };
+
+    self.updateTasks = function (options) {
 
         options = options || {};
-        
+
         self._taskListIsDirty = true;
 
         updateOptions.animate = (options.animate == null || options.animate == false) ? false : options.animate;
@@ -427,13 +428,13 @@ import { PiUtilities } from './PiUtilities.js';
 
         var clean = false;
         var updateMethod = options.updateMethod || "regular";
-        var dirtyTasks = (!options.tasks || options.tasks == [] || options.tasks == "all") ? userDayObject.tasks : options.tasks.map(function(id){
+        var dirtyTasks = (!options.tasks || options.tasks == [] || options.tasks == "all") ? userDayObject.tasks : options.tasks.map(function (id) {
             return self.getTask(id);
         });
 
-        console.log("Updating Tasks "+updateMethod, dirtyTasks);
+        console.log("Updating Tasks " + updateMethod, dirtyTasks);
 
-        if(updateMethod.includes("insert")){
+        if (updateMethod.includes("insert")) {
 
             var taskA = dirtyTasks[0];
             var taskB = dirtyTasks[1];
@@ -441,59 +442,67 @@ import { PiUtilities } from './PiUtilities.js';
             _updateTasksByInsertAndRipple(taskA, taskB, updateMethod);
         }
 
-        if(updateMethod.includes("push-pull")){
-            dirtyTasks.forEach(function(dirtyTask, index, array){
+        if (updateMethod.includes("push-pull")) {
+            dirtyTasks.forEach(function (dirtyTask, index, array) {
                 _updateTaskByPushPull(dirtyTask, updateMethod);
             });
         }
 
-        if(fullUpdate){
+        if (fullUpdate) {
             clean = _validateDay(userDayObject);
-            if(clean){
+            if (clean) {
                 _taskListUpdated();
-            }else{
+            } else {
                 _taskListUpdateFailed();
             }
         }
 
     };
 
-     //various setters and getters
+    //various setters and getters
 
-     self.getDay = function(){
-         return userDayObject.day;
-     };
+    self.getDay = function () {
+        return userDayObject.day;
+    };
 
-    self.getTasks = function(){
+    self.getTasks = function () {
         return userDayObject.tasks;
     };
 
-    self.getTaskCount = function(){
+    self.getProductiveTimeInMinutes = function () {
+        var sum = 0;
+        userDayObject.tasks.forEach(function (task) {
+            sum += PiUtilities.taskSize(task.start, task.end);
+        });
+        return sum;
+    };
+
+    self.getTaskCount = function () {
         return userDayObject.tasks.length;
     };
 
-    self.getSleepTasks = function (){
+    self.getSleepTasks = function () {
         return sleep;
     };
 
-    self.getSleepGoalInMinutes = function(){
+    self.getSleepGoalInMinutes = function () {
         return moment.duration(userDayObject.sleepGoal).asMinutes();
     };
 
-    self.wakeUpTime =  function(newWakeUpTime){
-        if(newWakeUpTime)
+    self.wakeUpTime = function (newWakeUpTime) {
+        if (newWakeUpTime)
             userDayObject.wakeUpTime = newWakeUpTime;
 
         return userDayObject.wakeUpTime;
     };
 
-    self.bedTime = function(newBedTime){
-        if(newBedTime)
+    self.bedTime = function (newBedTime) {
+        if (newBedTime)
             userDayObject.bedTime = newBedTime;
         return userDayObject.bedTime
     };
 
-    self.getSleepDetails = function(){
+    self.getSleepDetails = function () {
 
         return {
             wakeUpTime: userDayObject.wakeUpTime,
@@ -502,73 +511,102 @@ import { PiUtilities } from './PiUtilities.js';
 
     };
 
+    self.getAnticipatedSleepTime = function () {
+        var sleep = self.getSleepDetails(),
+            tonightBedTime = sleep.bedTime,
+
+        /*this should query storage
+         for tomorrows schedule and
+         uses tomorrows wake up time
+         not todays wake up time. but
+         for now we're just gonna
+         assume they're the same
+         */
+
+            tomorrowWakeTime = moment(sleep.wakeUpTime).add(1, "day"),
+            sleepTimeInMinutes = moment(tomorrowWakeTime).diff(moment(tonightBedTime), "minutes");
+
+        return sleepTimeInMinutes;
+    };
+
     //sum sleep minutes
-    self.getSleepTimeInMinutes = function(){
+    self.getSleepTimeInMinutes = function () {
         var sleep = self.getSleepTasks();
         var sumSleepTimeInMinutes = 0;
 
-        sleep.forEach(function(e, i, a){
-            sumSleepTimeInMinutes+=PiUtilities.taskSize(e.start, e.end);
+        sleep.forEach(function (e, i, a) {
+            sumSleepTimeInMinutes += PiUtilities.taskSize(e.start, e.end);
         });
 
         return sumSleepTimeInMinutes;
     };
 
-    self.taskListIsValid = function(){
-      return self._taskListIsValid;
+    self.taskListIsValid = function () {
+        return self._taskListIsValid;
     };
 
-    self.taskListIsDirty = function(){
+    self.taskListIsDirty = function () {
         return self._taskListIsDirty;
     };
 
-    utilities.taskIsValid = function(task) {
+    utilities.taskIsValid = function (task) {
         return _validateTask(task, task.index, userDayObject.tasks);
-     };
+    };
 
-    utilities.getTaskMaxStartTime = function(taskIndex) {
+    utilities.getTaskLatestPossibleStartTime = function (taskIndex) {
         var task = self.getTaskAtIndex(taskIndex);
         return moment(task.end).subtract(self.MINIMUM_TASK_SIZE, 'minutes').format();
     };
 
-    utilities.getTaskMinEndTime = function(taskIndex) {
+    utilities.getTaskEarliestPossibleEndTime = function (taskIndex) {
         var task = self.getTaskAtIndex(taskIndex);
         return moment(task.start).add(self.MINIMUM_TASK_SIZE, 'minutes').format();
     };
 
-    utilities.firstAvailableOpening = function(minutes, timeFrameStart, timeFrameEnd){
+    utilities.defaultDayObject = function () {
+        var today = new Day();
+        return {
+            day: today.string,
+            wakeUpTime: today.at("7:30 am"),
+            bedTime: today.nextDay().at("2:00 am"),
+            sleepGoal: "08:00",
+            tasks: []
+        }
+    };
+
+    utilities.firstAvailableOpening = function (minutes, timeFrameStart, timeFrameEnd) {
         var newStartingTime;
         var i = 0;
 
-        !userDayObject.tasks.every(function(task, index, array){
-            if(moment(task.start).isSameOrAfter(timeFrameStart)){
+        !userDayObject.tasks.every(function (task, index, array) {
+            if (moment(task.start).isSameOrAfter(timeFrameStart)) {
 
                 var prevTaskEnd;
                 var nextTaskStart;
                 var nextTask = array[index + 1];
 
-                if(i == 0){
+                if (i == 0) {
                     prevTaskEnd = timeFrameStart;
                     var spaceBetweenMinTimeAndFirstTaskIsBigEnough = moment(task.start).isSameOrAfter(moment(prevTaskEnd).add(minutes, "m"));
-                    if(spaceBetweenMinTimeAndFirstTaskIsBigEnough) {
+                    if (spaceBetweenMinTimeAndFirstTaskIsBigEnough) {
                         newStartingTime = timeFrameStart;
                         return false;
                     }
                 }
 
-                if(nextTask){
+                if (nextTask) {
                     nextTaskStart = moment(nextTask.start);
-                    if(moment(nextTaskStart).isSameOrAfter(timeFrameEnd)){
+                    if (moment(nextTaskStart).isSameOrAfter(timeFrameEnd)) {
                         nextTaskStart = timeFrameEnd
                     }
-                }else{
+                } else {
                     nextTaskStart = moment(timeFrameEnd);
                 }
 
                 var spaceIsBigEnoughToHoldTask = nextTaskStart.isSameOrAfter(moment(task.end).add(minutes, 'm')),
                     spaceIsWithinTimeFrame = moment(task.end).isSameOrAfter(timeFrameStart) && moment(nextTaskStart).isSameOrBefore(timeFrameEnd);
 
-                if(spaceIsBigEnoughToHoldTask && spaceIsWithinTimeFrame){
+                if (spaceIsBigEnoughToHoldTask && spaceIsWithinTimeFrame) {
                     newStartingTime = task.end;
                     return false;
                 }
@@ -588,28 +626,28 @@ import { PiUtilities } from './PiUtilities.js';
 }
 
 /*
-* I can imagine a version of this for
-* teams.. a project manager assigns a task
-* to someone for a particular day, and
-* it will automatically reject if the pie
-* calculates that you can't complete it
-*
-* at jawbone i liked the idea of points
-* but it's too arbitrary.. it was like
-* throwing a dart at the wall.. one was
-* expected to guess how many "points"
-* something was worth without regard to
-* the day... was a point = time?
-* difficulty ?
-*
-* i think the gem with this is
-* the design will help you to think
-* through the tasks you have so that you
-* can better estimate how long it will
-* take you... since the design changes
-* as you allocate more time to an object
-* you will be able to see how one
-* task directly affects another
-* its all about balance
-*
-* */
+ * I can imagine a version of this for
+ * teams.. a project manager assigns a task
+ * to someone for a particular day, and
+ * it will automatically reject if the pie
+ * calculates that you can't complete it
+ *
+ * at jawbone i liked the idea of points
+ * but it's too arbitrary.. it was like
+ * throwing a dart at the wall.. one was
+ * expected to guess how many "points"
+ * something was worth without regard to
+ * the day... was a point = time?
+ * difficulty ?
+ *
+ * i think the gem with this is
+ * the design will help you to think
+ * through the tasks you have so that you
+ * can better estimate how long it will
+ * take you... since the design changes
+ * as you allocate more time to an object
+ * you will be able to see how one
+ * task directly affects another
+ * its all about balance
+ *
+ * */

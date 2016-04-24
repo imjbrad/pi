@@ -46,7 +46,9 @@ PiUtilities.toAngle = function(time_of_day){
 
     var startOfDay = moment(moment().format("YYYY MM DD")),
         timeOfDay = moment.isMoment(time_of_day) ? time_of_day : moment(time_of_day),
-        minutes = moment.duration(timeOfDay.subtract(startOfDay)).asMinutes();
+        minutes = timeOfDay.diff(startOfDay, "m");
+
+    console.log(timeOfDay.format(PiUtilities.full_format), timeOfDay, minutes);
 
     return PiUtilities.toAngleSize(minutes);
 };

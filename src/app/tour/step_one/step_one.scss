@@ -1,0 +1,93 @@
+$donut-size: 350;
+$video-overlay-size: ($donut-size/(1.06));
+
+.You {
+
+  .container {
+    top: 25%;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .donut-wrapper {
+    position: relative;
+    float: right;
+
+    .TaskDonut {
+      width: $donut-size+px;
+      height: $donut-size+px;
+    }
+
+    #camera-wrapper {
+      background-color: #f6f1ea;
+      position: absolute;
+      border-radius: 50%;
+      width: $video-overlay-size+px;
+      height: $video-overlay-size+px;
+      top: 50%;
+      left: 50%;
+      -webkit-transform: translate(-50%, -50%);
+      overflow: hidden;
+
+      #camera {
+        position: absolute;
+        width: inherit;
+        height: inherit;
+        top: 50%;
+        left: 50%;
+        -webkit-filter: blur(9px);
+        opacity: .7;
+        -webkit-transform: translate(-50%, -50%) scale(#{$video-overlay-size / 240});
+      }
+
+      .prompt {
+        text-align: center;
+        width: 50%;
+        top: 30%;
+        margin: auto;
+        position: relative;
+        color: white;
+
+        .option {
+          .small {
+            font-family: source_sans_prolight;
+            font-size: 12px;
+          }
+          .big {
+            font-family: apercu_medium;
+            font-size: 22px;
+          }
+        }
+
+        .divider {
+          width: 100%;
+          height: 1px;
+          //border-bottom: 1px solid white;
+          position: relative;
+          margin: 10px 0;
+
+          span {
+            position: absolute;
+            //background-color: #cccccc;
+            font-size: 10px;
+            line-height: 10px;
+            padding: 0 5px;
+            top: -5px;
+            left: 47%;
+            font-family: apercu_mono;
+          }
+
+        }
+      }
+    }
+
+  }
+
+  .paragraph-content {
+    float: left;
+  }
+
+}

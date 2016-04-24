@@ -161,19 +161,7 @@ export function TaskStrip(svgArea, _taskManager) {
         * wake up time, if set
         * */
 
-        var sleep = self.taskManager.getSleepDetails(),
-            todayBedTime = sleep.bedTime,
-
-            /*this should query storage
-            for tomorrows schedule and
-            uses tomorrows wake up time
-            not todays wake up time. but
-            for now we're just gonna
-            assume they're the same
-             */
-
-            tomorrowWakeTime = new Day(self.taskManager.getDay()).nextDay().at(moment(sleep.wakeUpTime).format("h:mm a")),
-            sleepTimeInMinutes = moment(tomorrowWakeTime).diff(moment(todayBedTime), "minutes");
+        var sleepTimeInMinutes = taskManager.getAnticipatedSleepTime();
 
         var sleepBarScaleFactor = sleepTimeInMinutes/self.taskManager.getSleepGoalInMinutes();
 

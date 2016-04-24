@@ -3,27 +3,34 @@
         <div id="task-detail" ng-class="{'selected': selectedTaskIndex}">
 
             <div class="task-detail-header">
-                <div class="emoji"><img ng-src="app/assets/emojis/72x72/{{ selectedTaskDetail.emoji }}"></div>
+                <div class="emoji">
+                    <img ng-click="currentDetailView = 'emoji'" ng-src="app/assets/emojis/72x72/{{ selectedTaskDetail.emoji }}">
+                    <button class="close-emoji-view" ng-show="currentDetailView == 'emoji'" ng-click="currentDetailView = 'basic-details'"><span class="">Save Emoji</span></button>
+                </div>
                 <input type="text" class="task-name" ng-model="selectedTaskDetail.name" />
                 <div class="due-date"><span class="date-label">Aprl 1</span><button class="check-button"></button></div>
             </div>
 
-            <div id="task-details">
+            <div class="emoji-view detail-view" ng-show="currentDetailView == 'emoji'">
+                <emoji-picker selected-emoji-model="selectedTaskDetail.emoji"></emoji-picker>
+            </div>
+
+            <div class="task-basic-details detail-view" ng-show="currentDetailView == 'basic-details'">
                 <div class="col-1">
                     <div class="task-detail-item description">
                         <div class="description-input" contenteditable></div>
                     </div>
                     <div class="task-detail-item time-allotment">
                         <div class="btn-group btn-group-justified pie-btn-group-justified time-allotment-btn-group">
-                            <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(5)"><span>5<div class="unit">min</div></span></label>
-                            <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(15)"><span>15<div class="unit">min</div></span></label>
-                            <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(30)"><span>30<div class="unit">min</div></span></label>
-                            <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="Utilities.toAngleSize(45)"><span>45<div class="unit">min</div></span></label>
+                            <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="toLinearSize(5)"><span>5<div class="unit">min</div></span></label>
+                            <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="toLinearSize(15)"><span>15<div class="unit">min</div></span></label>
+                            <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="toLinearSize(30)"><span>30<div class="unit">min</div></span></label>
+                            <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="toLinearSize(45)"><span>45<div class="unit">min</div></span></label>
                             <label id="plus" class="btn"
                                    ng-class="{
-                       active: selectedTaskDetail.angleSize > Utilities.toAngleSize(45),
-                       revealMinutes: selectedTaskDetail.angleSize > Utilities.toAngleSize(45)}"
-                                   ng-click="selectedTaskDetail.angleSize = Utilities.toAngleSize(60)">
+                       active: selectedTaskDetail.angleSize > toLinearSize(45),
+                       revealMinutes: selectedTaskDetail.angleSize > toLinearSize(45)}"
+                                   ng-click="selectedTaskDetail.angleSize = toLinearSize(60)">
                                 <span><span class="minutes">{{ Utilities.humanizeMinutes(Utilities.toMinutes(selectedTaskDetail.angleSize)) }}</span><div class="unit">+</div></span>
                             </label>
                         </div>
@@ -33,6 +40,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
     <div id="task-list-wrapper">

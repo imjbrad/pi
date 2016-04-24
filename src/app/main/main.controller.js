@@ -1,23 +1,12 @@
 import { PiUtilities } from '../components/PiUtilities.js';
-import { TaskSetController } from '../components/TaskManager.js';
-import { TaskDonut } from '../components/TaskDonut.js';
+import { TaskManager } from '../components/TaskManager.js';
+import { TaskDonut } from '../components/TaskDonut/TaskDonut.js';
 import { TaskStrip } from '../components/TaskStrip/TaskStrip.js';
 import { Day } from '../components/DayHelper.js';
 
 export function MainController($scope, $timeout, $filter) {
 
     'ngInject';
-
-    Number.prototype.mod = function (n) {
-        return ((this % n) + n) % n;
-    };
-
-    Number.prototype.roundToTheNearest = function (i) {
-        var i = i || 1;
-        return Math.ceil(this / i) * i;
-    };
-
-    Math.TWOPI = 2 * Math.PI;
 
     var taskDonut,
         taskManager,
@@ -63,12 +52,13 @@ export function MainController($scope, $timeout, $filter) {
         ]
     };
 
-    taskManager = new TaskSetController($scope.taskData);
+    taskManager = new TaskManager($scope.taskData);
     taskDonut = new TaskDonut(Snap("#task-donut"), taskManager);
     taskStrip = new TaskStrip(Snap("#task-strip"), taskManager);
 
     $scope.selectedTask = null;
     $scope.selectedTaskDetail = {};
+    $scope.currentDetailView = "basic-details";
 
     eve.on("taskListUpdated", taskListUpdated);
     eve.on("taskBlockSelected", taskBlockSelected);
@@ -98,6 +88,10 @@ export function MainController($scope, $timeout, $filter) {
 
     $scope.Utilities = PiUtilities;
     $scope.taskFilter = PiUtilities.task_data_filter;
+
+    $scope.toLinearSize = function(minutes){
+      return PiUtilities.toLinearSizeFromTaskSize(minutes, taskStrip.scale.min, taskStrip.scale.max)
+    };
 
     $scope.redraw = function(){
         eve("taskListUpdated");
@@ -216,10 +210,10 @@ export function MainController($scope, $timeout, $filter) {
     };
 
     $scope.$watch('selectedTaskDetail.emoji', function () {
-        //var newEmoji = $scope.selectedTaskDetail.emoji;
-        //if (newEmoji) {
-            //taskDonut.redraw();
-        //}
+        var newEmoji = $scope.selectedTaskDetail.emoji;
+        if (newEmoji) {
+            taskManager.updateTasks();
+        }
     });
 
     $scope.$watch('selectedTaskDetail.angleSize', function () {

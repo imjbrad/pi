@@ -7,9 +7,11 @@ import { runBlock } from './index.run';
 import './components/eve.js';
 
 import { MainController } from './main/main.controller';
-import { TaskDonut } from './components/TaskDonut.js';
-import { TaskDonutDirective } from './components/TaskDonutDirective.js';
-import { TaskSlice } from './components/TaskSlice.js';
+import { TourController } from './tour/tour.controller'
+
+import { TaskDonut } from './components/TaskDonut/TaskDonut.js';
+import { TaskDonutDirective } from './components/TaskDonut/TaskDonutDirective.js';
+import { TaskSlice } from './components/TaskDonut/TaskSlice.js';
 import { Bucket } from './components/Bucket.js';
 import { BucketRing } from './components/BucketRing.js';
 
@@ -30,6 +32,7 @@ angular.module('app', ['ngResource', 'ui.router', 'ui.bootstrap','ui.sortable', 
   .run(runBlock)
 
   .controller('MainController', MainController)
+  .controller('TourController', TourController)
 
   .directive('taskDetailPanel', TaskDetailPanelDirective)
   .directive('emojiPicker', EmojiPicker)

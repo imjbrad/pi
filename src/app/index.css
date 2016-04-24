@@ -96,7 +96,7 @@ html, body {
   top: 15%;
   cursor: pointer;
   -webkit-transition: all 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53);
-  background-image: url("../app/assets/list.png");
+  background-image: url("../assets/list.png");
   background-repeat: no-repeat;
   background-size: 35px 35px;
   background-position: right center; }

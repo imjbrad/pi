@@ -31,7 +31,17 @@ export function TaskBlock(TaskStrip, _taskID) {
     var blockColorHeight = taskStrip.stripHeight * (1/22),
         handleWidth = 1.1;
 
-    var canResizeAdjacentTaskByDraggingSeparationLine = null;
+    var separationLineStrokeWidth =.6,
+        separationLineStrokeColor = "#e2e2e2",
+        separationLineHighlightedStrokeWidth = .6,
+        separationLineHighlightedStrokeColor = "#3fa9f5";
+
+    var handleStrokeWidth = .1,
+        handleStrokeAndFillColor = "transparent";
+
+    var canResizeAdjacentTaskRight,
+        canResizeAdjacentTaskLeft;
+
     var isInSingleSelectionMode = false;
 
     var single_selection_mode_class = "in-single-selection-mode";
@@ -78,14 +88,12 @@ export function TaskBlock(TaskStrip, _taskID) {
     }
 
     function canUserResizeAdjacentTask(){
-        var adjacentTaskRight = taskManager.getTaskAtIndex(self.task.index + 1),
-            adjacentTaskLeft = taskManager.getTaskAtIndex(self.task.index - 1);
-
-        canResizeAdjacentTaskByDraggingSeparationLine =
-            ((adjacentTaskRight && moment(adjacentTaskRight.start).isSame(moment(self.task.end)))
-            || (adjacentTaskLeft) && moment(adjacentTaskLeft.end).isSame(moment(self.task.start)));
+        canResizeAdjacentTaskRight = false;
+        var adjacentTaskRight = taskManager.getTaskAtIndex(self.task.index + 1);
+        if((adjacentTaskRight && moment(adjacentTaskRight.start).isSame(moment(self.task.end))))
+            canResizeAdjacentTaskRight = true;
     }
-    
+
     /*
     * since each block is recylced, we
     * need to re apply ui classes if neccessary
@@ -100,8 +108,8 @@ export function TaskBlock(TaskStrip, _taskID) {
         blockTerminalHandle.drag(resizeTaskSliceByDraggingTerminalHandle, null, cancelResizeTaskSliceByDraggingStartOrEndHandle);
         blockMiddleHandle.dblclick(selectTaskBlock);
         blockMiddleHandle.drag(moveTaskLeftOrRightByDraggingMiddleHandle, start_moveTaskLeftOrRightByDraggingMiddleHandle, endMoveTaskLeftOrRightByDraggingMiddleHandle);
-        terminalSeparationLine.drag(resizeAdjacentTaskByDraggingSeparationLine);
-        terminalSeparationLine.hover(highlightSeparationLineIfUserCanResizeAdjacentTaskByDraggingSeparationLine, unHighlightSeparationLine);
+        terminalSeparationLine.drag(resizeAdjacentTaskRightByDraggingTerminalSeparationLine, null, cancelResizeAdjacentTaskRightByDraggingTerminalSeparationLine);
+        terminalSeparationLine.hover(highlightTerminalSeparationLine, unHighlightSeparationLine);
         eve.on("userDraggingTaskInSingleSelectionMode", determineIfTaskCanBeInsertedHere);
         eve.on("taskBlockSelected", selectTaskBlock);
     }
@@ -420,32 +428,41 @@ export function TaskBlock(TaskStrip, _taskID) {
         self.redraw();
     }
 
-    function highlightSeparationLineIfUserCanResizeAdjacentTaskByDraggingSeparationLine(){
-        console.log(canResizeAdjacentTaskByDraggingSeparationLine);
-        if(canResizeAdjacentTaskByDraggingSeparationLine){
-            terminalSeparationLine.attr({strokeWidth: .3, stroke: "#3fa9f5"});
+
+    function highlightTerminalSeparationLine(){
+        if(canResizeAdjacentTaskRight){
+            terminalSeparationLine.attr({strokeWidth: separationLineHighlightedStrokeWidth, stroke: separationLineHighlightedStrokeColor});
         }
     }
 
     function unHighlightSeparationLine(){
-        if(canResizeAdjacentTaskByDraggingSeparationLine){
-            terminalSeparationLine.attr({strokeWidth: .2, stroke: "#e6e6e5"});
+        if(canResizeAdjacentTaskRight){
+            terminalSeparationLine.attr({strokeWidth: separationLineStrokeWidth, stroke: "#e6e6e5"});
         }
     }
 
-    function resizeAdjacentTaskByDraggingSeparationLine(dx, dy, mx, my, e){
-        if(canResizeAdjacentTaskByDraggingSeparationLine){
-            var adjacentTaskRight = taskManager.getTaskAtIndex(self.task.index + 1);
+    function resizeAdjacentTaskRightByDraggingTerminalSeparationLine(dx, dy, mx, my){
+        console.log("adjacent: ",canResizeAdjacentTaskRight);
+        if(canResizeAdjacentTaskRight){
+            var adjacentTask = taskManager.getTaskAtIndex(self.task.index + 1);
             var horizontalMousePosition = drawingArea.limitUIValueIfNecessary(
                 PiUtilities.toLinearPosition0to1FromArbitraryXPosition(drawingArea.relativeMousePoints(mx, my).x, taskStrip.stripWidth),
-                PiUtilities.toLinearPosition0to1FromTimeOfDay(taskManager.utilities.getTaskMinEndTime(self.task.index), taskStrip.scale.min, taskStrip.scale.max),
-                PiUtilities.toLinearPosition0to1FromTimeOfDay(taskManager.utilities.getTaskMaxStartTime(self.task.index + 1), taskStrip.scale.min, taskStrip.scale.max)
+                PiUtilities.toLinearPosition0to1FromTimeOfDay(taskManager.utilities.getTaskEarliestPossibleEndTime(self.task.index), taskStrip.scale.min, taskStrip.scale.max),
+                PiUtilities.toLinearPosition0to1FromTimeOfDay(taskManager.utilities.getTaskLatestPossibleStartTime(self.task.index + 1), taskStrip.scale.min, taskStrip.scale.max)
             ).limitedValue;
-            self.task.end = PiUtilities.toTimeOfDayFromLinearPosition0to1(horizontalMousePosition, taskStrip.scale.min, taskStrip.scale.max);
-            adjacentTaskRight.start =  PiUtilities.toTimeOfDayFromLinearPosition0to1(horizontalMousePosition, taskStrip.scale.min, taskStrip.scale.max);
+
+            var newTime = PiUtilities.toTimeOfDayFromLinearPosition0to1(horizontalMousePosition, taskStrip.scale.min, taskStrip.scale.max);
+            self.task.end = newTime;
+            adjacentTask.start =  newTime;
             taskManager.updateTasks();
+            highlightTerminalSeparationLine();
         }
     }
+
+    function cancelResizeAdjacentTaskRightByDraggingTerminalSeparationLine() {
+        unHighlightSeparationLine();
+    }
+
 
     function endMoveTaskLeftOrRightByDraggingMiddleHandle() {
 
@@ -467,10 +484,6 @@ export function TaskBlock(TaskStrip, _taskID) {
         });
 
         _clearLimitsForPushPull()
-    }
-
-    self.select = function(){
-
     }
 
     self.redraw = function(_animate){
@@ -525,23 +538,27 @@ export function TaskBlock(TaskStrip, _taskID) {
             blockBottomColor.attr({x: drawingStartPosition - (padding/2), y: (taskStrip.stripTopOffset + taskStrip.stripHeight) - blockColorHeight, width: blockWidth + padding, height: blockColorHeight, fill: self.task.color || PiUtilities.colors.pieOrangeCream});
 
             //handles
-            blockStartingHandle.attr({x: drawingStartPosition, y: taskStrip.stripTopOffset, width: handleWidth, height: taskStrip.stripHeight, fill: "transparent", stroke: "transparent", "stroke-width": .1});
-            blockTerminalHandle.attr({x: drawingTerminalPosition-handleWidth, y: taskStrip.stripTopOffset, width: handleWidth, height: taskStrip.stripHeight, fill: "transparent", stroke: "transparent", "stroke-width": .1});
-            blockMiddleHandle.attr({x: drawingStartPosition+handleWidth, y:taskStrip.stripTopOffset, width: (blockWidth-(2*handleWidth)), height: taskStrip.stripHeight, fill:"transparent", stroke: "transparent", "stroke-width": .1});
+            blockStartingHandle.attr({x: drawingStartPosition, y: taskStrip.stripTopOffset, width: handleWidth, height: taskStrip.stripHeight, fill: handleStrokeAndFillColor, stroke: handleStrokeAndFillColor, "stroke-width": .1});
+            blockTerminalHandle.attr({x: drawingTerminalPosition-handleWidth, y: taskStrip.stripTopOffset, width: handleWidth, height: taskStrip.stripHeight, fill: handleStrokeAndFillColor, stroke: handleStrokeAndFillColor, "stroke-width": .1});
+            blockMiddleHandle.attr({x: drawingStartPosition+handleWidth, y:taskStrip.stripTopOffset, width: (blockWidth-(2*handleWidth)), height: taskStrip.stripHeight, fill:"transparent", stroke: handleStrokeAndFillColor, "stroke-width": .1});
 
-            //separator lines
             var move = "M"+drawingStartPosition+","+taskStrip.stripTopOffset,
                 arc = "A"+radiusX+","+radiusY+" 0 0 "+sweep+" "+drawingStartPosition+","+(taskStrip.stripTopOffset + taskStrip.stripHeight),
                 startPath = [move, arc].join(" ");
 
-            startSeparationLine.attr({d: startPath, "stroke-width": .3, "stroke": "#E5E5E5", fill: "transparent"});
+            startSeparationLine.attr({d: startPath, "stroke-width": 0, "stroke": separationLineStrokeColor, fill: "transparent", strokeAlignment: "inner"});
 
 
+            if (bend){
+                startSeparationLine.attr({d: startPath, "stroke-width": separationLineStrokeWidth, "stroke": separationLineStrokeColor, fill: "transparent", strokeAlignment: "inner"});
+            }
+
+            //separator lines
             var move = "M"+(drawingStartPosition + blockWidth)+","+taskStrip.stripTopOffset,
                 arc = "A"+radiusX+","+radiusY+" 0 0 "+sweep+" "+(drawingStartPosition + blockWidth)+","+(taskStrip.stripTopOffset + taskStrip.stripHeight),
                 terminalPath = [move, arc].join(" ");
 
-            terminalSeparationLine.attr({d: terminalPath, "stroke-width": .3, "stroke": "#E5E5E5", fill: "transparent"});
+            terminalSeparationLine.attr({d: terminalPath, "stroke-width": separationLineStrokeWidth, "stroke": separationLineStrokeColor, fill: "transparent", strokeAlignment: "inner"});
 
             //emoji
             if(self.task.type != "sleep"){
@@ -557,8 +574,8 @@ export function TaskBlock(TaskStrip, _taskID) {
             }
 
             //apply mask
-            blockMask.attr({d: blockPath, fill: "white"});
-            self.blockGroup.attr({mask: blockMask})
+            blockMask.attr({d: blockPath, fill: "white", stroke: "transparent"});
+            self.blockGroup.attr({clip: blockMask})
 
         }
 

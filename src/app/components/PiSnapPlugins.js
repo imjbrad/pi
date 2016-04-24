@@ -2,6 +2,18 @@ var lastValidatedUIValue;
 
 Snap.plugin(function (Snap, Element, Paper, global, Fragment) {
 
+
+    Math.TWOPI = 2 * Math.PI;
+
+    Number.prototype.mod = function (n) {
+        return ((this % n) + n) % n;
+    };
+
+    Number.prototype.roundToTheNearest = function (i) {
+        var i = i || 1;
+        return Math.ceil(this / i) * i;
+    };
+
     Paper.prototype.relativeMousePoints = function (mx, my) {
         var root = this.node;
         var mousePoint = root.createSVGPoint();

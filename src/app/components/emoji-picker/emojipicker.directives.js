@@ -889,7 +889,7 @@ export function EmojiPicker() {
       ];
 
       $scope.selectEmoji = function(i){
-        $scope.selectedEmojiModel = $scope.emojis[i].replace(/.png/, "");
+        $scope.selectedEmojiModel = $scope.emojis[i];
       };
 
     }

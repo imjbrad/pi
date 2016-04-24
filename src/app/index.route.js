@@ -1,22 +1,22 @@
-export function routerConfig($stateProvider, $urlRouterProvider) {
+export function routerConfig($stateProvider, $urlRouterProvider, $locationProvider) {
     'ngInject';
+
     $stateProvider
 
         .state('tour', {
             url: '/tour',
             abstract: true,
-            controller: 'TourController',
             templateUrl: 'app/tour/tour.html'
         })
 
-        .state('tour.splash', {
+        .state('tour.step_one', {
             url: '',
-            templateUrl: 'app/tour/splash/splash.html'
+            templateUrl: 'app/tour/step_one/step_one.html',
+            controller: 'TourStepOneController'
         })
 
-        .state('tour.step_one', {
-            url: '/you',
-            templateUrl: 'app/tour/step_one/step_one.html'
+        .state('tour.step_one.photo', {
+            url: '/you'
         })
 
         .state('home', {
@@ -26,5 +26,19 @@ export function routerConfig($stateProvider, $urlRouterProvider) {
             controllerAs: 'main'
         });
 
+    //instagram router
+    $urlRouterProvider.rule(function ($injector, $location) {
+        var fullPath = window.location.href.split(window.location.origin)[1];
+        if(fullPath.includes("/instagram")){
+            var everythingAfter = fullPath.split("/instagram")[1];
+            //hacky
+            everythingAfter = everythingAfter.replace("#/access_token", "?access_token");
+            window.location = window.location.origin + "/#/tour/you" + everythingAfter;
+        }
+    });
+
     $urlRouterProvider.otherwise('/tour');
+
+
+
 }

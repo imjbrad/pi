@@ -1,5 +1,9 @@
 .SplashScreen{
   background-color: #393a3a !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
 }
 
 .center-logo {

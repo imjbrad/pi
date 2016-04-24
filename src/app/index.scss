@@ -13,12 +13,19 @@
   //border: 1px solid red;
 }
 
+button {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 button, button:focus, button:active {
   -webkit-appearance: none;
   background-color: transparent;
   outline: none;
   border: none;
 }
+
 
 .pie-btn-group-justified{
 

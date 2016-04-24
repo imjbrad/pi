@@ -35,3 +35,51 @@
     line-height: 19px;
   }
 }
+
+.PiModal {
+
+  & * {
+    border: 1px solid red;
+  }
+
+  border: 1px solid red;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 544px;
+  height: 544px;
+  border-radius: 10px;
+  -webkit-transform: translate(-50%, -50%);
+  background-color: #f6f1ea;
+
+  header{
+    margin: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    font-family: apercu_medium;
+    color: #4d4e4e;
+    border-bottom: 1px solid #4d4e4e;
+    height: 50px;
+
+    .title {
+      flex-grow: 1;
+      text-align: center;
+    }
+
+    .close {
+      width: 50px;
+      height: inherit;
+      background-image: url("../assets/modal-close.png");
+      background-size: 20px 20px;
+    }
+
+  }
+
+  .body {
+    height: calc(100% - 50px);
+  }
+
+
+
+}

@@ -6,9 +6,13 @@ export function TaskDonutDirective(){
   return{
     restrict: 'E',
     replace: true,
+    scope: {
+      taskDonutModel: "=",
+      taskDonutManager: "="
+    },
     template:'<svg viewBox="0 0 200 200" class="TaskDonut"></svg>',
     link: function($scope, el, attr){
-      new TaskDonut(Snap(el[0]), $scope.taskManager);
+      $scope.taskDonutModel = new TaskDonut(Snap(el[0]), $scope.taskDonutManager);
     }
   }
 

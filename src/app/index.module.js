@@ -7,7 +7,7 @@ import { runBlock } from './index.run';
 import './components/eve.js';
 
 import { MainController } from './main/main.controller';
-import { TourController } from './tour/tour.controller'
+import { TourStepOneController, AttachWebcamDirective } from './tour/step_one/tour.step_one.controller.js'
 
 import { TaskDonut } from './components/TaskDonut/TaskDonut.js';
 import { TaskDonutDirective } from './components/TaskDonut/TaskDonutDirective.js';
@@ -32,7 +32,9 @@ angular.module('app', ['ngResource', 'ui.router', 'ui.bootstrap','ui.sortable', 
   .run(runBlock)
 
   .controller('MainController', MainController)
-  .controller('TourController', TourController)
+  .controller('TourStepOneController', TourStepOneController)
+
+  .directive('attachWebcam', AttachWebcamDirective)
 
   .directive('taskDetailPanel', TaskDetailPanelDirective)
   .directive('emojiPicker', EmojiPicker)

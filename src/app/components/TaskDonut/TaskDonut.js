@@ -21,6 +21,7 @@ export function TaskDonut(svgArea, _taskManager) {
   self.taskManager = taskManager;
   self.slices = [];
   self.sliceDataObjects = [];
+  self.picture = null;
 
   init = function(){
 
@@ -107,7 +108,7 @@ export function TaskDonut(svgArea, _taskManager) {
     var pictureHeight = pictureWidth;
     var pictureX = self.centerX - pictureWidth/2;
     var pictureY = self.centerY - pictureHeight/2;
-    var picture = drawingArea.image("../assets/terron.jpg", pictureX, pictureY, pictureWidth, pictureHeight)
+    var picture = drawingArea.image(self.picture, pictureX, pictureY, pictureWidth, pictureHeight)
         //.attr({filter: drawingArea.filter(Snap.filter.grayscale(.5))})
         ;
 
@@ -121,7 +122,7 @@ export function TaskDonut(svgArea, _taskManager) {
 
     //task ring, categories
     var circle = drawingArea.circle();
-    circle.attr({"cx":self.centerX, "cy":self.centerY, "r":self.radius, "fill": "#7e3c46", 'fill-opacity': ".1"});
+    circle.attr({"cx":self.centerX, "cy":self.centerY, "r":self.radius, "fill": "#cccccc", 'fill-opacity': "1"});
 
     //create mask
     var donutMaskCircle = drawingArea.circle(self.centerX, self.centerY, self.outerRadius+5).attr({"fill":"white"});
@@ -146,6 +147,9 @@ export function TaskDonut(svgArea, _taskManager) {
   };
 
   self.drawSlices = function(_animate){
+
+    if(!self.picture)
+      return;
 
     var sleepSize = calculateSleepAngleSize(),
         productiveSize = calculateProductiveTimeAngleSize(),
@@ -175,6 +179,12 @@ export function TaskDonut(svgArea, _taskManager) {
 
   });
 
+  };
+
+  self.setPhoto = function(uri){
+    console.log("Setting Photo");
+    self.picture = uri;
+    self.redraw();
   };
 
   init();

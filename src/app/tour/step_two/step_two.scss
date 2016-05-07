@@ -1,0 +1,107 @@
+.Sleep {
+
+  .container {
+
+  }
+
+  .content {
+    margin-top: 60px;
+    overflow: auto;
+
+    .description {
+
+      float: left;
+
+      .content {
+        margin-bottom: 30px;
+      }
+
+      .sleep_input {
+        margin-bottom: 8px;
+
+        label, input {
+          font-size: 12px;
+          font-family: "apercu_mono", monospace;
+        }
+
+        label {
+          margin-right: 8px;
+        }
+
+        input {
+          text-align: center;
+          border: none;
+          border-bottom: 1px solid black;
+          width: 40px;
+          background-color: transparent;
+          -webkit-appearance: none;
+
+          &:focus {
+            -webkit-appearance: none;
+            outline: none;
+            border-bottom: 1px solid black;
+          }
+        }
+
+        &.bedtime .carets {
+
+          margin-left: 8px;
+
+          button {
+            padding: 0;
+            vertical-align: bottom;
+          }
+
+          .fa-caret-up {
+            margin-right: 1px;
+          }
+        }
+
+      }
+    }
+
+    .right {
+      padding: 13px;
+      background-color: rgba(204, 200, 196, .3);
+      font-size: 13px;
+      font-family: "apercu_medium";
+      float: right;
+
+      span {
+        font-family: "apercu_bold";
+      }
+    }
+
+  }
+
+  #sleep_slider {
+
+    .slider-bar {
+
+      .value-bar, .bar {
+        height: 6px;
+        border-radius: 15px;
+        border: none;
+      }
+
+      .bar {
+        background-color: #ccc8c4;
+      }
+
+      .value-bar {
+        background: -webkit-gradient(linear, 0% 3044.45%, 100% 3044.45%, color-stop(0, rgba(245, 182, 119, 1)), color-stop(0.4415, rgba(180, 149, 120, 1)), color-stop(1, rgba(92, 104, 121, 1)));
+        .handle {
+          border: none;
+          height: 15px;
+          width: 15px;
+          //background-color: $pie-orange-cream;
+          top: -5px;
+          border-radius: 100%;
+        }
+      }
+
+    }
+
+  }
+
+}

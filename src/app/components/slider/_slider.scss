@@ -6,19 +6,17 @@
   .value-bar, .bar {
     height: 45px;
     position: relative;
-    top: 50%;
-    -webkit-transform: translateY(-50%);
   }
 
   .bar {
-    background-color: #f4f4f4;
+    border: 1px solid black;
   }
 
   .value-bar{
     position: relative;
     width: 25%;
     min-width: 12px;
-    background-color: #c14237;
+    border: 1px solid black;
 
     .handle{
       content: "";
@@ -26,13 +24,9 @@
       width: 12px;
       height: 100%;
       right: 0;
-      background-color: rgba(193, 66, 55, 0);
+      border: 1px solid black;
       -webkit-transition: all, .3s;
       z-index: 101;
-
-      &:hover{
-        background-color: rgba(193, 66, 55, .3);
-      }
 
     }
 

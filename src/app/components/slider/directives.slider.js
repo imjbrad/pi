@@ -49,8 +49,6 @@ export function SliderDirective(){
                             raw = max;
                         }
 
-
-
                         return {
                             "percentage": percentage,
                             "raw": raw
@@ -63,19 +61,15 @@ export function SliderDirective(){
 
                 function snap(x, i){
                     var i = i || 1;
-                    return Math.ceil(x/i)*i;
+                    return Math.round(x/i)*i;
                 }
 
                 function moveSliderFromClickOrDrag(e){
                     var point = {x: e.pageX, y: e.pageY};
-                    if (_xBound(slider_bar[0], point)){
                         var value = _findValue(slider_bar[0], point);
                         //snap every 15 minutes
-                        var raw = value.raw;
-                        raw = snap(raw, PiUtilities.toAngleSize(15));
-                        $scope.sliderValue = raw;
+                        $scope.sliderValue = value.raw;
                         $scope.$apply();
-                    }
                 }
 
                 function setDragImage(e){

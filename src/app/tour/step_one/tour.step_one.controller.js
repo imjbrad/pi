@@ -113,7 +113,7 @@ export function TourStepOneController($rootScope, $scope, $timeout, $state, $loc
         else if(search.error_description){console.log("Instagram Error")}
     };
 
-    if($state.current.name == "tour.step_one.photo"){
+    if($state.current.name == "tour_step_one"){
         $scope.handleInstagramAuth();
     }
 

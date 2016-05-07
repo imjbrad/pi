@@ -3,20 +3,21 @@ export function routerConfig($stateProvider, $urlRouterProvider, $locationProvid
 
     $stateProvider
 
-        .state('tour', {
+        .state('tour_splash', {
             url: '/tour',
-            abstract: true,
-            templateUrl: 'app/tour/tour.html'
+            templateUrl: 'app/tour/splash/splash.html'
         })
 
-        .state('tour.step_one', {
-            url: '',
+        .state('tour_step_one', {
+            url: '/tour/you',
             templateUrl: 'app/tour/step_one/step_one.html',
             controller: 'TourStepOneController'
         })
 
-        .state('tour.step_one.photo', {
-            url: '/you'
+        .state('tour_step_two', {
+            url: '/tour/step_two',
+            templateUrl: 'app/tour/step_two/step_two.html',
+            controller: 'TourStepTwoController'
         })
 
         .state('home', {

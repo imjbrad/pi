@@ -2,7 +2,6 @@
 
 
     <div class="container">
-        <slider id="sleep_slider"></slider>
         <div class="content">
             <div class="paragraph-content description">
                 <h1 class="big-header">Make Time for Sleep</h1>
@@ -12,15 +11,27 @@
                     there are often more, like Personal Projects, or Chores.<br>
                     Choose a few or add your own to grasp a big picture.
                 </p>
-                <div class="sleep_input age"><label>Age:</label><input type="text" /></div>
-                <div class="sleep_input bedtime"><label>When's Bedtime?</label><input type="text" /><span class="carets"><button class="fa fa-caret-up"></button><button class="fa fa-caret-down"></button></span></div>
+                <div class="sleep_input age"><label>Age:</label><input ng-model="ageInput" ng-change="determineRecommendedSleepHoursForAge()" type="number" /></div>
+                <div class="sleep_input bedtime">
+                    <label>When's Bedtime?</label>
+                    <input ng-model="bedTimeInput" placeholder="10:30pm" ng-change="determineBedtime()" type="text" />
+                    <span class="carets"><button class="fa fa-caret-up" ng-click="adjustBedTime('+')"></button><button class="fa fa-caret-down" ng-click="adjustBedTime('-')"></button></span>
+                </div>
+                <!--<div class="memo">-->
+                    <!--You've set aside <span>5 hours for sleep.</span><br>-->
+                    <!--The national sleep association recommends <span>{{recommendedSleepHours[0]}}-{{recommendedSleepHours[1]}}</span> hours-->
+                    <!--for your age.-->
+                <!--</div>-->
             </div>
-            <div class="right">
-                The national sleep association<br>
-                recommends <span>6-8</span> hours of sleep <br>
-                for your age. You've set aside <br> <span>5 hours</span>
+            <div class="memo right">
+                You've set aside <span>{{sleepSliderValue}} hours for sleep.</span>
+                <span ng-show="recommendedSleepHours">The National Sleep Foundation recommends <span>{{recommendedSleepHours[0]}}-{{recommendedSleepHours[1]}}</span> hours
+                for your age.</span>
             </div>
         </div>
+
+        <slider id="sleep_slider" max="recommendedSleepHours[1]" slider-value="sleepSliderValue"></slider>
+
     </div>
 
 </section>

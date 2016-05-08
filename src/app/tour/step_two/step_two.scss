@@ -5,7 +5,7 @@
   }
 
   .content {
-    margin-top: 60px;
+    margin-bottom: 80px;
     overflow: auto;
 
     .description {
@@ -43,32 +43,48 @@
           }
         }
 
-        &.bedtime .carets {
+        input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+        }
 
-          margin-left: 8px;
+        &.bedtime {
 
-          button {
-            padding: 0;
-            vertical-align: bottom;
+          input {
+            width: 55px;
           }
 
-          .fa-caret-up {
-            margin-right: 1px;
+          .carets {
+            margin-left: 8px;
+            button {
+              padding: 0;
+              vertical-align: bottom;
+            }
+            .fa-caret-up {
+              margin-right: 1px;
+            }
           }
+
         }
 
       }
+
     }
 
-    .right {
-      padding: 13px;
+    .memo {
+      padding: 16px;
+      max-width: 300px;
       background-color: rgba(204, 200, 196, .3);
       font-size: 13px;
+      line-height: 16px;
+      float: left;
       font-family: "apercu_medium";
-      float: right;
 
       span {
         font-family: "apercu_bold";
+      }
+
+      &.right {
+        float: right;
       }
     }
 
@@ -85,19 +101,22 @@
       }
 
       .bar {
-        background-color: #ccc8c4;
+        background-color: rgba(204, 200, 196, .3);
       }
 
       .value-bar {
         background: -webkit-gradient(linear, 0% 3044.45%, 100% 3044.45%, color-stop(0, rgba(245, 182, 119, 1)), color-stop(0.4415, rgba(180, 149, 120, 1)), color-stop(1, rgba(92, 104, 121, 1)));
+
         .handle {
           border: none;
-          height: 15px;
-          width: 15px;
-          //background-color: $pie-orange-cream;
-          top: -5px;
+          height: 12px;
+          width: 12px;
+          background-color: #5c6879;
+          top: -3px;
           border-radius: 100%;
+          -webkit-transition: all .1s;
         }
+
       }
 
     }

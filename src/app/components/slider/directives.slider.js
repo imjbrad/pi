@@ -16,12 +16,23 @@ export function SliderDirective(){
                 var slider_bar = angular.element('.slider-bar', element),
                     value_bar = angular.element('.value-bar', slider_bar),
                     handle = angular.element('.handle', slider_bar),
-                    min = $scope.min || 0,
-                    max = $scope.max || 100;
+                    min,
+                    max;
 
                 //1x1 pixel transparent image for the dragging ghost
                 var img = document.createElement("img");
                 img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
+                function refresh() {
+                    determineMinMax();
+                    setWidth();
+                }
+
+                function determineMinMax(){
+                    min = $scope.min || 0;
+                    max = $scope.max || 100;
+                    console.log(min, max);
+                }
 
                 function _xBound(element, point){
                     var bounds = element.getBoundingClientRect();
@@ -34,12 +45,13 @@ export function SliderDirective(){
                 }
 
                 function _findValue(bar, point){
+
                     var bounds = bar.getBoundingClientRect(),
                         i = point.x-bounds.left,
                         total = bounds.width,
                         fraction = (i/total),
-                        percentage = fraction*100,
-                        raw = Math.round(fraction*max);
+                        raw = Math.round(fraction*max),
+                        percentage = (raw/max)*100;
 
                         if(raw <= min ){
                             raw = min;
@@ -55,8 +67,11 @@ export function SliderDirective(){
                         };
                 }
 
-                function _setWidth(value){
-                    value_bar[0].style.width = value+"%";
+                function setWidth(value){
+                    var sliderValue = value || $scope.sliderValue;
+                    if(sliderValue != undefined){
+                        value_bar[0].style.width = _mapNum(sliderValue)+"%";
+                    }
                 }
 
                 function snap(x, i){
@@ -65,11 +80,16 @@ export function SliderDirective(){
                 }
 
                 function moveSliderFromClickOrDrag(e){
-                    var point = {x: e.pageX, y: e.pageY};
-                        var value = _findValue(slider_bar[0], point);
-                        //snap every 15 minutes
-                        $scope.sliderValue = value.raw;
-                        $scope.$apply();
+
+                    var point = {x: e.pageX, y: e.pageY},
+                        value = _findValue(slider_bar[0], point);
+
+                    if(!point.x && !point.y)
+                        return;
+
+                    $scope.sliderValue = value.raw;
+                    $scope.$apply();
+                    console.log(value);
                 }
 
                 function setDragImage(e){
@@ -80,12 +100,10 @@ export function SliderDirective(){
                 slider_bar[0].addEventListener("dragstart", setDragImage);
                 slider_bar[0].addEventListener("drag", moveSliderFromClickOrDrag);
 
-                $scope.$watch('sliderValue', function(){
-                    var sliderValue = $scope.sliderValue;
-                    if(sliderValue){
-                        _setWidth(_mapNum(sliderValue));
-                    }
+                $scope.$watchGroup(['sliderValue', 'min', 'max'], function(){
+                    refresh();
                 });
+
             }
         };
     }

@@ -1,0 +1,53 @@
+<div id="big-day">
+
+    <div class="tour-tip welcome" ng-show="$root.tourStep == 0">
+        Pi, an entirely new way to plan your day. Pi emphasizes holistic wellness alongside planning
+        to encourage sustainable, everyday productivity. You're at the center of your day, so let's
+        change this to a photo of you!
+        <div class="action-bar">
+            <button class="ok" ng-click="showCamera = true" ng-disabled="showCamera"> {{ showCamera ? "Choose an Option Below" : "Ok"}}</button>
+        </div>
+    </div>
+
+    <div class="tour-tip welcome" ng-show="$root.tourStep == 1">
+        Nice, you're looking pretty good. Let's keep it that way by getting enough rest each night.
+        By emphasizing sleep, Pi makes you more aware of your productivity.
+        <div class="action-bar">
+            <button class="ok">Add Sleep To Your Day</button>
+        </div>
+    </div>
+
+    <task-donut id="main-donut" show-camera="showCamera" task-donut-model="taskDonut" task-donut-manager="taskManager"></task-donut>
+
+</div>
+
+<div class="sleep-config">
+    <slider class="sleep_slider" max="recommendedSleepHours[1]" slider-value="sleepSliderValue"></slider>
+    <div class="content">
+        <div class="paragraph-content description">
+            <h1 class="big-header">Make Time for Sleep</h1>
+            <p class="content">
+                You are a part of your schedule. All the things we have to<br>
+                do. Home, Work, and School are common categories, but<br>
+                there are often more, like Personal Projects, or Chores.<br>
+                Choose a few or add your own to grasp a big picture.
+            </p>
+            <div class="sleep_input age"><label>Enter Your Age:</label><input ng-model="ageInput" min="0" max="100" placeholder="22" ng-change="determineRecommendedSleepHoursForAge()" type="number" /></div>
+            <div class="sleep_input bedtime">
+                <label>Enter Your Bedtime?</label>
+                <input ng-model="bedTimeInput" placeholder="10:30pm" ng-change="determineBedtime()" type="text" />
+                <span class="carets"><button class="fa fa-caret-up" ng-click="adjustBedTime('+')"></button><button class="fa fa-caret-down" ng-click="adjustBedTime('-')"></button></span>
+            </div>
+            <button class="tour-next-button">Next, add tasks <span class="fa fa-caret-right"></span></button>
+        </div>
+        <div class="memo right" ng-show="sleepSliderValue > 0">
+            We've set aside <span class="recommendation">{{sleepSliderValue}} hours for sleep.</span>
+            <span ng-show="recommendedSleepHours">The National Sleep Foundation recommends {{recommendedSleepHours[0]}}-{{recommendedSleepHours[1]}} hours for your age.</span>
+            Edit sleep time below.
+        </div>
+    </div>
+</div>
+
+<!--<button class="btn" style="position: absolute; z-index: 1000;" ng-click="redraw()">-->
+<!--redraw-->
+<!--</button>-->

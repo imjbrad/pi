@@ -5,7 +5,7 @@
   }
 
   .content {
-    margin-bottom: 80px;
+    margin-top: 80px;
     overflow: auto;
 
     .description {
@@ -68,6 +68,10 @@
 
       }
 
+      .tour-next-button  {
+        margin-top: 30px;
+      }
+
     }
 
     .memo {
@@ -77,9 +81,9 @@
       font-size: 13px;
       line-height: 16px;
       float: left;
-      font-family: "apercu_medium";
+      font-family: "apercu";
 
-      span {
+      span.recommendation {
         font-family: "apercu_bold";
       }
 
@@ -106,12 +110,13 @@
 
       .value-bar {
         background: -webkit-gradient(linear, 0% 3044.45%, 100% 3044.45%, color-stop(0, rgba(245, 182, 119, 1)), color-stop(0.4415, rgba(180, 149, 120, 1)), color-stop(1, rgba(92, 104, 121, 1)));
+        min-width: 0;
 
         .handle {
           border: none;
           height: 12px;
-          width: 12px;
-          background-color: #5c6879;
+          width: 0px;
+          background-color: transparent;
           top: -3px;
           border-radius: 100%;
           -webkit-transition: all .1s;

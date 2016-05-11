@@ -1,51 +1,62 @@
-$donut-size: 350;
-$video-overlay-size: ($donut-size/(1.06));
+.TaskDonut {
 
-.You {
+  height: calc(100% - 1px);
+  width: calc(100% - 1px);
 
-  .container {
-    top: 25%;
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    overflow: visible !important;
-    -webkit-transition: all .2s;
+  overflow: visible;
+  position: relative;
+
+  &:before{
+    content: "";
+    display: block;
+    border: 0px solid transparent;
+    border-radius: 50%;
+    //box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    height: 100%;
+    position: absolute;
   }
 
   .donut-wrapper {
-    position: relative;
-    width: $donut-size+px;
-    height: $donut-size+px;
 
-    .TaskDonut {
+    width: 100%;
+    height: 100%;
+    position: relative;
+
+    .circle-content {
+      position: absolute;
       width: 100%;
       height: 100%;
+      top: 50%;
+      left: 50%;
+      -webkit-transform-origin: center;
     }
 
-    #camera-wrapper {
+    .donut {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .camera-wrapper {
+
+      $video-overlay-size: calc(100% / 1.06);
+
       background-color: #f6f1ea;
       position: absolute;
       border-radius: 50%;
-      width: $video-overlay-size+px;
-      height: $video-overlay-size+px;
+      width: $video-overlay-size;
+      height: $video-overlay-size;
       top: 50%;
       left: 50%;
       -webkit-transform: translate(-50%, -50%);
       overflow: hidden;
 
-      .circle-content {
+      .camera {
         position: absolute;
-        width: inherit;
-        height: inherit;
         top: 50%;
         left: 50%;
-        -webkit-transform: translate(-50%, -50%);
-      }
-
-      #camera {
-        -webkit-transform: translate(-50%, -50%) scale(#{$video-overlay-size / 240});
+        -webkit-transform: translate(-50%, -50%) scale(2.2);
 
         &.idle {
           -webkit-filter: blur(9px);
@@ -77,12 +88,12 @@ $video-overlay-size: ($donut-size/(1.06));
 
         .option {
           .small {
-            font-family: source_sans_prolight;
-            font-size: 12px;
+            font-family: source_sans_proregular;
+            font-size: 15px;
           }
           .big {
             font-family: apercu_medium;
-            font-size: 22px;
+            font-size: 30px;
           }
 
           &:hover .big{
@@ -95,7 +106,7 @@ $video-overlay-size: ($donut-size/(1.06));
           width: 100%;
           height: 1px;
           position: relative;
-          margin: 15px 0;
+          margin: 20px 0;
 
           &:after, &:before {
             content: "";
@@ -103,7 +114,7 @@ $video-overlay-size: ($donut-size/(1.06));
             position: absolute;
             width: calc(50% - 10px);
             height: 1px;
-            border-bottom: 1px solid white;
+            border-bottom: 2px solid white;
           }
 
           &:after {
@@ -129,6 +140,8 @@ $video-overlay-size: ($donut-size/(1.06));
         }
       }
     }
+
+
   }
 
   .photo-controls {
@@ -173,7 +186,7 @@ $video-overlay-size: ($donut-size/(1.06));
     .photo-select-button {
       padding: 25px;
       margin: 0 20px;
-      background-color: transparent;
+      background-color: #7AC943;
       -webkit-transition: all .2s;
 
       &:hover {
@@ -203,14 +216,11 @@ $video-overlay-size: ($donut-size/(1.06));
 
   }
 
-  .container.centerMode {
-    justify-content: space-around;
 
-    .paragraph-content {
-      display: none;
-    }
+  -webkit-transition: -webkit-transform .2s $easeInOutCubic;
 
+  &.push-donut {
+    -webkit-transform: scale(.9);
   }
 
 }
-

@@ -216,9 +216,9 @@ export function TaskStrip(svgArea, _taskManager) {
                 y: self.sleepAdjustmentButtonTopOffset,
                 width: self.sleepAdjustmentButtonWidth,
                 height: self.sleepAdjustmentButtonHeight,
-                image: "app/assets/sun.png",
-                leftIcon: "app/assets/plus.svg",
-                rightIcon: "app/assets/minus.svg"
+                image: "/assets/sun.png",
+                leftIcon: "/assets/plus.svg",
+                rightIcon: "/assets/minus.svg"
             });
             morningSleepAdjustmentButton.leftButton.click(wakeUpEarlier);
             morningSleepAdjustmentButton.rightButton.click(wakeUpLater);
@@ -230,9 +230,9 @@ export function TaskStrip(svgArea, _taskManager) {
                 y: self.sleepAdjustmentButtonTopOffset,
                 width: self.sleepAdjustmentButtonWidth,
                 height: self.sleepAdjustmentButtonHeight,
-                image: "app/assets/moon.png",
-                leftIcon: "app/assets/minus.svg",
-                rightIcon: "app/assets/plus.svg"
+                image: "/assets/moon.png",
+                leftIcon: "/assets/minus.svg",
+                rightIcon: "/assets/plus.svg"
             });
 
             nightSleepAdjustmentButton.leftButton.click(goToBedEarlier);

@@ -1,0 +1,148 @@
+
+  #big-day {
+    position: relative;
+    -webkit-transition: all .4s;
+    height: 540px;
+    width: 540px;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    -webkit-transition: $transition;
+  }
+
+
+  .sleep-config {
+    background-color: rgba(250, 247, 241, 1);
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 0 20vw;
+    padding-top: 20px;
+    padding-bottom: 50px;
+
+    -webkit-box-shadow: 0px -2px 5px 1px $pie-grey;
+
+    .content {
+      margin-top: 37px;
+      overflow: auto;
+
+      .description {
+
+        float: left;
+
+        .content {
+          margin-bottom: 30px;
+        }
+
+        .sleep_input {
+          margin-bottom: 8px;
+
+          label, input {
+            font-size: 12px;
+            font-family: "apercu_mono", monospace;
+          }
+
+          label {
+            margin-right: 8px;
+          }
+
+          input {
+            text-align: center;
+            border: none;
+            border-bottom: 1px solid black;
+            width: 40px;
+            background-color: transparent;
+            -webkit-appearance: none;
+
+            &:focus {
+              -webkit-appearance: none;
+              outline: none;
+              border-bottom: 1px solid black;
+            }
+          }
+
+          input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+          }
+
+          &.bedtime {
+
+            input {
+              width: 55px;
+            }
+
+            .carets {
+              margin-left: 8px;
+              button {
+                padding: 0;
+                vertical-align: bottom;
+              }
+              .fa-caret-up {
+                margin-right: 1px;
+              }
+            }
+
+          }
+
+        }
+
+        .tour-next-button  {
+          margin-top: 30px;
+        }
+
+      }
+
+      .memo {
+        padding: 16px;
+        max-width: 300px;
+        background-color: rgba(204, 200, 196, .3);
+        font-size: 13px;
+        line-height: 16px;
+        float: left;
+        font-family: "apercu";
+
+        span.recommendation {
+          font-family: "apercu_bold";
+        }
+
+        &.right {
+          float: right;
+        }
+      }
+
+    }
+
+    .sleep_slider {
+
+      .slider-bar {
+
+        .value-bar, .bar {
+          height: 6px;
+          border-radius: 15px;
+          border: none;
+        }
+
+        .bar {
+          background-color: rgba(204, 200, 196, .3);
+        }
+
+        .value-bar {
+          background: -webkit-gradient(linear, 0% 3044.45%, 100% 3044.45%, color-stop(0, rgba(245, 182, 119, 1)), color-stop(0.4415, rgba(180, 149, 120, 1)), color-stop(1, rgba(92, 104, 121, 1)));
+          min-width: 0;
+
+          .handle {
+            border: none;
+            height: 12px;
+            width: 0px;
+            background-color: transparent;
+            top: -3px;
+            border-radius: 100%;
+            -webkit-transition: all .1s;
+          }
+
+        }
+
+      }
+
+    }
+
+  }

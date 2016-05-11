@@ -51,6 +51,26 @@
   }
 }
 
+.tour-next-button {
+  background-color: #f1656f;
+  font-size: 12px;
+  font-family: "apercu_bold";
+  color: white;
+  padding: 10px 25px;
+  -webkit-transition: background-color .2s;
+
+  .fa-caret-right {
+    color: white;
+    vertical-align: middle;
+    margin-left: 7px;
+  }
+
+  &:active, &:hover {
+    background-color: #d15860;
+  }
+
+}
+
 .PiModal {
 
   & * {

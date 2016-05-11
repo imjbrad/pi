@@ -9,8 +9,23 @@
 @import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/button-groups";
 @import "../../bower_components/angular-material/angular-material.scss";
 
-* {
-  //border: 1px solid red;
+*{
+  box-sizing: border-box;
+}
+
+
+html {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  height: 100%;
+  padding: 0;
+  overflow: auto;
+  margin: 0;
+  -webkit-overflow-scrolling: touch;
 }
 
 button {
@@ -19,7 +34,7 @@ button {
   background-repeat: no-repeat;
 }
 
-button, button:focus, button:active {
+button, button:active {
   -webkit-appearance: none;
   background-color: transparent;
   outline: none;
@@ -48,6 +63,8 @@ button, button:focus, button:active {
 
 //mannually import app styles
 @import "main/main.style";
+@import "main/linear_view/linearview";
+@import "main/donut_view/donutview";
 
 @import "components/TaskDetailPanel/layouts.showtasks";
 @import "main/layouts.singleday";
@@ -55,6 +72,7 @@ button, button:focus, button:active {
 @import "components/emoji-picker/emojipicker";
 @import "components/slider/slider";
 
+@import "components/TaskDonut/TaskDonut";
 @import "components/TaskStrip/TaskStrip";
 
 @import "components/TaskDetailPanel/taskitem.style";

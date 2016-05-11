@@ -1,45 +1,39 @@
 $sleep-blue: #5B6778;
 $footer-size: 45px;
 $transition: all .2s linear;
-$top: 10vh;
+$top: 8vh;
 
 $task-space-width: 550px;
 $task-detail-height: 250px;
 $task-list-inset: 30px;
 
-*{
-  box-sizing: border-box;
-}
 
-
-html {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-}
-
-body {
-  height: 100%;
-  padding: 0;
+#Space{
+  background : -webkit-linear-gradient(-50deg, rgba(248, 185, 120, 1) 0%, rgba(250, 204, 156, 1) 24.54%, rgba(254, 240, 227, 1) 76.02%, rgba(255, 255, 255, 1) 100%);
+  background: #faf7f1;
+  width: 100vw;
+  max-width: 100%;
+  height: 100vh;
+  max-height: 100%;
   overflow: auto;
-  margin: 0;
-  -webkit-overflow-scrolling: touch;
-}
-
-#MainSpace, header{
-  width: 80%;
-  max-width: 1200px;
+  overflow-x: hidden;
   margin: auto;
 }
 
+#Space header {
 
-header {
+  width: 80%;
+  max-width: 1200px;
   margin: auto;
   margin-top: 70px;
   overflow: auto;
   -webkit-transition: $transition;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-  .header-button{
+
+  .header-button {
 
     display: block;
     overflow: auto;
@@ -47,7 +41,7 @@ header {
     padding: 0;
     -webkit-transition: $transition;
 
-    .label{
+    .label {
       background-color: #7e3c46;
       border-right: 1px solid white;
       color: white;
@@ -59,7 +53,7 @@ header {
       font-size: 12px;
     }
 
-    .icon{
+    .icon {
       float: left;
       background-color: #7e3c46;
       height: inherit;
@@ -68,7 +62,7 @@ header {
       cursor: pointer;
       -webkit-transition: $transition;
 
-      img{
+      img {
         max-width: 100%;
         max-height: 100%;
         width: auto;
@@ -77,11 +71,17 @@ header {
     }
   }
 
-  #day-picker-button{
+  .mini-donut {
+    width: 80px;
+    height: 80px;
+  }
+
+
+  #day-picker-button {
     float: left;
   }
 
-  #show-tasks-button{
+  #show-tasks-button {
     float: right;
   }
 
@@ -92,7 +92,7 @@ header {
     top: 55px;
     background-color: rgba(255, 255, 255, .5);
 
-    .md-calendar-scroll-mask, .md-calendar-scroll-container{
+    .md-calendar-scroll-mask, .md-calendar-scroll-container {
       height: 264px;
       width: 346px;
     }
@@ -102,7 +102,7 @@ header {
       box-shadow: none;
     }
 
-    .md-calendar-day-header{
+    .md-calendar-day-header {
       background-color: rgba(255, 255, 255, .5);
       color: $pie-dark-grey;
       font-family: "apercu_bold", sans-serif;
@@ -122,7 +122,7 @@ header {
 
     }
 
-    .md-calendar-date{
+    .md-calendar-date {
       font-family: "apercu_mono", monospace;
       color: $pie-dark-grey;
     }
@@ -131,16 +131,16 @@ header {
       background-color: $pie-orange-cream;
     }
 
-    .md-calendar-date-today .md-calendar-date-selection-indicator{
+    .md-calendar-date-today .md-calendar-date-selection-indicator {
       border: none;
       border-width: 2px;
       background-color: white;
     }
 
-    .md-calendar-date-selection-indicator{
+    .md-calendar-date-selection-indicator {
       border-radius: 0;
 
-      &:hover{
+      &:hover {
         background-color: $pie-orange-cream;
       }
     }
@@ -153,130 +153,8 @@ header {
 
 }
 
-#Space{
-  background : -webkit-linear-gradient(-50deg, rgba(248, 185, 120, 1) 0%, rgba(250, 204, 156, 1) 24.54%, rgba(254, 240, 227, 1) 76.02%, rgba(255, 255, 255, 1) 100%);
-  background: #faf7f1;
-  width: 100vw;
-  max-width: 100%;
-  height: 100vh;
-  max-height: 100%;
-  overflow: auto;
-  overflow-x: hidden;
-  margin: auto;
-}
-
 #MainSpace {
-  position: relative;
-  -webkit-transition: width .3s $easeInQuad;
-  top: $top;
-
-  #big-day {
-    position: relative;
-    -webkit-transition: all .4s;
-    display: none;
-
-    .TaskDonut{
-      height: calc(100% - 1px);
-      width: calc(100% - 1px);
-    }
-
-  }
-
-  #strip {
-    //height: 540px;
-    width: 900px;
-    margin: auto;
-  }
-
-
-}
-
-
-.TaskDonut{
-  overflow: visible;
-
-  &:before{
-    content: "";
-    display: block;
-    border: 0px solid transparent;
-    border-radius: 50%;
-    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.25);
-    width: 45%;
-    height: 45%;
-  }
-}
-
-#TaskSpace {
-
-  opacity: 0;
-  overflow: auto;
-  -webkit-transition: all .2s $easeInOutBack;
-  width: 850px;
-  margin: auto;
-  margin-top: 50px;
-  -webkit-transform: scale(.95) translateY(20%);
-
-  #task-space-wrapper {
-    overflow: auto;
-
-    #task-detail-wrapper {
-      background-color: white;
-      #task-detail{
-        height: $task-detail-height;
-      }
-    }
-
-    #task-list-wrapper{
-      overflow: hidden;
-      border-width: 1px 1px 1px 0px;
-      border-style: solid;
-      border-color: $pie-light-grey;
-      display: flex;
-      flex-direction: column;
-      width: 30%;
-      top: $task-list-inset/2;
-      position: relative;
-      height: calc(#{$task-detail-height - $task-list-inset});
-
-      .shadow {
-        box-shadow: inset -2px 0px 13px 0px #E5E5E5;
-        position: absolute;
-        width: 280px;
-        left: 0;
-        top: -21px;
-        bottom: -21px;
-        pointer-events: none;
-        z-index: 100;
-      }
-
-      #taskList{
-        list-style: none;
-        overflow: auto;
-        padding: 0;
-        margin: 0;
-        height: auto;
-        flex-grow: 1;
-
-        li {
-          overflow: auto;
-        }
-
-      }
-
-    }
-
-    #task-detail-wrapper{
-      width: 70%;
-    }
-
-    #task-list-wrapper, #task-detail-wrapper{
-      float: left;
-    }
-
-  }
-
-  #taskList::-webkit-scrollbar { width: 0 !important; display: none; }
-
+  margin-top: $top;
 }
 
 /**for ui sortable**/
@@ -296,7 +174,69 @@ g.dragOver {
   text {
     stroke: black;
   }
+
 }
 
+// Tour
 
-.TaskStrip {}
+.tour-tip, .tour-tip:after {
+  background-color: white;
+  border-radius: 3px;
+}
+
+.tour-tip {
+  border: 1px solid $pie-light-grey;
+  padding: 20px;
+  font-size: 15px;
+  line-height: 22px;
+  font-family: apercu_medium, monospace;
+  color: $pie-dark-grey;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.25);
+  z-index: 2;
+
+  &:after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    bottom: -10px;
+    left: 50%;
+    -webkit-transform: translateX(-50%) rotate(45deg);
+  }
+
+  .action-bar {
+  }
+
+  .ok {
+    background-color: #F1656F;
+    padding: 5px;
+    font-family: apercu_mono, monospace;
+    color: white;
+    font-size: 13px;
+    border: 1px solid #c6535c;
+    margin-top: 13px;
+    width: 100%;
+    -webkit-transition: all .3s;
+
+    &:active {
+      background-color: #c6535c;
+    }
+
+    &[disabled] {
+      border: none;
+      background-color: $pie-dark-grey;
+      opacity: .3;
+    }
+
+  }
+
+  &.welcome {
+    width: 350px;
+    position: absolute;
+    z-index: 2;
+    left: 50%;
+    -webkit-transform: translate(-50%, -80%);
+  }
+
+}
+

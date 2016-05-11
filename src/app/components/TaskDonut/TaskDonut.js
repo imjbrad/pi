@@ -16,6 +16,7 @@ export function TaskDonut(svgArea, _taskManager) {
   var pattern, patternImg;
   var taskManager = _taskManager;
   var tasks;
+  var picture;
 
   self.dispatchedEvents = {};
   self.taskManager = taskManager;
@@ -38,6 +39,10 @@ export function TaskDonut(svgArea, _taskManager) {
 
     self.p = drawingArea.circle(self.centerX, self.centerY, 10);
     self.p.attr({transform: "rotate("+(self.angle_offset) + " " + self.centerX +" "+self.centerY+")"});
+
+    self.picture = self.taskManager.picture() || null;
+
+    console.log(self.picture);
 
     eve.on("taskListUpdated", tasksListUpdated);
 
@@ -94,7 +99,7 @@ export function TaskDonut(svgArea, _taskManager) {
     }
   };
 
-  self.draw = function(){
+  self.draw = function(_animate){
 
     self.angle_offset = 90 - (calculateSleepAngleSize()/2);
 
@@ -103,14 +108,20 @@ export function TaskDonut(svgArea, _taskManager) {
     var shadow = drawingArea.filter(Snap.filter.shadow(0, 0, 2, 'black', .2));
     borderCircle.attr({"cx":self.centerX, "cy":self.centerY, "r":self.outerRadius, "fill": "white", 'fill-opacity': "1"});
 
+    if(picture){
+      picture.remove();
+    }
+
     //self portrait
     var pictureWidth = self.pictureRadius*2;
     var pictureHeight = pictureWidth;
     var pictureX = self.centerX - pictureWidth/2;
     var pictureY = self.centerY - pictureHeight/2;
-    var picture = drawingArea.image(self.picture, pictureX, pictureY, pictureWidth, pictureHeight)
-        //.attr({filter: drawingArea.filter(Snap.filter.grayscale(.5))})
-        ;
+    picture = drawingArea.image(self.picture, pictureX, pictureY, pictureWidth, pictureHeight)
+      //.attr({filter: drawingArea.filter(Snap.filter.grayscale(.5))})
+    ;
+
+
 
     //mask self portrait
     var pictureMask = drawingArea.circle();
@@ -130,7 +141,7 @@ export function TaskDonut(svgArea, _taskManager) {
     var donutMask = drawingArea.g().add(donutMaskCircle, donutMaskInnerCircle);
     self.donut_group.add(borderCircle, circle);
 
-    self.drawSlices();
+    self.drawSlices(_animate);
 
     //draw task slice handles
     //apply masks
@@ -139,11 +150,11 @@ export function TaskDonut(svgArea, _taskManager) {
 
   };
 
-  self.redraw = function(){
+  self.redraw = function(_animate){
     self.drawingArea.clear();
 
     init();
-    self.draw();
+    self.draw(_animate);
   };
 
   self.drawSlices = function(_animate){
@@ -181,8 +192,8 @@ export function TaskDonut(svgArea, _taskManager) {
 
   };
 
-  self.setPhoto = function(uri){
-    console.log("Setting Photo");
+  self.refreshPhoto = function(uri){
+    console.log("refreshing");
     self.picture = uri;
     self.redraw();
   };

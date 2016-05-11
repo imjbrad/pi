@@ -1,12 +1,11 @@
 <section class="You TourStep">
-    <div class="container" ng-class="{'centerMode':(photoOption)}">
+    <div class="container" ng-class="{'centerMode':(photoOption || settings.profile_picture)}">
         <div class="paragraph-content">
             <h1 class="big-header">Choose a Photo</h1>
             <p class="content">
                 You are a part of your schedule. All the things we have to<br>
                 do. Home, Work, and School are common categories, but<br>
                 there are often more, like Personal Projects, or Chores.<br>
-                Choose a few or add your own to grasp a big picture of your day
             </p>
         </div>
         <div class="photo-wrapper">
@@ -37,6 +36,7 @@
                     <div class="big">{{(photoOption == 'instagram') ? "Set" : "Take" }} Photo</div>
                 </button>
                 <button ng-show="(photoOption == 'instagram')" ng-disabled="!shouldShowNext()" class="instagram-arrow-button right" ng-click="nextInstagramImage()">Next<img src="assets/chevron.png"></button>
+                <button ng-show="settings.profile_picture" class="tour-next-button" ui-sref="tour_step_two">Next, make time for sleep<span class="fa fa-caret-right"></span></button>
             </div>
         </div>
     </div>

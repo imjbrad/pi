@@ -1,0 +1,31 @@
+<div class="TaskDonut">
+    <div class="donut-wrapper">
+        <svg viewBox="0 0 200 200" class="donut"></svg>
+        <div class="camera-wrapper" ng-show="showCamera">
+            <div class="camera" attach-webcam ng-hide="photoOption == 'instagram'" ng-class="{'idle':(photoOption == null), 'ready':(photoOption == 'webcam'), }"></div>
+            <div id="instagram-picker" class="circle-content" ng-show="photoOption == 'instagram'">
+                <img src="{{ currentInstagramImage }}">
+            </div>
+            <div class="prompt" ng-hide="photoOption">
+                <div class="option" ng-click="selectInstagram()">
+                    <div class="small">PICK FROM</div>
+                    <div class="big">Instagram</div>
+                </div>
+                <div class="divider"><span>or</span></div>
+                <div class="option" ng-click="selectWebcam()">
+                    <div class="small">TAKE WITH</div>
+                    <div class="big">Webcam</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="photo-controls">
+        <button ng-show="(photoOption == 'instagram')" ng-disabled="!shouldShowPrev()" class="instagram-arrow-button left" ng-click="prevInstagramImage()"><img src="assets/chevron.png">Prev</button>
+        <button class="photo-select-button" ng-show="photoOption" ng-click="setPhoto()">
+            <div class="small">{{(photoOption == 'instagram') ? "INSTAGRAM" : "LIVE" }}</div>
+            <div class="big">{{(photoOption == 'instagram') ? "Set" : "Capture" }} Photo</div>
+        </button>
+        <button ng-show="(photoOption == 'instagram')" ng-disabled="!shouldShowNext()" class="instagram-arrow-button right" ng-click="nextInstagramImage()">Next<img src="assets/chevron.png"></button>
+        <button ng-show="settings.profile_picture" class="tour-next-button" ui-sref="tour_step_two">Next, make time for sleep<span class="fa fa-caret-right"></span></button>
+    </div>
+</div>

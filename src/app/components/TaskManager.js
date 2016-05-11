@@ -502,6 +502,13 @@ export function TaskManager(_dayDataObject) {
         return userDayObject.bedTime
     };
 
+    self.picture = function(newPhotoUrl) {
+        if(newPhotoUrl)
+            userDayObject.picture = newPhotoUrl;
+
+        return userDayObject.picture;
+    };
+
     self.getSleepDetails = function () {
 
         return {

@@ -1,23 +1,3 @@
-#Space {
-
-  &.single-day-view {
-
-    #MainSpace {
-      width: 100%;
-
-      #big-day{
-        height: 540px;
-        width: 540px;
-        left: 50%;
-        -webkit-transform: translateX(-50%);
-        -webkit-transition: $transition;
-      }
-
-    }
-
-  }
-}
-
 .single-selection-mode-enabled {
   stroke: #6fccdd;
   stroke-width: 1 !important;

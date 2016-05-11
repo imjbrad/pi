@@ -7,6 +7,10 @@ import { runBlock } from './index.run';
 import './components/eve.js';
 
 import { MainController } from './main/main.controller';
+import { DonutViewController } from './main/donut_view/main.donutview.controller';
+import { LinearViewController } from './main/linear_view/main.linearview.controller';
+
+
 import { TourStepOneController, AttachWebcamDirective } from './tour/step_one/tour.step_one.controller.js'
 import { TourStepTwoController } from './tour/step_two/tour.step_two.controller.js'
 
@@ -34,6 +38,9 @@ angular.module('app', ['ngResource', 'ui.router', 'ui.bootstrap','ui.sortable', 
   .run(runBlock)
 
   .controller('MainController', MainController)
+  .controller('DonutViewController', DonutViewController)
+  .controller('LinearViewController', LinearViewController)
+
   .controller('TourStepOneController', TourStepOneController)
   .controller('TourStepTwoController', TourStepTwoController)
 

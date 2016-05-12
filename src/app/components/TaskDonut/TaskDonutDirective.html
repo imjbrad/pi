@@ -2,7 +2,7 @@
     <div class="donut-wrapper">
         <svg viewBox="0 0 200 200" class="donut"></svg>
         <div class="camera-wrapper" ng-show="showCamera">
-            <div class="camera" attach-webcam ng-hide="photoOption == 'instagram'" ng-class="{'idle':(photoOption == null), 'ready':(photoOption == 'webcam'), }"></div>
+            <div class="camera" ng-hide="photoOption == 'instagram'" ng-class="{'idle':(photoOption == null), 'ready':(photoOption == 'webcam'), }"></div>
             <div id="instagram-picker" class="circle-content" ng-show="photoOption == 'instagram'">
                 <img src="{{ currentInstagramImage }}">
             </div>
@@ -12,9 +12,9 @@
                     <div class="big">Instagram</div>
                 </div>
                 <div class="divider"><span>or</span></div>
-                <div class="option" ng-click="selectWebcam()">
-                    <div class="small">TAKE WITH</div>
-                    <div class="big">Webcam</div>
+                <div class="option" ng-click="skip()">
+                    <div class="small">SKIP THIS STEP</div>
+                    <!--<div class="big">Webcam</div>-->
                 </div>
             </div>
         </div>

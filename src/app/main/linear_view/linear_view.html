@@ -1,7 +1,50 @@
 <div id="strip">
+
+    <div class="tour-tip add-tasks" ng-show="$root.tourStep == 4">
+        Pi is a highly visual day planner. The timeline lets you add tasks
+        and rearrange with incredible precision, all visually. To add an item to the list, just
+        click an open spot in your schedule.
+        <div class="action-bar">
+            <button class="ok" ng-disabled="true">Click in the Empty Space Below</button>
+        </div>
+    </div>
+
+    <div class="tour-tip move-tasks" ng-show="$root.tourStep == 6">
+        The timeline is also highly flexible. Try dragging blocks by the middle or the sides. You
+        can even hold shift to move many at the same time. If two blocks are side by side,
+        try dragging the line between them for precise adjustment.
+        <div class="action-bar">
+            <button class="ok" ng-disabled="true">Drag a block</button>
+        </div>
+    </div>
+
+    <div class="tour-tip sleep-buttons" ng-show="$root.tourStep == 7">
+        By default, the timeline accounts for the recommended number
+        of sleep hours you should set aside. If you end up with too
+        much on your plate, adjust these buttons to add more time for
+        work and less time for rest. Pi helps you stay aware of how
+        workload affects everyday health.
+        <div class="action-bar">
+            <button class="ok" ng-click="$root.advanceTour()">Click to Continue</button>
+        </div>
+    </div>
+
     <svg id="task-strip" viewBox="0 0 100 20" class="TaskStrip"></svg>
+
 </div>
 
 <div id="TaskSpace" ng-class="{'show-list': showListView}" >
+
+    <div class="tour-tip edit-task" ng-show="$root.tourStep == 5">
+        This is the detail pane. Here you
+        can prioritize, allot time, add tasks manually, and more.
+        To start, try changing the name and emoji for your task.
+        <div class="action-bar">
+            <button class="ok" ng-click="$root.advanceTour()">Click to Continue</button>
+        </div>
+    </div>
+
+
     <task-detail-panel></task-detail-panel>
 </div>
+

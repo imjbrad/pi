@@ -42,7 +42,7 @@
 
       $video-overlay-size: calc(100% / 1.06);
 
-      background-color: #f6f1ea;
+      background-color: rgba(0, 0, 0, 0.48);;
       position: absolute;
       border-radius: 50%;
       width: $video-overlay-size;

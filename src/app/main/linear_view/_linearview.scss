@@ -3,6 +3,7 @@
   #strip {
     width: 900px;
     margin: auto;
+    position: relative;
   }
 
 }
@@ -10,7 +11,7 @@
 #TaskSpace {
 
   opacity: 0;
-  overflow: auto;
+  overflow: visible;
   -webkit-transition: all .2s $easeInOutBack;
   width: 850px;
   margin: auto;

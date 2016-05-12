@@ -188,16 +188,18 @@ export function TaskStrip(svgArea, _taskManager) {
 
     function createNewTaskInEmptySpace(e, mx, my){
         var scaled_mx = drawingArea.relativeMousePoints(mx, my).x/self.stripWidth;
-        var halfSize = PiUtilities.toLinearSizeFromTaskSize(taskManager.MINIMUM_TASK_SIZE, self.scale.min, self.scale.max)/2;
+        var halfSize = PiUtilities.toLinearSizeFromTaskSize(taskManager.MINIMUM_TASK_SIZE + 10, self.scale.min, self.scale.max)/2;
         var startingPosition = scaled_mx - halfSize;
 
         var newTask = taskManager.addTask({
-            name: "New Task",
+            name: "",
             start: PiUtilities.toTimeOfDayFromLinearPosition0to1(startingPosition, self.scale.min, self.scale.max),
             end: PiUtilities.toTimeOfDayFromLinearPosition0to1(scaled_mx + halfSize, self.scale.min, self.scale.max),
             emoji: '1f3c0.png',
             tempData: {}
-        })
+        });
+
+        eve("userAddedTaskByClickingStrip", {}, newTask);
 
     }
 

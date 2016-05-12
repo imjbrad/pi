@@ -384,6 +384,8 @@ export function TaskBlock(TaskStrip, _taskID) {
 
         prevMx = scaled_mx;
 
+        eve("userIsDraggingTask");
+
         //drawingArea.circle(newStartingPosition.liveValue * taskStrip.stripWidth, 7, .5).attr({"fill": "blue"});
         //drawingArea.circle(scaled_mx, 7, .5).attr({"fill": "green"});
         //drawingArea.circle(minStartingPosition * taskStrip.stripWidth, 7, .5).attr({"fill": "red"});

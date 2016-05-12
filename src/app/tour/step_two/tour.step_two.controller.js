@@ -6,7 +6,7 @@ import { TaskManager } from "../../components/TaskManager";
 import { TaskDonut } from "../../components/TaskDonut/TaskDonut";
 import { Day } from "../../components/DayHelper";
 
-export function TourStepTwoController($scope) {
+export function TourStepTwoController($scope, $rootScope) {
     'ngInject';
 
     Number.prototype.isBetween = function(a, b){
@@ -15,11 +15,30 @@ export function TourStepTwoController($scope) {
 
     $scope.sleepSliderValue = 0;
 
-    $scope.determineBedtime = function(_bedTimeInput) {
-        var bedTimeInput = _bedTimeInput || $scope.bedTimeInput;
-        $scope.bedTime = moment(bedTimeInput, "h:mma");
+    $scope.determineBedtime = function(_bedTimeModel) {
 
-        if(bedTimeInput.includes("am") || bedTimeInput.includes("a")){
+        $scope.sleepForm.bedTimeInput.$setValidity("valid", true);
+
+        var bedTimeModel = _bedTimeModel || $scope.bedTimeModel;
+        var bedTimeMoment = moment(bedTimeModel, "h:mma");
+
+        if(!bedTimeMoment.isValid()){
+            $scope.sleepForm.bedTimeInput.$setValidity("valid", false);
+            return;
+        }
+
+        $scope.bedTime = bedTimeMoment;
+
+        var hasAM = bedTimeModel.includes("am") || bedTimeModel.includes("a") || bedTimeModel.includes("AM") || bedTimeModel.includes("A"),
+            hasPM = bedTimeModel.includes("pm") || bedTimeModel.includes("p") || bedTimeModel.includes("PM") || bedTimeModel.includes("P");
+
+        if(!hasAM && !hasPM){
+            console.log("doesn't have am or pm");
+            $scope.sleepForm.bedTimeInput.$setValidity("valid", false);
+            return;
+        }
+
+        if(hasAM){
             $scope.bedTime.add(1, 'day')
         }
 
@@ -29,7 +48,7 @@ export function TourStepTwoController($scope) {
 
     $scope.adjustBedTime = function(increaseOrDecrease){
 
-        var oTime = $scope.determineBedtime($scope.bedTimeInput);
+        var oTime = $scope.determineBedtime($scope.bedTimeModel);
 
         if(increaseOrDecrease == "+"){
             oTime.add("30", "m");
@@ -39,13 +58,13 @@ export function TourStepTwoController($scope) {
             oTime.subtract("30", "m");
         }
 
-        $scope.bedTimeInput = oTime.format("h:mma");
-        $scope.determineBedtime($scope.bedTimeInput);
+        $scope.bedTimeModel = oTime.format("h:mma");
+        $scope.determineBedtime($scope.bedTimeModel);
     };
 
-    $scope.determineRecommendedSleepHoursForAge = function(_ageInput) {
+    $scope.determineRecommendedSleepHoursForAge = function(_ageModel) {
 
-        var age = _ageInput || $scope.ageInput,
+        var age = _ageModel || $scope.ageModel,
             recommendedSleepHours;
 
         if(!age)
@@ -76,6 +95,18 @@ export function TourStepTwoController($scope) {
             $scope.sleepSliderValue = $scope.recommendedSleepHours[0] + 1;
         }
 
+    };
+
+    $scope.configureSleep = function(){
+        if(!$scope.sleepForm.$valid){
+            if(!$scope.sleepForm.bedTimeInput.valid){
+                alert("Be sure to specify a bed time in the correct format, with AM or PM. ie: 10:30pm or 1:00am");
+            }
+            return;
+        }
+        if($rootScope.tourInProgress){
+            $rootScope.advanceTour();
+        }
     }
 
 

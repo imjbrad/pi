@@ -23,27 +23,28 @@ export function TaskDonutDirective($state, $timeout, $rootScope){
 
       var donut = $(".TaskDonut", this);
 
-      //
-      //el.mousedown(function(){
-      //  donut.addClass("push-donut");
-      //});
-      //
-      //el.click(function(){
-      //
-      //  console.log(attr.stateLink);
-      //
-      //  var wait = 0;
-      //  donut.addClass("push-donut");
-      //
-      //  wait+=300;
-      //  $timeout(function(){donut.removeClass("push-donut");}, wait);
-      //
-      //  wait+=100;
-      //  $timeout(function(){$state.go($scope.stateLink || attr.stateLink || 'home.linear')}, wait);
-      //
-      //});
+        el.mousedown(function(){
+          if($rootScope.tourInProgress && $rootScope.tourStep < 4)
+            return false;
+          donut.addClass("push-donut");
+        });
 
-      var redirectURL = "	http://www.google.com";
+        el.click(function(){
+          if($rootScope.tourInProgress && $rootScope.tourStep < 4)
+            return false;
+
+          var wait = 0;
+          donut.addClass("push-donut");
+
+          wait+=300;
+          $timeout(function(){donut.removeClass("push-donut");}, wait);
+
+          wait+=100;
+          $timeout(function(){$state.go($scope.stateLink || attr.stateLink || 'home.linear')}, wait);
+
+        });
+
+      var redirectURL = window.location.origin + "main/instagram";
 
       $scope.instagramPhotoIndex = 0;
       $scope.images = [];
@@ -58,6 +59,10 @@ export function TaskDonutDirective($state, $timeout, $rootScope){
 
       $scope.selectInstagram = function(){
         window.location = $scope.instagram_auth_url;
+      };
+
+      $scope.skip = function() {
+        $scope.setPhoto();
       };
 
       $scope.selectWebcam = function(){

@@ -1,19 +1,39 @@
 <div id="big-day">
 
     <div class="tour-tip welcome" ng-show="$root.tourStep == 0">
-        Pi, an entirely new way to plan your day. Pi emphasizes holistic wellness alongside planning
-        to encourage sustainable, everyday productivity. You're at the center of your day, so let's
-        change this to a photo of you!
+        Welcome to Pi, an entirely new way to plan your day. Pi emphasizes holistic wellness alongside planning
+        to encourage sustainable, everyday productivity.
         <div class="action-bar">
-            <button class="ok" ng-click="showCamera = true" ng-disabled="showCamera"> {{ showCamera ? "Choose an Option Below" : "Ok"}}</button>
+            <button class="ok" ng-click="$root.advanceTour()" >Click to Continue</button>
         </div>
     </div>
 
-    <div class="tour-tip welcome" ng-show="$root.tourStep == 1">
-        Nice, you're looking pretty good. Let's keep it that way by getting enough rest each night.
-        By emphasizing sleep, Pi makes you more aware of your productivity.
+    <div class="tour-tip pre-sleep" ng-show="$root.tourStep == 1">
+        With a focus on sleep, Pi makes you more aware of your productivity.
         <div class="action-bar">
-            <button class="ok">Add Sleep To Your Day</button>
+            <button class="ok" ng-click="$root.advanceTour()">Click to Set Aside Sleep Time</button>
+        </div>
+    </div>
+
+    <div class="tour-tip sleep-ring" ng-show="$root.tourStep == 3">
+        To make sure the importance of sleep never falls to the wayside, keep an eye
+        on this green arc. Green means you've got a full night of sleep ahead. Orange or red
+        means you may need to re-prioritize.
+        <Br>
+        In education environments, Pi's holistic productivity platform makes it
+        possible for teachers to assign work with better understanding of
+        how potential overload affects students' health and output.
+        <div class="action-bar">
+            <button class="ok" ng-click="$root.advanceTour()">Click to Continue</button>
+        </div>
+    </div>
+
+    <div class="tour-tip click-in" ng-show="$root.tourStep == 4">
+        So far you've got a full night of sleep ahead with nothing planned.
+        To get a closer look at the day and add things to the list, click
+        into your picture to the right.
+        <div class="action-bar">
+            <button class="ok" ng-disabled="true">Click Your Picture <span class="fa fa-caret-right"></span></button>
         </div>
     </div>
 
@@ -21,29 +41,39 @@
 
 </div>
 
-<div class="sleep-config">
+<div class="sleep-config" ng-show="$root.tourStep == 2" ng-controller="TourStepTwoController">
+
+    <div class="tour-tip sleep">
+        Enter your age and the time you try to get to bed each night. We'll calculate the recommended
+        number of hours you should set aside in your schedule.
+        <div class="action-bar">
+            <button class="ok" ng-disabled="true">Configure Below</button>
+        </div>
+    </div>
+
     <slider class="sleep_slider" max="recommendedSleepHours[1]" slider-value="sleepSliderValue"></slider>
     <div class="content">
         <div class="paragraph-content description">
             <h1 class="big-header">Make Time for Sleep</h1>
             <p class="content">
-                You are a part of your schedule. All the things we have to<br>
-                do. Home, Work, and School are common categories, but<br>
-                there are often more, like Personal Projects, or Chores.<br>
-                Choose a few or add your own to grasp a big picture.
+                Sleep is probably the single most important way
+                to sustain productivity. The National Sleep Foundation recommends
+                <span ng-show="recommendedSleepHours" class="recommendation">{{recommendedSleepHours[0]}}-{{recommendedSleepHours[1]}} hours for your age.</span>
+                <span ng-hide="recommendedSleepHours"> healthy sleep durations for each age group.</span>
+                <span ng-show="sleepSliderValue">
+                    We've set aside <span class="recommendation">{{sleepSliderValue}} hours for sleep.</span>
+                    <span ng-show="recommendedSleepHours">You can also adjust the slider manually to change your allotted sleep time</span>
+                </span>
             </p>
-            <div class="sleep_input age"><label>Enter Your Age:</label><input ng-model="ageInput" min="0" max="100" placeholder="22" ng-change="determineRecommendedSleepHoursForAge()" type="number" /></div>
-            <div class="sleep_input bedtime">
-                <label>Enter Your Bedtime?</label>
-                <input ng-model="bedTimeInput" placeholder="10:30pm" ng-change="determineBedtime()" type="text" />
-                <span class="carets"><button class="fa fa-caret-up" ng-click="adjustBedTime('+')"></button><button class="fa fa-caret-down" ng-click="adjustBedTime('-')"></button></span>
-            </div>
-            <button class="tour-next-button">Next, add tasks <span class="fa fa-caret-right"></span></button>
-        </div>
-        <div class="memo right" ng-show="sleepSliderValue > 0">
-            We've set aside <span class="recommendation">{{sleepSliderValue}} hours for sleep.</span>
-            <span ng-show="recommendedSleepHours">The National Sleep Foundation recommends {{recommendedSleepHours[0]}}-{{recommendedSleepHours[1]}} hours for your age.</span>
-            Edit sleep time below.
+            <form name="sleepForm" novalidate>
+                <div class="sleep_input age"><label>Enter Your Age:</label><input name="ageInput" ng-model="ageModel" min="0" max="100" placeholder="22" ng-change="determineRecommendedSleepHoursForAge()" ng-required="true" type="number" /></div>
+                <div class="sleep_input bedtime">
+                    <label>Enter Your Bedtime?</label>
+                    <input ng-model="bedTimeModel" ng-required="true" name="bedTimeInput" placeholder="10:30" ng-change="determineBedtime()" type="text" />
+                    <span class="carets"><button class="fa fa-caret-up" ng-click="adjustBedTime('+')"></button><button class="fa fa-caret-down" ng-click="adjustBedTime('-')"></button></span>
+                </div>
+                <button class="tour-next-button" ng-click="configureSleep()">Click to Continue <span class="fa fa-caret-right"></span></button>
+            </form>
         </div>
     </div>
 </div>

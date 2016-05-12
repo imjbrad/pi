@@ -4,7 +4,7 @@ import { TaskDonut } from '../../components/TaskDonut/TaskDonut.js';
 import { TaskStrip } from '../../components/TaskStrip/TaskStrip.js';
 import { Day } from '../../components/DayHelper.js';
 
-export function LinearViewController($scope, $timeout, $filter) {
+export function LinearViewController($scope, $timeout, $rootScope) {
 
     'ngInject';
 
@@ -12,21 +12,12 @@ export function LinearViewController($scope, $timeout, $filter) {
 
     var today = new Day();
 
-    $scope.showListView = true;
-
     $scope.taskData = {
         picture: "/assets/terron.jpg",
         wakeUpTime: today.at("7:30 am"),
         bedTime: today.nextDay().at("2:00 am"),
         sleepGoal: "08:00",
         tasks: [
-            {
-                name: "Work at the Studio",
-                start: today.at("7:30 am"),
-                end: today.at("1:30 pm"),
-                emoji: '1f3c0.png',
-                tempData: {}
-            },
             {
                 name: "Gym",
                 start: today.at("3:00 pm"),
@@ -63,6 +54,8 @@ export function LinearViewController($scope, $timeout, $filter) {
     eve.on("taskListUpdated", taskListUpdated);
     eve.on("taskBlockSelected", taskBlockSelected);
     eve.on("userClickedOutsideOfStrip", userClickedOutsideOfStrip);
+    eve.on("userAddedTaskByClickingStrip", userAddedTaskByClickingStrip);
+    eve.on("userIsDraggingTask", userIsDraggingTask);
 
     function taskListUpdated(){
         $timeout(function(){
@@ -86,6 +79,24 @@ export function LinearViewController($scope, $timeout, $filter) {
         });
     }
 
+    function userAddedTaskByClickingStrip(id){
+        console.log(id);
+        $timeout(function(){
+            $scope.selectTask(id);
+            if($rootScope.tourInProgress && $rootScope.tourStep == 4){
+                $rootScope.advanceTour();
+            }
+        });
+    }
+
+    function userIsDraggingTask(){
+        $timeout(function(){
+            if($rootScope.tourInProgress && $rootScope.tourStep == 6){
+                $rootScope.advanceTour();
+            }
+        });
+    }
+
     $scope.Utilities = PiUtilities;
     $scope.taskFilter = PiUtilities.task_data_filter;
 
@@ -97,10 +108,17 @@ export function LinearViewController($scope, $timeout, $filter) {
         eve("taskListUpdated");
     };
 
-    $scope.selectTask = function (id) {
-        $scope.selectedTaskDetail = $scope.taskManager.getTask(id);
-        $scope.selectedTaskID = id;
-        taskStrip.selectedTaskBlock(id);
+    $scope.selectTask = function (idOrIndex) {
+
+        if(typeof idOrIndex == "number")
+            $scope.selectedTaskDetail = $scope.taskManager.getTaskAtIndex(idOrIndex);
+
+        if(typeof idOrIndex == "string")
+            $scope.selectedTaskDetail = $scope.taskManager.getTask(idOrIndex);
+
+        $scope.selectedTaskID = $scope.selectedTaskDetail.id;
+        taskStrip.selectedTaskBlock($scope.selectedTaskID);
+
     };
 
     $scope.deselectTasks = function () {
@@ -262,4 +280,8 @@ export function LinearViewController($scope, $timeout, $filter) {
         }
 
     };
+
+    //init
+    $scope.selectTask(1);
+    $scope.showListView = true;
 }

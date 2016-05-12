@@ -1,0 +1,38 @@
+.SplashScreen{
+  background-color: #393a3a !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+
+
+.center-logo {
+  width: 300px;
+  position: relative;
+  top: 20vh;
+  margin: auto;
+  -webkit-user-select: none;
+  text-align: center;
+
+  img {
+    margin-bottom: 40vh;
+  }
+}
+
+.next {
+
+  &.light {
+    background-image: url('../assets/arrow-light.png');
+  }
+
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+
+}
+
+
+}

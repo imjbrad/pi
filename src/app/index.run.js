@@ -9,7 +9,7 @@ export function runBlock ($rootScope, $log, $timeout, $window) {
   var random = Math.random();
 
   $rootScope.taskData = {
-    picture: random < .5 ? "/assets/terron.jpg" : "/assets/faridah.jpg",
+    picture: random < .5 ? "assets/terron.jpg" : "assets/faridah.jpg",
     wakeUpTime: today.at("7:30 am"),
     bedTime: today.nextDay().at("2:00 am"),
     sleepGoal: "08:00",
@@ -19,6 +19,7 @@ export function runBlock ($rootScope, $log, $timeout, $window) {
         start: today.at("7:30 am"),
         end: today.at("1:30 pm"),
         emoji: '1f3c0.png',
+        description: '',
         tempData: {}
       },
       {
@@ -27,6 +28,7 @@ export function runBlock ($rootScope, $log, $timeout, $window) {
         end: today.at("4:00 pm"),
         color: '#7e3c46',
         emoji: '1f4d0.png',
+        description: '',
         tempData: {}
       },
       {
@@ -34,6 +36,7 @@ export function runBlock ($rootScope, $log, $timeout, $window) {
         start: today.at("4:00 pm"),
         end: today.at("5:00 pm"),
         emoji: '1f4de.png',
+        description: '',
         tempData: {}
       },
       {
@@ -41,6 +44,7 @@ export function runBlock ($rootScope, $log, $timeout, $window) {
         start: today.at("8:00 pm"),
         end: today.at("11:30 pm"),
         emoji: '1f62d.png',
+        description: '',
         tempData: {}
       }
     ]

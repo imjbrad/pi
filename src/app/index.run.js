@@ -86,7 +86,7 @@ export function runBlock ($rootScope, $log, $timeout, $window) {
   };
 
   //Session Control
-  var sessionLengthInMinutes = .5,
+  var sessionLengthInMinutes = 1.5,
   userActiveTimer;
 
   //tour timeout

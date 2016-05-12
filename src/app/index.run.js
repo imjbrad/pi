@@ -71,14 +71,16 @@ export function runBlock ($rootScope, $log, $timeout, $window) {
     $rootScope.tourStep = 0;
     $rootScope.tourInProgress = true;
 
-    var main = $window.location.origin + "/#/main";
+    var origin = $window.location.origin,
+        path = $window.location.origin.indexOf("github") == -1 ? "/#/main" : "/pi/#/main",
+        current = origin + path;
 
-    if($window.location.href == main){
+    if($window.location.href == current){
       console.log("already on the home page, refreshing");
       $window.location.reload(true);
     }else{
       console.log("returning to home page");
-      $window.location.href = main;
+      $window.location.href = current;
     }
 
   };

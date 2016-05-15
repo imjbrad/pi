@@ -66,10 +66,10 @@
                 </span>
             </p>
             <form name="sleepForm" novalidate>
-                <div class="sleep_input age"><label>Enter Your Age:</label><input name="ageInput" ng-model="ageModel" min="0" max="100" placeholder="22" ng-change="determineRecommendedSleepHoursForAge()" ng-required="true" type="number" /></div>
+                <div class="sleep_input age"><label>Enter Your Age:</label><input name="ageInput" ng-model="ageModel" min="0" max="100" placeholder="00" ng-change="determineRecommendedSleepHoursForAge()" ng-required="true" type="number" /></div>
                 <div class="sleep_input bedtime">
                     <label>Enter Your Bedtime?</label>
-                    <input ng-model="bedTimeModel" ng-required="true" name="bedTimeInput" placeholder="10:30" ng-change="determineBedtime()" type="text" />
+                    <input ng-model="bedTimeModel" ng-required="true" name="bedTimeInput" placeholder="HH:MM PM" ng-change="determineBedtime()" type="text" />
                     <span class="carets"><button class="fa fa-caret-up" ng-click="adjustBedTime('+')"></button><button class="fa fa-caret-down" ng-click="adjustBedTime('-')"></button></span>
                 </div>
                 <button class="tour-next-button" ng-click="configureSleep()">Click to Continue <span class="fa fa-caret-right"></span></button>

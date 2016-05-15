@@ -99,9 +99,15 @@ export function TourStepTwoController($scope, $rootScope) {
 
     $scope.configureSleep = function(){
         if(!$scope.sleepForm.$valid){
+
             if(!$scope.sleepForm.bedTimeInput.valid){
                 alert("Be sure to specify a bed time in the correct format, with AM or PM. ie: 10:30pm or 1:00am");
             }
+
+            if(!$scope.sleepForm.ageInput.valid){
+                alert("Don't forget to enter your age");
+            }
+
             return;
         }
         if($rootScope.tourInProgress){

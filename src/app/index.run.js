@@ -15,14 +15,6 @@ export function runBlock ($rootScope, $log, $timeout, $window) {
     sleepGoal: "08:00",
     tasks: [
       {
-        name: "Work at the Studio",
-        start: today.at("7:30 am"),
-        end: today.at("1:30 pm"),
-        emoji: '1f3c0.png',
-        description: '',
-        tempData: {}
-      },
-      {
         name: "Gym",
         start: today.at("3:00 pm"),
         end: today.at("4:00 pm"),
@@ -57,6 +49,12 @@ export function runBlock ($rootScope, $log, $timeout, $window) {
   });
 
   //Tour Control
+
+  var origin = $window.location.origin,
+      isOnGitHub = origin.indexOf("github") != -1,
+      piPath = isOnGitHub ? "/pi/#/main" : "/#/main",
+      resetPage = origin + piPath;
+
   $rootScope.tourStep = 0;
 
   $rootScope.tourInProgress = true;
@@ -71,16 +69,12 @@ export function runBlock ($rootScope, $log, $timeout, $window) {
     $rootScope.tourStep = 0;
     $rootScope.tourInProgress = true;
 
-    var origin = $window.location.origin,
-        path = $window.location.origin.indexOf("github") == -1 ? "/#/main" : "/pi/#/main",
-        current = origin + path;
-
-    if($window.location.href == current){
+    if($window.location.href == resetPage){
       console.log("already on the home page, refreshing");
       $window.location.reload(true);
     }else{
       console.log("returning to home page");
-      $window.location.href = current;
+      $window.location.href = resetPage;
     }
 
   };
@@ -103,12 +97,16 @@ export function runBlock ($rootScope, $log, $timeout, $window) {
     setSessionTimer();
   }
 
-  $(document).on('mousemove keypress', function(){
-    console.log("renewing session, resetting timer");
-    resetSessionTimer();
-  });
-
-  setSessionTimer();
+  //initialize the tour on live site
+  if(isOnGitHub){
+    console.log("initializing session timer");
+    $(document).on('mousemove keypress', function(){
+      resetSessionTimer();
+    });
+    setSessionTimer();
+  }else{
+    console.log("not initializing session timer")
+  }
 
   $log.debug('runBlock end');
 

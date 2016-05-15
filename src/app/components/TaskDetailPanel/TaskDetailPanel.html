@@ -4,7 +4,7 @@
 
             <div class="task-detail-header">
                 <div class="emoji">
-                    <img ng-click="currentDetailView = 'emoji'" ng-src="/assets/emojis/72x72/{{ selectedTaskDetail.emoji }}">
+                    <img ng-click="currentDetailView = 'emoji'" ng-src="assets/emojis/72x72/{{ selectedTaskDetail.emoji }}">
                     <button class="close-emoji-view" ng-show="currentDetailView == 'emoji'" ng-click="currentDetailView = 'basic-details'"><span class="">Save Emoji</span></button>
                 </div>
                 <input type="text" class="task-name" ng-model="selectedTaskDetail.name" placeholder="Edit task name" />

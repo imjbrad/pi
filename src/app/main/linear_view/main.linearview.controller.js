@@ -10,40 +10,7 @@ export function LinearViewController($scope, $timeout, $rootScope) {
 
     var taskStrip;
 
-    var today = new Day();
-
-    $scope.taskData = {
-        picture: "/assets/terron.jpg",
-        wakeUpTime: today.at("7:30 am"),
-        bedTime: today.nextDay().at("2:00 am"),
-        sleepGoal: "08:00",
-        tasks: [
-            {
-                name: "Gym",
-                start: today.at("3:00 pm"),
-                end: today.at("4:00 pm"),
-                color: '#7e3c46',
-                emoji: '1f4d0.png',
-                tempData: {}
-            },
-            {
-                name: "Return rentals",
-                start: today.at("4:00 pm"),
-                end: today.at("5:00 pm"),
-                emoji: '1f4de.png',
-                tempData: {}
-            },
-            {
-                name: "Finish Paper",
-                start: today.at("8:00 pm"),
-                end: today.at("11:30 pm"),
-                emoji: '1f62d.png',
-                tempData: {}
-            }
-        ]
-    };
-
-    $scope.taskManager = new TaskManager($scope.taskData);
+    $scope.taskManager = new TaskManager($rootScope.taskData);
 
     taskStrip = new TaskStrip(Snap("#task-strip"), $scope.taskManager);
 

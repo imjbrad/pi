@@ -18,11 +18,11 @@
 
     <button id="show-tasks-button" class="header-button" ng-click="toggleListView()">
       <div class="label" ng-hide="showListView">
-        {{ numberOfUserTasks || "No"  }} Item{{ (numberOfUserTasks > 1 || 0) ? "s" : ""  }} Today
+        {{ numberOfUserTasks || "No"  }} Item{{ (numberOfUserTasks > 1 || numberOfUserTasks == 0) ? "s" : ""  }} Today
       </div>
-      <div class="icon">
-        <img ng-src="{{ showListView ? 'assets/x.svg' : 'assets/list.svg'}}">
-      </div>
+      <!--<div class="icon">-->
+        <!--<img ng-src="{{ showListView ? 'assets/x.svg' : 'assets/list.svg'}}">-->
+      <!--</div>-->
     </button>
 
   </header>

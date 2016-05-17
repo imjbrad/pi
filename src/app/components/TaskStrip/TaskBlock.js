@@ -571,7 +571,7 @@ export function TaskBlock(TaskStrip, _taskID) {
                     blockEmoji.remove();
                 }
 
-                blockEmoji = drawingArea.image("assets/emojis/72x72/"+self.task.emoji || "1f0cf.png", blockBox.cx-(emojiSize/2) + radiusX, blockBox.cy-(emojiSize/2),  emojiSize, emojiSize);
+                blockEmoji = drawingArea.image("assets/emojis/72x72/"+(self.task.emoji || "blank.png"), blockBox.cx-(emojiSize/2) + radiusX, blockBox.cy-(emojiSize/2),  emojiSize, emojiSize);
                 blockGroup.add(blockEmoji);
             }
 

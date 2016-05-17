@@ -4,17 +4,15 @@
 
             <div class="task-detail-header">
                 <div class="emoji">
-                    <img ng-click="currentDetailView = 'emoji'" ng-src="assets/emojis/72x72/{{ selectedTaskDetail.emoji }}">
+                    <img ng-click="currentDetailView = 'emoji'" ng-src="assets/emojis/72x72/{{ selectedTask.emoji }}">
                     <button class="close-emoji-view" ng-show="currentDetailView == 'emoji'" ng-click="currentDetailView = 'basic-details'"><span class="">Save Emoji</span></button>
                 </div>
-                <input type="text" class="task-name" ng-model="selectedTaskDetail.name" placeholder="Edit task name" />
+                <input type="text" class="task-name" ng-model="selectedTask.name" placeholder="Blank Item" />
                 <div class="due-date"><span class="date-label">Aprl 1</span><button class="check-button"></button></div>
             </div>
-
             <div class="emoji-view detail-view" ng-show="currentDetailView == 'emoji'">
-                <emoji-picker selected-emoji-model="selectedTaskDetail.emoji"></emoji-picker>
+                <emoji-picker selected-emoji-model="selectedTask.emoji"></emoji-picker>
             </div>
-
             <div class="task-basic-details detail-view" ng-show="currentDetailView == 'basic-details'">
                 <div class="col-1">
                     <div class="task-detail-item description">
@@ -22,26 +20,23 @@
                     </div>
                     <div class="task-detail-item time-allotment">
                         <div class="btn-group btn-group-justified pie-btn-group-justified time-allotment-btn-group">
-                            <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="toLinearSize(5)"><span>5<div class="unit">min</div></span></label>
-                            <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="toLinearSize(15)"><span>15<div class="unit">min</div></span></label>
-                            <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="toLinearSize(30)"><span>30<div class="unit">min</div></span></label>
-                            <label class="btn" ng-model="selectedTaskDetail.angleSize" uib-btn-radio="toLinearSize(45)"><span>45<div class="unit">min</div></span></label>
+                            <label class="btn" ng-model="selectedTask.tempData.allotment" uib-btn-radio="5"><span>5<div class="unit">min</div></span></label>
+                            <label class="btn" ng-model="selectedTask.tempData.allotment" uib-btn-radio="15"><span>15<div class="unit">min</div></span></label>
+                            <label class="btn" ng-model="selectedTask.tempData.allotment" uib-btn-radio="30"><span>30<div class="unit">min</div></span></label>
+                            <label class="btn" ng-model="selectedTask.tempData.allotment" uib-btn-radio="45"><span>45<div class="unit">min</div></span></label>
                             <label id="plus" class="btn"
                                    ng-class="{
-                       active: selectedTaskDetail.angleSize > toLinearSize(45),
-                       revealMinutes: selectedTaskDetail.angleSize > toLinearSize(45)}"
-                                   ng-click="selectedTaskDetail.angleSize = toLinearSize(60)">
-                                <span><span class="minutes">{{ Utilities.humanizeMinutes(Utilities.toMinutes(selectedTaskDetail.angleSize)) }}</span><div class="unit">+</div></span>
+                       active: selectedTask.angleSize > toLinearSize(45),
+                       revealMinutes: selectedTask.angleSize > toLinearSize(45)}"
+                                   ng-click="selectedTask.angleSize = toLinearSize(60)">
+                                <span><span class="minutes">{{ Utilities.humanizeMinutes(Utilities.toMinutes(selectedTask.angleSize)) }}</span><div class="unit">+</div></span>
                             </label>
-                        </div>
-                        <div class="task-slider" ng-class="{ fadeOut: selectedTaskDetail.angleSize <= Utilities.toAngleSize(45) }">
-                            <slider  slider-value="selectedTaskDetail.angleSize" min="Utilities.toAngleSize(30)" max="360"></slider>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
+
     </div>
     <div id="task-list-wrapper">
         <div class="shadow"></div>
@@ -52,7 +47,7 @@
             <li class="task-li" ng-repeat="task in taskData.tasks" data-index="{{$index}}" data-task-id="{{ task.id }}" ng-click="selectTask(task.id)">
                 <div class="task-item {{ task.type }}" ng-class="{'selected': $index == selectedTaskIndex}">
                     <div class="handle"></div>
-                    <input type="text" class="task-label" ng-model="task.name">
+                    <input type="text" class="task-label" ng-model="task.name" placeholder="Blank Item">
                 </div>
             </li>
         </ul>

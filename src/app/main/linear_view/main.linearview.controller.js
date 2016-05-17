@@ -14,8 +14,7 @@ export function LinearViewController($scope, $timeout, $rootScope) {
 
     taskStrip = new TaskStrip(Snap("#task-strip"), $scope.taskManager);
 
-    $scope.selectedTask = null;
-    $scope.selectedTaskDetail = {};
+    $scope.selectedTask = {};
     $scope.currentDetailView = "basic-details";
 
     eve.on("taskListUpdated", taskListUpdated);
@@ -32,18 +31,12 @@ export function LinearViewController($scope, $timeout, $rootScope) {
     }
 
     function taskBlockSelected(taskID){
-        console.log("task block clicked");
         $timeout(function(){
-            $scope.selectedTaskDetail = $scope.taskManager.getTask(taskID);
-            //$scope.showListView = true;
+            $scope.selectedTask = $scope.taskManager.getTask(taskID);
         });
     }
 
     function userClickedOutsideOfStrip(){
-        $scope.$apply(function(){
-            $scope.selectedTaskDetail = null;
-            //$scope.showListView = false;
-        });
     }
 
     function userAddedTaskByClickingStrip(id){
@@ -78,18 +71,18 @@ export function LinearViewController($scope, $timeout, $rootScope) {
     $scope.selectTask = function (idOrIndex) {
 
         if(typeof idOrIndex == "number")
-            $scope.selectedTaskDetail = $scope.taskManager.getTaskAtIndex(idOrIndex);
+            $scope.selectedTask = $scope.taskManager.getTaskAtIndex(idOrIndex);
 
         if(typeof idOrIndex == "string")
-            $scope.selectedTaskDetail = $scope.taskManager.getTask(idOrIndex);
+            $scope.selectedTask = $scope.taskManager.getTask(idOrIndex);
 
-        $scope.selectedTaskID = $scope.selectedTaskDetail.id;
+        $scope.selectedTaskID = $scope.selectedTask.id;
         taskStrip.selectedTaskBlock($scope.selectedTaskID);
 
     };
 
     $scope.deselectTasks = function () {
-        $scope.selectedTaskDetail = null;
+        $scope.selectedTask = null;
         $scope.selectedTaskID = null;
         console.log($scope.selectedTaskID);
     };
@@ -183,7 +176,7 @@ export function LinearViewController($scope, $timeout, $rootScope) {
     };
 
     $scope.selectTaskAfter = function () {
-        var key = $scope.selectedTaskDetail.afterward;
+        var key = $scope.selectedTask.afterward;
         if (key) {
             var insertTaskFunction = "insert" + key + "Task";
             if (insertTaskFunction in $scope) {
@@ -194,22 +187,20 @@ export function LinearViewController($scope, $timeout, $rootScope) {
         }
     };
 
-    $scope.$watch('selectedTaskDetail.emoji', function () {
-        var newEmoji = $scope.selectedTaskDetail.emoji;
+    $scope.$watch('selectedTask.emoji', function () {
+        var newEmoji = $scope.selectedTask.emoji;
         if (newEmoji) {
             $scope.taskManager.updateTasks();
         }
     });
 
-    $scope.$watch('selectedTaskDetail.angleSize', function () {
-        var newTimeAllotment = $scope.selectedTaskDetail.angleSize;
-        if (newTimeAllotment) {
-            var slice = $scope.taskDonuts[0].slices[$scope.selectedTaskID];
-            slice.update({
-                angleSize: newTimeAllotment
-            });
-            console.log("Angle " + newTimeAllotment + " Minutes: " + PiUtilities.toMinutes(newTimeAllotment));
-        }
+    $scope.$watch('selectedTask.tempData.allotment', function () {
+        var newTimeAllotment = $scope.selectedTask.tempData.allotment;
+
+        $scope.selectedTask.end = moment($scope.selectedTask.start).add(newTimeAllotment, 'm').format();
+        $scope.taskManager.updateTasks();
+
+        console.log(newTimeAllotment);
     });
 
     var prevIndex;

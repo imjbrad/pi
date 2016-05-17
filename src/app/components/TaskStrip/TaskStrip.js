@@ -195,7 +195,6 @@ export function TaskStrip(svgArea, _taskManager) {
             name: "",
             start: PiUtilities.toTimeOfDayFromLinearPosition0to1(startingPosition, self.scale.min, self.scale.max),
             end: PiUtilities.toTimeOfDayFromLinearPosition0to1(scaled_mx + halfSize, self.scale.min, self.scale.max),
-            emoji: '1f3c0.png',
             tempData: {}
         });
 

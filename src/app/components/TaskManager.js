@@ -25,7 +25,7 @@ export function TaskManager(_dayDataObject) {
 
     var updateOptions = {};
 
-    self.MINIMUM_TASK_SIZE = 15;
+    self.MINIMUM_TASK_SIZE = 5;
 
     function init(_dayDataObject) {
 
@@ -132,10 +132,9 @@ export function TaskManager(_dayDataObject) {
     }
 
     function ___taskWouldBeTooSmall(task) {
-        var MINIMUM = 10;
         var taskSize = PiUtilities.taskSize(task.start, task.end);
-        if (taskSize < MINIMUM) {
-            console.log("Task can't be too smaller than " + MINIMUM + " minimum", taskSize);
+        if (taskSize < self.MINIMUM_TASK_SIZE) {
+            console.log("Task can't be too smaller than " + self.MINIMUM_TASK_SIZE + "minute minimum", taskSize);
             return true;
         }
         return false
